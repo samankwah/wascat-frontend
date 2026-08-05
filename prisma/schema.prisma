@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ReleaseStatus {
+  DRAFT
+  PUBLISHED
+  RETIRED
+}
+
+model Collection {
+  id          String    @id @default(uuid()) @db.Uuid
+  slug        String    @unique
+  title       String
+  description String    @db.Text
+  license     String
+  citation    String    @db.Text
+  methodsUrl  String?
+  publicationUrl String?
+  createdAt   DateTime  @default(now())
+  releases    Release[]
+}
+
+model Release {
+  id             String        @id @default(uuid()) @db.Uuid
+  collectionId   String        @db.Uuid
+  collection     Collection    @relation(fields: [collectionId], references: [id])
+  version        String
+  status         ReleaseStatus @default(DRAFT)
+  current        Boolean       @default(false)
+  publishedAt    DateTime?
+  captureStart   DateTime?
+  captureEnd     DateTime?
+  bundleUrl      String?
+  bundleChecksum String?
+  metadata       Json?
+  createdAt      DateTime      @default(now())
+  images         ImageRecord[]
+
+  @@unique([collectionId, version])
+  @@index([collectionId, current])
+}
+
+model ImageRecord {
+  id           String   @id
+  releaseId    String   @db.Uuid
+  release      Release  @relation(fields: [releaseId], references: [id])
+  capturedAt   DateTime
+  latitude     Decimal? @db.Decimal(9, 6)
+  longitude    Decimal? @db.Decimal(9, 6)
+  location     String?
+  skyClass     String?
+  season       String?
+  timeOfDay    String?
+  conditionTags String[]
+  width        Int
+  height       Int
+  instrument   String?
+  provenance   Json
+  custom       Json?
+  searchText   String   @db.Text
+  artifacts    Artifact[]
+
+  @@index([releaseId, capturedAt])
+  @@index([skyClass, season, timeOfDay])
+  @@index([location])
+}
+
+model Artifact {
+  id         String      @id @default(uuid()) @db.Uuid
+  imageId    String
+  image      ImageRecord @relation(fields: [imageId], references: [id])
+  type       String
+  mediaType  String
+  objectKey  String
+  publicUrl  String
+  checksum   String
+  bytes      BigInt
+  width      Int?
+  height     Int?
+  metadata   Json?
+
+  @@unique([imageId, type])
+  @@index([type])
+}

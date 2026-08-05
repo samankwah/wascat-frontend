@@ -1,0 +1,19 @@
+import type { Metadata } from "next";
+import { CollectionCard } from "@/components/collection-card";
+import { collections } from "@/lib/catalog";
+
+export const metadata: Metadata = { title: "Collections", description: "Three West African demonstration sky collections represented across Ghana, Nigeria, and Burkina Faso." };
+
+export default function CollectionsPage() {
+  return (
+    <>
+      <section className="bg-[#102f41] py-16 text-white md:py-24">
+        <div className="container-shell grid gap-8 md:grid-cols-[1.15fr_.85fr] md:items-end"><div><p className="eyebrow text-[#91c8e2]">WEST AFRICAN DEMONSTRATION DATA</p><h1 className="display mt-4 text-5xl md:text-7xl">Three places, one transparent archive.</h1></div><p className="max-w-lg leading-7 text-[#bdd0da]">Kumasi, Lagos, and Ouagadougou anchor expert-labelled fixture collections. Numbered demonstration releases show how downloads and citations can retain stable meaning.</p></div>
+      </section>
+      <section className="container-shell py-16 md:py-24">
+        <div className="grid gap-14 md:grid-cols-3 md:gap-7">{collections.map((collection) => <CollectionCard collection={collection} key={collection.slug} />)}</div>
+      </section>
+      <section className="border-t border-[#d7e2e9] bg-[#eaf4f8] py-12"><div className="container-shell grid gap-5 md:grid-cols-[1fr_2fr]"><p className="eyebrow text-sky">RELEASE POLICY</p><p className="max-w-3xl text-sm leading-6 text-muted">Published data is immutable. When processing or metadata changes, maintainers issue a new numbered release and retain earlier releases for reproducibility. One release is marked current for convenience.</p></div></section>
+    </>
+  );
+}
