@@ -4,8 +4,8 @@ import { Header } from "@/components/header";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: { default: "WASCAT v1.0 — West African Sky Archive", template: "%s · WASCAT v1.0" },
-  description: "Explore an expert-labelled demonstration archive of West African skies represented across Ghana, Nigeria, and Burkina Faso.",
+  title: { default: "WASCAT — All-Sky Cloud Segmentation Archive", template: "%s · WASCAT" },
+  description: "All-sky camera frames paired with their binary cloud-segmentation masks, with cloud cover measured from each mask.",
   metadataBase: new URL("https://wascat.example.org"),
 };
 

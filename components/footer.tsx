@@ -8,7 +8,7 @@ export function Footer() {
       <div className="container-shell grid grid-cols-2 gap-x-7 gap-y-10 py-12 md:grid-cols-[1.4fr_1fr_1fr] md:py-14">
         <div className="col-span-2 md:col-span-1">
           <Logo inverse />
-          <p className="mt-5 max-w-sm text-sm leading-6 text-[#b8cad4]">An expert-labelled demonstration archive of West African sky imagery and processed artifacts for research, teaching, and public discovery.</p>
+          <p className="mt-5 max-w-sm text-sm leading-6 text-[#b8cad4]">An archive of all-sky camera frames and their cloud-segmentation masks, with cloud cover measured from the imagery itself.</p>
         </div>
         <div>
           <p className="eyebrow text-[#94acb9]">Archive</p>
@@ -26,7 +26,7 @@ export function Footer() {
       </div>
       <div className="border-t border-white/15">
         <div className="container-shell flex flex-col gap-2 py-5 text-xs text-[#94acb9] sm:flex-row sm:justify-between">
-          <p>© 2026 WASCAT v1.0 Demonstration Archive</p><p>West Africa · Versioned fixtures · Transparent methods</p>
+          <p>© 2026 WASCAT</p><p>Measured cloud cover · Versioned releases · Checksummed artifacts</p>
         </div>
       </div>
     </footer>

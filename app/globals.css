@@ -107,11 +107,6 @@ button, a, input, select { -webkit-tap-highlight-color: transparent; }
 .image-zoom img { transition: transform .5s cubic-bezier(.2,.7,.2,1); }
 .image-zoom:hover img { transform: scale(1.035); }
 
-.artifact-mask {
-  background: radial-gradient(circle at 52% 46%, rgba(217,238,157,.76) 0 16%, transparent 17%), radial-gradient(circle at 72% 38%, rgba(217,238,157,.7) 0 13%, transparent 14%), radial-gradient(circle at 39% 57%, rgba(217,238,157,.75) 0 20%, transparent 21%);
-  mix-blend-mode: screen;
-}
-
 @media (max-width: 767px) {
   .container-shell { width: min(100% - 28px, 1220px); }
 }

@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Check, Database, Image as ImageIcon, Layers3, MapPin, Search } from "lucide-react";
 import { CollectionCard } from "@/components/collection-card";
-import { archiveImageTotal, collections, seasons, skyClasses, timesOfDay } from "@/lib/catalog";
+import { archiveImageTotal, collections, oktaValues, videoIds } from "@/lib/catalog";
 
 export default function HomePage() {
   return (
@@ -54,9 +54,9 @@ export default function HomePage() {
               <Search size={24} strokeWidth={1.75} className="pointer-events-none absolute left-4 top-3.5 text-[#526d80]" aria-hidden="true" />
               <input name="q" type="search" className="field-input hero-search-control search-field-input" placeholder="Search by date, class or condition" />
             </label>
-            <label className="hero-filter-label"><span className="field-label text-[#526879]">Sky class</span><select name="class" className="field-select hero-search-control" defaultValue=""><option value="">All classes</option>{skyClasses.map((skyClass) => <option key={skyClass}>{skyClass}</option>)}</select></label>
-            <label className="hero-filter-label"><span className="field-label text-[#526879]">Season</span><select name="season" className="field-select hero-search-control" defaultValue=""><option value="">All seasons</option>{seasons.map((season) => <option key={season}>{season}</option>)}</select></label>
-            <label className="hero-filter-label"><span className="field-label text-[#526879]">Time of day</span><select name="time" className="field-select hero-search-control" defaultValue=""><option value="">All times</option>{timesOfDay.map((time) => <option key={time}>{time}</option>)}</select></label>
+            <label className="hero-filter-label"><span className="field-label text-[#526879]">Sequence</span><select name="video" className="field-select hero-search-control" defaultValue=""><option value="">All sequences</option>{videoIds.map((videoId) => <option key={videoId}>{videoId}</option>)}</select></label>
+            <label className="hero-filter-label"><span className="field-label text-[#526879]">Min cloud cover</span><select name="oktasMin" className="field-select hero-search-control" defaultValue=""><option value="">Any</option>{oktaValues.map((okta) => <option key={okta} value={okta}>{okta}/8</option>)}</select></label>
+            <label className="hero-filter-label"><span className="field-label text-[#526879]">Max cloud cover</span><select name="oktasMax" className="field-select hero-search-control" defaultValue=""><option value="">Any</option>{oktaValues.map((okta) => <option key={okta} value={okta}>{okta}/8</option>)}</select></label>
             <button type="submit" className="inline-flex h-[50px] items-center justify-center self-end whitespace-nowrap rounded-[7px] bg-[#0b83c9] px-5 text-sm font-bold text-white transition-colors hover:bg-[#076da9] sm:col-span-2 lg:col-span-1">Explore archive</button>
           </form>
         </div>
@@ -69,8 +69,8 @@ export default function HomePage() {
           </div>
           <div className="flex min-h-[64px] items-center gap-5 border-t border-[#bcd3e1] pt-5 sm:justify-center sm:border-l sm:border-t-0 sm:px-7 sm:pt-0">
             <Layers3 size={43} strokeWidth={1.25} className="shrink-0 text-[#1688c9]" aria-hidden="true" />
-            <strong className="display text-[2rem] font-normal text-[#102433]">{skyClasses.length}</strong>
-            <span className="text-[.66rem] font-bold uppercase tracking-[.14em] text-[#40576a]">Classes</span>
+            <strong className="display text-[2rem] font-normal text-[#102433]">{videoIds.length}</strong>
+            <span className="text-[.66rem] font-bold uppercase tracking-[.14em] text-[#40576a]">Sequences</span>
           </div>
           <div className="flex min-h-[64px] items-center gap-5 border-t border-[#bcd3e1] pt-5 sm:justify-end sm:border-l sm:border-t-0 sm:pl-7 sm:pt-0">
             <MapPin size={43} strokeWidth={1.25} className="shrink-0 text-[#1688c9]" aria-hidden="true" />

@@ -1,6 +1,26 @@
+# dependencies
 node_modules
+
+# next.js build output
 .next
+next-env.d.ts
+
+# typescript incremental build cache
+*.tsbuildinfo
+
+# environment
 .env
 .env.local
+.env*.local
+
+# test / tooling output
 coverage
+test-results
+playwright-report
 *.log
+
+# Generated catalogue data and frame imagery.
+# These are owned by wascat-backend (Postgres + object storage) and are only
+# present here transiently while migrating off the bundled JSON catalogue.
+/data
+/public/frames

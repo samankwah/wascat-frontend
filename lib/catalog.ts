@@ -1,55 +1,69 @@
-export const artifactTypes = ["source", "thumbnail", "mask", "overlay"] as const;
-export const skyClasses = [
-  "Clear",
-  "Cirrus",
-  "Altocumulus",
-  "Altostratus",
-  "Stratus",
-  "Stratocumulus",
-  "Cumulus",
-  "Cumulonimbus",
-  "Mixed",
-] as const;
-export const seasons = ["Harmattan", "Dry season", "Wet season", "Transition"] as const;
-export const timesOfDay = ["Morning", "Midday", "Afternoon", "Evening"] as const;
+import generated from "@/data/catalog.generated.json";
+import { oktaLabel, oktasFromFraction, type Okta, type Season, type TimeOfDay } from "./vocab";
 
-export type ArtifactType = (typeof artifactTypes)[number];
-export type SkyClass = (typeof skyClasses)[number];
-export type Season = (typeof seasons)[number];
-export type TimeOfDay = (typeof timesOfDay)[number];
+export { artifactTypes, oktaValues, oktaLabel, oktasFromFraction, seasons, timesOfDay } from "./vocab";
+export type { ArtifactType, Okta, Season, TimeOfDay } from "./vocab";
 
 export type Artifact = {
-  type: ArtifactType;
+  type: "source" | "mask";
   url: string;
+  objectKey: string;
   bytes: number;
   checksum: string;
+  mediaType: string;
 };
 
 export type ImageRecord = {
   id: string;
   collection: string;
   release: string;
-  capturedAt: string;
-  location: string;
-  skyClass: SkyClass;
-  season: Season;
-  timeOfDay: TimeOfDay;
+  /** Capture sequence the frame belongs to, e.g. "vid7". */
+  videoId: string;
+  /** Position of the frame within its sequence. */
+  frameIndex: number;
+  /**
+   * Measured cloud cover as a share of the camera's circular field of view, and
+   * the same measurement in oktas (eighths of sky), the synoptic convention.
+   * Both are absent on frames that have not been segmented: cloud cover comes
+   * from the mask, so with no mask there is no measurement to report.
+   */
+  cloudFraction?: number;
+  cloudCoverOktas?: Okta;
+  /**
+   * Scale at which the mask was delivered relative to its source frame. 1 for
+   * every correctly registered sequence; >1 where the mask was rendered larger
+   * than the frame it segments, in which case the viewer must scale it back to
+   * line the two up.
+   */
+  maskScale: number;
   width: number;
   height: number;
-  instrument: string;
+  /** Primary image for listings: the source frame when delivered, else the mask. */
   image: string;
+  sourceUrl?: string;
+  maskUrl?: string;
+  hasSource: boolean;
+  hasMask: boolean;
   alt: string;
   tags: string[];
   artifacts: Artifact[];
+  /** Stable ordering key: real timestamp when known, sequence position otherwise. */
+  sortKey: string;
+  // Present only when the capture team has supplied provenance for the sequence.
+  capturedAt?: string;
+  location?: string;
+  coordinates?: { latitude: number; longitude: number };
+  season?: Season;
+  timeOfDay?: TimeOfDay;
+  instrument?: string;
 };
 
 export type Release = {
   version: string;
-  publishedAt: string;
   images: number;
   size: string;
   current: boolean;
-  checksum: string;
+  publishedAt?: string;
 };
 
 export type Collection = {
@@ -58,151 +72,194 @@ export type Collection = {
   shortTitle: string;
   kicker: string;
   description: string;
-  locationName: string;
-  location: string;
   coverage: string;
-  instrument: string;
-  image: string;
-  imageAlt: string;
+  videoIds: string[];
   images: number;
   artifacts: number;
-  license: string;
-  citation: string;
-  doi?: string;
+  withSource: number;
+  /** Records carrying a mask, and therefore a measured cloud cover. */
+  segmented: number;
+  image: string;
+  imageAlt: string;
   releases: Release[];
+  // Editorial metadata, present only once supplied in data/provenance.json.
+  locationName?: string;
+  location?: string;
+  coordinates?: { latitude: number; longitude: number };
+  instrument?: string;
+  license?: string;
+  citation?: string;
+  doi?: string;
 };
 
-const sha = "e31f942c8a124172b73f50c682ba9481bf34eb3a62869a337170b335b63f4812";
+type GeneratedImage = (typeof generated)["images"][number];
+type GeneratedCollection = (typeof generated)["collections"][number];
 
-export const collections: Collection[] = [
-  {
-    slug: "kumasi-convective-skies",
-    title: "Kumasi Convective Skies",
-    shortTitle: "Kumasi Convective Skies",
-    kicker: "HUMID-FOREST CONVECTION · GHANA",
-    description: "An expert-labelled demonstration collection of humid-forest convection, layered cloud, and urban sky conditions represented around Kumasi.",
-    locationName: "Kumasi, Ghana",
-    location: "Kumasi, Ghana · 6.6885° N, 1.6244° W",
-    coverage: "January 2023 — June 2026 · demonstration",
-    instrument: "Demonstration fixed-view RGB camera profile · 2,048 × 1,536 px",
-    image: "/images/kumasi-hero.png",
-    imageAlt: "Bright cumulus clouds above the green urban skyline of Kumasi, Ghana.",
-    images: 10842,
-    artifacts: 32526,
-    license: "Creative Commons Attribution 4.0 International",
-    citation: "WASCAT Demonstration Archive (2026). Kumasi Convective Skies, release 1.0. Expert-labelled demonstration records; not an operational dataset.",
-    releases: [
-      { version: "1.0", publishedAt: "2026-07-15", images: 10842, size: "21.7 GB (est.)", current: true, checksum: sha },
-    ],
-  },
-  {
-    slug: "gulf-of-guinea-coastal-clouds",
-    title: "Gulf of Guinea Coastal Clouds",
-    shortTitle: "Gulf of Guinea Coastal Clouds",
-    kicker: "COASTAL LOW CLOUD · NIGERIA",
-    description: "An expert-labelled demonstration collection of coastal low cloud, marine haze, and aerosol-influenced skies represented around Lagos.",
-    locationName: "Lagos, Nigeria",
-    location: "Lagos, Nigeria · 6.5244° N, 3.3792° E",
-    coverage: "March 2023 — June 2026 · demonstration",
-    instrument: "Demonstration coastal RGB camera profile · 1,536 × 1,152 px",
-    image: "/images/lagos-coastal-clouds.png",
-    imageAlt: "Low coastal cloud and humid marine haze above the Lagos shoreline in Nigeria.",
-    images: 7426,
-    artifacts: 22278,
-    license: "Creative Commons Attribution 4.0 International",
-    citation: "WASCAT Demonstration Archive (2026). Gulf of Guinea Coastal Clouds, release 1.0. Expert-labelled demonstration records; not an operational dataset.",
-    releases: [
-      { version: "1.0", publishedAt: "2026-07-15", images: 7426, size: "14.9 GB (est.)", current: true, checksum: sha },
-    ],
-  },
-  {
-    slug: "sahel-sky-observatory",
-    title: "Sahel Sky Observatory",
-    shortTitle: "Sahel Sky Observatory",
-    kicker: "DUST & SEASONAL CONVECTION · BURKINA FASO",
-    description: "An expert-labelled demonstration collection of Sahelian dust, high cloud, and seasonal convection represented around Ouagadougou.",
-    locationName: "Ouagadougou, Burkina Faso",
-    location: "Ouagadougou, Burkina Faso · 12.3714° N, 1.5197° W",
-    coverage: "December 2023 — June 2026 · demonstration",
-    instrument: "Demonstration dryland RGB camera profile · 1,536 × 1,152 px",
-    image: "/images/ouagadougou-sahel-sky.png",
-    imageAlt: "High cirrus, distant convection, and dust-filtered light over a dry Sahel landscape near Ouagadougou, Burkina Faso.",
-    images: 4701,
-    artifacts: 14103,
-    license: "Creative Commons Attribution 4.0 International",
-    citation: "WASCAT Demonstration Archive (2026). Sahel Sky Observatory, release 1.0. Expert-labelled demonstration records; not an operational dataset.",
-    releases: [
-      { version: "1.0", publishedAt: "2026-07-15", images: 4701, size: "9.4 GB (est.)", current: true, checksum: sha },
-    ],
-  },
-];
+const bytesToSize = (bytes: number) => {
+  if (bytes >= 1024 ** 3) return `${(bytes / 1024 ** 3).toFixed(1)} GB`;
+  if (bytes >= 1024 ** 2) return `${(bytes / 1024 ** 2).toFixed(1)} MB`;
+  return `${(bytes / 1024).toFixed(0)} KB`;
+};
 
-export const locations = collections.map((collection) => collection.locationName);
-export const archiveImageTotal = collections.reduce((total, collection) => total + collection.images, 0);
+const pad = (value: number, width: number) => String(value).padStart(width, "0");
 
-type ImageSeed = readonly [
-  id: string,
-  collection: string,
-  release: string,
-  capturedAt: string,
-  location: string,
-  skyClass: SkyClass,
-  season: Season,
-  timeOfDay: TimeOfDay,
-  image: string,
-  tags: readonly string[],
-];
+function toRecord(image: GeneratedImage): ImageRecord {
+  const artifacts: Artifact[] = image.artifacts.map((artifact) => ({
+    type: artifact.type as "source" | "mask",
+    url: artifact.publicUrl,
+    objectKey: artifact.objectKey,
+    bytes: artifact.bytes,
+    checksum: artifact.checksum,
+    mediaType: artifact.mediaType,
+  }));
+  const sourceUrl = artifacts.find((artifact) => artifact.type === "source")?.url;
+  const maskUrl = artifacts.find((artifact) => artifact.type === "mask")?.url;
+  const measured = image as Partial<{ cloudFraction: number }>;
+  const oktas =
+    measured.cloudFraction === undefined ? undefined : (oktasFromFraction(measured.cloudFraction) as Okta);
+  const sequenceKey = `${pad(Number(image.videoId.slice(3)), 3)}-${pad(image.frameIndex, 7)}`;
+  const optional = image as Partial<{
+    capturedAt: string;
+    location: string;
+    coordinates: { latitude: number; longitude: number };
+    season: Season;
+    timeOfDay: TimeOfDay;
+    instrument: string;
+  }>;
 
-const seeds: readonly ImageSeed[] = [
-  ["WAS-KMS-20250523-154200", "kumasi-convective-skies", "1.0", "2025-05-23T15:42:00Z", "Kumasi, Ghana", "Cumulonimbus", "Wet season", "Afternoon", "/images/kumasi-hero.png", ["deep convection", "urban horizon"]],
-  ["WAS-KMS-20240718-121530", "kumasi-convective-skies", "1.0", "2024-07-18T12:15:30Z", "Kumasi, Ghana", "Cumulus", "Wet season", "Midday", "/images/kumasi-hero.png", ["humid forest", "towering"]],
-  ["WAS-KMS-20250311-092600", "kumasi-convective-skies", "1.0", "2025-03-11T09:26:00Z", "Kumasi, Ghana", "Altocumulus", "Transition", "Morning", "/images/kumasi-hero.png", ["broken field", "moisture return"]],
-  ["WAS-KMS-20241009-173800", "kumasi-convective-skies", "1.0", "2024-10-09T17:38:00Z", "Kumasi, Ghana", "Mixed", "Transition", "Evening", "/images/kumasi-hero.png", ["layered", "urban sky"]],
-  ["WAS-KMS-20250127-100400", "kumasi-convective-skies", "1.0", "2025-01-27T10:04:00Z", "Kumasi, Ghana", "Clear", "Dry season", "Morning", "/images/kumasi-hero.png", ["low cloud fraction", "dry air"]],
-  ["WAS-KMS-20230615-081900", "kumasi-convective-skies", "1.0", "2023-06-15T08:19:00Z", "Kumasi, Ghana", "Altostratus", "Wet season", "Morning", "/images/kumasi-hero.png", ["layered deck", "diffuse light"]],
-  ["WAS-LOS-20250602-071200", "gulf-of-guinea-coastal-clouds", "1.0", "2025-06-02T07:12:00Z", "Lagos, Nigeria", "Stratus", "Wet season", "Morning", "/images/lagos-coastal-clouds.png", ["coastal low cloud", "humid haze"]],
-  ["WAS-LOS-20240819-104500", "gulf-of-guinea-coastal-clouds", "1.0", "2024-08-19T10:45:00Z", "Lagos, Nigeria", "Stratocumulus", "Wet season", "Morning", "/images/lagos-coastal-clouds.png", ["marine deck", "broken low cloud"]],
-  ["WAS-LOS-20250417-160800", "gulf-of-guinea-coastal-clouds", "1.0", "2025-04-17T16:08:00Z", "Lagos, Nigeria", "Mixed", "Transition", "Afternoon", "/images/lagos-coastal-clouds.png", ["aerosol veil", "coastal transition"]],
-  ["WAS-LOS-20250114-134100", "gulf-of-guinea-coastal-clouds", "1.0", "2025-01-14T13:41:00Z", "Lagos, Nigeria", "Altostratus", "Harmattan", "Midday", "/images/lagos-coastal-clouds.png", ["dry haze", "diffuse sun"]],
-  ["WAS-LOS-20241206-152900", "gulf-of-guinea-coastal-clouds", "1.0", "2024-12-06T15:29:00Z", "Lagos, Nigeria", "Clear", "Dry season", "Afternoon", "/images/lagos-coastal-clouds.png", ["marine haze", "low cloud fraction"]],
-  ["WAS-LOS-20230922-120600", "gulf-of-guinea-coastal-clouds", "1.0", "2023-09-22T12:06:00Z", "Lagos, Nigeria", "Cumulus", "Wet season", "Midday", "/images/lagos-coastal-clouds.png", ["coastal convection", "humid boundary layer"]],
-  ["WAS-OUA-20250108-093300", "sahel-sky-observatory", "1.0", "2025-01-08T09:33:00Z", "Ouagadougou, Burkina Faso", "Clear", "Harmattan", "Morning", "/images/ouagadougou-sahel-sky.png", ["mineral dust", "reduced visibility"]],
-  ["WAS-OUA-20250226-164800", "sahel-sky-observatory", "1.0", "2025-02-26T16:48:00Z", "Ouagadougou, Burkina Faso", "Cirrus", "Dry season", "Afternoon", "/images/ouagadougou-sahel-sky.png", ["high cloud", "dust-filtered light"]],
-  ["WAS-OUA-20240421-102700", "sahel-sky-observatory", "1.0", "2024-04-21T10:27:00Z", "Ouagadougou, Burkina Faso", "Altocumulus", "Transition", "Morning", "/images/ouagadougou-sahel-sky.png", ["moisture return", "mid-level cloud"]],
-  ["WAS-OUA-20240730-181500", "sahel-sky-observatory", "1.0", "2024-07-30T18:15:00Z", "Ouagadougou, Burkina Faso", "Cumulonimbus", "Wet season", "Evening", "/images/ouagadougou-sahel-sky.png", ["seasonal convection", "distant tower"]],
-  ["WAS-OUA-20250512-144400", "sahel-sky-observatory", "1.0", "2025-05-12T14:44:00Z", "Ouagadougou, Burkina Faso", "Mixed", "Transition", "Afternoon", "/images/ouagadougou-sahel-sky.png", ["dust", "developing convection"]],
-  ["WAS-OUA-20231218-113800", "sahel-sky-observatory", "1.0", "2023-12-18T11:38:00Z", "Ouagadougou, Burkina Faso", "Altostratus", "Harmattan", "Morning", "/images/ouagadougou-sahel-sky.png", ["dust layer", "high overcast"]],
-];
-
-export const images: ImageRecord[] = seeds.map((seed, index) => {
-  const collection = collections.find((item) => item.slug === seed[1]);
   return {
-    id: seed[0],
-    collection: seed[1],
-    release: seed[2],
-    capturedAt: seed[3],
-    location: seed[4],
-    skyClass: seed[5],
-    season: seed[6],
-    timeOfDay: seed[7],
-    width: index < 6 ? 2048 : 1536,
-    height: index < 6 ? 1536 : 1152,
-    instrument: collection?.instrument.split(" · ")[0] ?? "Demonstration camera profile",
-    image: seed[8],
-    alt: `${seed[5]} sky observation representing expert-labelled demonstration data for ${seed[4]} on ${new Date(seed[3]).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}.`,
-    tags: [...seed[9]],
-    artifacts: artifactTypes.map((type, artifactIndex) => ({
-      type,
-      url: seed[8],
-      bytes: 1895517 - artifactIndex * 245300,
-      checksum: sha,
-    })),
+    id: image.id,
+    collection: image.collection,
+    release: image.release,
+    videoId: image.videoId,
+    frameIndex: image.frameIndex,
+    ...(measured.cloudFraction === undefined
+      ? {}
+      : { cloudFraction: measured.cloudFraction, cloudCoverOktas: oktas }),
+    maskScale: image.maskScale,
+    width: image.width,
+    height: image.height,
+    image: (sourceUrl ?? maskUrl)!,
+    sourceUrl,
+    maskUrl,
+    hasSource: Boolean(sourceUrl),
+    hasMask: Boolean(maskUrl),
+    alt: sourceUrl
+      ? `All-sky camera frame ${image.frameIndex} of sequence ${image.videoId}${
+          oktas === undefined ? ", not yet segmented" : `, measured at ${oktaLabel(oktas)} cloud cover`
+        }.`
+      : `Binary cloud segmentation mask for frame ${image.frameIndex} of sequence ${image.videoId}, measured at ${oktaLabel(oktas!)} cloud cover.`,
+    tags: [
+      image.videoId,
+      ...(oktas === undefined ? ["unsegmented"] : [oktaLabel(oktas)]),
+      sourceUrl && maskUrl ? "source + mask" : maskUrl ? "mask only" : "source only",
+    ],
+    artifacts,
+    sortKey: optional.capturedAt ?? sequenceKey,
+    ...(optional.capturedAt ? { capturedAt: optional.capturedAt } : {}),
+    ...(optional.location ? { location: optional.location } : {}),
+    ...(optional.coordinates ? { coordinates: optional.coordinates } : {}),
+    ...(optional.season ? { season: optional.season } : {}),
+    ...(optional.timeOfDay ? { timeOfDay: optional.timeOfDay } : {}),
+    ...(optional.instrument ? { instrument: optional.instrument } : {}),
   };
-});
+}
+
+export const images: ImageRecord[] = (generated.images as GeneratedImage[]).map(toRecord);
+
+const imagesByCollection = new Map<string, ImageRecord[]>();
+for (const image of images) {
+  const list = imagesByCollection.get(image.collection) ?? [];
+  list.push(image);
+  imagesByCollection.set(image.collection, list);
+}
+
+function toCollection(collection: GeneratedCollection): Collection {
+  const members = imagesByCollection.get(collection.slug) ?? [];
+  // Prefer a fully paired frame for the cover so the sequence is shown at its best.
+  const cover =
+    members.find((image) => image.hasSource && image.hasMask) ??
+    members.find((image) => image.hasSource) ??
+    members[0];
+  const sourceOnly = collection.images - collection.segmented;
+  const maskOnly = collection.images - collection.withSource;
+  const frames = members.map((image) => image.frameIndex);
+  const editorial = collection as Partial<{
+    locationName: string;
+    coordinates: { latitude: number; longitude: number };
+    instrument: string;
+    license: string;
+    citation: string;
+    doi: string;
+  }>;
+  const sequenceLabel = collection.videoIds.join(", ");
+
+  return {
+    slug: collection.slug,
+    title: editorial.locationName ?? `Capture sequence ${sequenceLabel}`,
+    shortTitle: editorial.locationName ?? sequenceLabel,
+    kicker: `ALL-SKY CLOUD SEGMENTATION · ${sequenceLabel.toUpperCase()}`,
+    description: [
+      `${collection.images.toLocaleString()} all-sky frames from capture sequence ${sequenceLabel}. `,
+      `${collection.segmented.toLocaleString()} carry a binary cloud mask and a measured cloud cover`,
+      maskOnly > 0 ? `, ${maskOnly.toLocaleString()} of them without the source frame` : "",
+      ".",
+      sourceOnly > 0
+        ? ` A further ${sourceOnly.toLocaleString()} frames are sampled evenly from the rest of the sequence and have not been segmented yet.`
+        : "",
+    ].join(""),
+    coverage: frames.length
+      ? `Frames ${Math.min(...frames).toLocaleString()}–${Math.max(...frames).toLocaleString()} · ${collection.segmented.toLocaleString()} of ${collection.images.toLocaleString()} segmented`
+      : "No frames",
+    videoIds: collection.videoIds,
+    images: collection.images,
+    artifacts: collection.artifacts,
+    withSource: collection.withSource,
+    segmented: collection.segmented,
+    image: cover?.image ?? "",
+    imageAlt: cover?.alt ?? "",
+    releases: [
+      { version: generated.release, images: collection.images, size: bytesToSize(collection.bytes), current: true },
+    ],
+    ...(editorial.locationName
+      ? {
+          locationName: editorial.locationName,
+          location: editorial.coordinates
+            ? `${editorial.locationName} · ${editorial.coordinates.latitude}, ${editorial.coordinates.longitude}`
+            : editorial.locationName,
+        }
+      : {}),
+    ...(editorial.coordinates ? { coordinates: editorial.coordinates } : {}),
+    ...(editorial.instrument ? { instrument: editorial.instrument } : {}),
+    ...(editorial.license ? { license: editorial.license } : {}),
+    ...(editorial.citation ? { citation: editorial.citation } : {}),
+    ...(editorial.doi ? { doi: editorial.doi } : {}),
+  };
+}
+
+export const collections: Collection[] = (generated.collections as GeneratedCollection[]).map(toCollection);
+
+/** Capture sequences present in the catalogue, ordered numerically. */
+export const videoIds = [...new Set(images.map((image) => image.videoId))].sort(
+  (a, b) => Number(a.slice(3)) - Number(b.slice(3)),
+);
+
+/** Sites, once provenance supplies them. Empty until then — never guessed. */
+export const locations = [
+  ...new Set(images.map((image) => image.location).filter((value): value is string => Boolean(value))),
+].sort();
+
+export const archiveImageTotal = images.length;
+/** Records carrying a mask, and so a measured cloud cover. */
+export const segmentedImageTotal = images.filter((image) => image.hasMask).length;
+export const archiveCounts = generated.counts;
+export const maskRegistration = generated.maskRegistration;
+export const generatedAt = generated.generatedAt;
 
 export const collectionBySlug = (slug: string) => collections.find((collection) => collection.slug === slug);
 export const imageById = (id: string) => images.find((image) => image.id === id);
 export const collectionTitle = (slug: string) => collectionBySlug(slug)?.shortTitle ?? slug;
+export const imagesInCollection = (slug: string) => imagesByCollection.get(slug) ?? [];
 
 export const formatDate = (value: string, withTime = false) =>
   new Intl.DateTimeFormat("en-GB", {
@@ -211,3 +268,9 @@ export const formatDate = (value: string, withTime = false) =>
     year: "numeric",
     ...(withTime ? { hour: "2-digit", minute: "2-digit", timeZone: "UTC", timeZoneName: "short" } : {}),
   }).format(new Date(value));
+
+/** How a record is labelled in listings when there is no capture timestamp yet. */
+export const frameLabel = (image: ImageRecord) => `${image.videoId} · frame ${image.frameIndex.toLocaleString()}`;
+
+export const recordTimestamp = (image: ImageRecord) =>
+  image.capturedAt ? formatDate(image.capturedAt, true) : frameLabel(image);
