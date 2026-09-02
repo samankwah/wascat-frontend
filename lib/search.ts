@@ -52,9 +52,14 @@ export function filterImages(records: ImageRecord[], query: ImageQuery) {
         (!query.time || record.timeOfDay === query.time) &&
         (!query.location || (record.location ?? "").toLowerCase().includes(query.location.toLowerCase())) &&
         (!query.artifact || record.artifacts.some((artifact) => artifact.type === query.artifact)) &&
-        // Date filters only apply to records that carry a real capture timestamp.
-        (!query.from || (record.capturedAt ?? "").slice(0, 10) >= query.from) &&
-        (!query.to || (record.capturedAt ?? "").slice(0, 10) <= query.to),
+        // Date filters describe a capture time, so a record without one cannot
+        // satisfy them -- it is excluded rather than treated as an early date.
+        // Coalescing to "" would let every untimestamped record pass `to`,
+        // because "" sorts before any ISO date.
+        (query.from === undefined ||
+          (record.capturedAt !== undefined && record.capturedAt.slice(0, 10) >= query.from)) &&
+        (query.to === undefined ||
+          (record.capturedAt !== undefined && record.capturedAt.slice(0, 10) <= query.to)),
     )
     .sort((a, b) =>
       query.sort === "oldest" ? a.sortKey.localeCompare(b.sortKey) : b.sortKey.localeCompare(a.sortKey),

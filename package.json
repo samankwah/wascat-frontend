@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "import:release": "tsx scripts/import-release.ts",
-    "build:catalog": "tsx scripts/build-catalog.ts"
+    "build:catalog": "tsx scripts/build-catalog.ts",
+    "record:contract": "tsx scripts/record-contract.ts"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",

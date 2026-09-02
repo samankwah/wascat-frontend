@@ -53,6 +53,25 @@ describe("catalog filters and cursors", () => {
     }
   });
 
+  it("excludes frames without a capture timestamp from both date bounds", () => {
+    // Every record in the catalogue is untimestamped until the capture team
+    // supplies provenance, so neither bound may match any of them. Coalescing
+    // a missing timestamp to "" would let `to` match the entire archive,
+    // because "" sorts before every ISO date.
+    expect(filterImages(images, imageQuerySchema.parse({ from: "2024-01-01" }))).toHaveLength(0);
+    expect(filterImages(images, imageQuerySchema.parse({ to: "2030-01-01" }))).toHaveLength(0);
+
+    // A frame that does carry one is still bounded normally in both directions.
+    const dated = { ...images[0], id: "WAS-TEST-DATED", capturedAt: "2026-03-14T09:00:00.000Z" };
+    const pool = [dated, images[1]];
+    for (const query of [{ from: "2020-01-01" }, { to: "2030-01-01" }]) {
+      expect(filterImages(pool, imageQuerySchema.parse(query)).map((item) => item.id)).toEqual(["WAS-TEST-DATED"]);
+    }
+    for (const query of [{ from: "2027-01-01" }, { to: "2020-01-01" }]) {
+      expect(filterImages(pool, imageQuerySchema.parse(query))).toHaveLength(0);
+    }
+  });
+
   it("splits the catalog on whether a frame has been segmented", () => {
     const segmented = filterImages(images, imageQuerySchema.parse({ segmented: "true" }));
     const unsegmented = filterImages(images, imageQuerySchema.parse({ segmented: "false" }));
