@@ -35,14 +35,14 @@ export function ArtifactViewer({ record }: { record: ImageRecord }) {
             role="tab"
             aria-selected={tab === item}
             onClick={() => setTab(item)}
-            className={`min-h-12 border-b-2 px-5 text-xs font-bold ${tab === item ? "border-[#d9ee9d] text-white" : "border-transparent text-white/55 hover:text-white"}`}
+            className={`min-h-12 border-b-2 px-5 text-xs font-bold ${tab === item ? "border-lime text-white" : "border-transparent text-white/55 hover:text-white"}`}
           >
             {item}
           </button>
         ))}
       </div>
 
-      <div className="relative mt-5 aspect-[16/9] overflow-hidden bg-[#071c27]" role="tabpanel" aria-label={`${tab} view`}>
+      <div className="relative mt-5 aspect-[16/9] overflow-hidden bg-ink-abyss" role="tabpanel" aria-label={`${tab} view`}>
         {/* The source frame sits underneath for Source and Overlay. */}
         {tab !== "Mask" && record.sourceUrl && (
           <Image src={record.sourceUrl} alt={record.alt} fill priority sizes="(max-width: 1024px) 100vw, 70vw" className="object-contain" />
@@ -74,7 +74,7 @@ export function ArtifactViewer({ record }: { record: ImageRecord }) {
       {tab === "Overlay" && (
         <label className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
           <span className="eyebrow min-w-28 text-white/60">Mask opacity</span>
-          <input aria-label="Mask opacity" type="range" min="0" max="100" value={opacity} onChange={(event) => setOpacity(Number(event.target.value))} className="w-full accent-[#d9ee9d]" />
+          <input aria-label="Mask opacity" type="range" min="0" max="100" value={opacity} onChange={(event) => setOpacity(Number(event.target.value))} className="w-full accent-lime" />
           <output className="w-10 text-right font-mono text-xs text-white">{opacity}%</output>
         </label>
       )}

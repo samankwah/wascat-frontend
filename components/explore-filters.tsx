@@ -57,7 +57,7 @@ function Panel({
 }) {
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between border-b border-[#d7e2e9] pb-4">
+      <div className="flex items-center justify-between border-b border-line pb-4">
         <span className="flex items-center gap-2 text-sm font-bold"><SlidersHorizontal size={16} /> Filters</span>
         <button onClick={clear} className="text-xs font-bold text-sky hover:underline">Clear all</button>
       </div>
@@ -65,7 +65,7 @@ function Panel({
       <label>
         <span className="field-label">Search</span>
         <span className="relative block">
-          <Search size={18} strokeWidth={1.75} aria-hidden="true" className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#526d80]" />
+          <Search size={18} strokeWidth={1.75} aria-hidden="true" className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-dim" />
           <input className="field-input pl-11" defaultValue={value("q")} onBlur={(event) => update("q", event.target.value)} placeholder="Record ID, sequence, or frame" />
         </span>
       </label>
@@ -225,7 +225,7 @@ export function ExploreShell({
         </aside>
 
         <div>
-          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#d7e2e9] pb-5">
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-line pb-5">
             <p className="text-sm"><strong>{resultCount.toLocaleString()}</strong> record{resultCount === 1 ? "" : "s"} match</p>
             <div className="flex gap-2">
               <button onClick={() => setDrawerOpen(true)} className="button-secondary min-h-10 px-3 lg:hidden">
@@ -233,7 +233,7 @@ export function ExploreShell({
               </button>
               <label className="flex items-center gap-2 text-xs font-bold">
                 <span>Sort</span>
-                <select className="h-10 border border-[#b8c8d1] bg-white px-3" value={value("sort") || "newest"} onChange={(event) => update("sort", event.target.value === "newest" ? "" : event.target.value)}>
+                <select className="h-10 border border-field bg-white px-3" value={value("sort") || "newest"} onChange={(event) => update("sort", event.target.value === "newest" ? "" : event.target.value)}>
                   <option value="newest">Latest first</option>
                   <option value="oldest">Earliest first</option>
                 </select>
@@ -242,9 +242,9 @@ export function ExploreShell({
           </div>
 
           {active.length > 0 && (
-            <div className="flex flex-wrap gap-2 border-b border-[#d7e2e9] py-4" aria-label="Active filters">
+            <div className="flex flex-wrap gap-2 border-b border-line py-4" aria-label="Active filters">
               {active.map((field) => (
-                <button key={field} onClick={() => update(field, "")} className="flex items-center gap-1.5 rounded-full bg-[#eaf4f8] px-3 py-1.5 text-xs font-bold text-[#155778]">
+                <button key={field} onClick={() => update(field, "")} className="flex items-center gap-1.5 rounded-full bg-sky-pale px-3 py-1.5 text-xs font-bold text-sky-dark">
                   {chipLabels[field]}:{" "}
                   {field === "collection"
                     ? collectionLabel(value(field))
@@ -263,7 +263,7 @@ export function ExploreShell({
 
       {drawerOpen && (
         <div className="fixed inset-0 z-[80] lg:hidden" role="dialog" aria-modal="true" aria-label="Image filters">
-          <button aria-label="Close filters" className="absolute inset-0 bg-[#071b27]/60" onClick={() => setDrawerOpen(false)} />
+          <button aria-label="Close filters" className="absolute inset-0 bg-ink-abyss/60" onClick={() => setDrawerOpen(false)} />
           <div className="absolute bottom-0 right-0 top-0 w-[min(90vw,390px)] overflow-y-auto bg-white p-6 shadow-2xl">
             <div className="mb-5 flex items-center justify-between">
               <h2 className="display text-2xl">Filter records</h2>

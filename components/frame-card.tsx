@@ -13,7 +13,7 @@ export function FrameCard({ image, priority = false }: { image: ImageRecord; pri
   return (
     <article className="group">
       <Link href={`/images/${image.id}`}>
-        <div className="image-zoom relative aspect-[16/9] bg-[#dbe7ec]">
+        <div className="image-zoom relative aspect-[16/9] bg-line-soft">
           <Image
             src={image.image}
             alt={image.alt}
@@ -23,8 +23,8 @@ export function FrameCard({ image, priority = false }: { image: ImageRecord; pri
             priority={priority}
           />
           <div className="absolute left-3 top-3 flex gap-1">
-            {image.hasSource && <span className="bg-[#102433]/85 px-2 py-1 text-[.6rem] font-bold tracking-wide text-white">SOURCE</span>}
-            {image.hasMask && <span className="bg-[#d9ee9d] px-2 py-1 text-[.6rem] font-bold tracking-wide text-[#24331a]">MASK</span>}
+            {image.hasSource && <span className="bg-ink/85 px-2 py-1 text-[.6rem] font-bold tracking-wide text-white">SOURCE</span>}
+            {image.hasMask && <span className="bg-lime px-2 py-1 text-[.6rem] font-bold tracking-wide text-lime-ink">MASK</span>}
           </div>
         </div>
         <div className="mt-3 flex flex-col items-start gap-2 sm:flex-row sm:justify-between sm:gap-3">
@@ -37,7 +37,7 @@ export function FrameCard({ image, priority = false }: { image: ImageRecord; pri
           </div>
           <span
             className={`shrink-0 rounded-full border px-2 py-1 text-[.55rem] font-bold uppercase sm:text-[.6rem] ${
-              image.cloudCoverOktas === undefined ? "border-dashed border-[#b8c8d1] text-muted" : "border-[#b8c8d1]"
+              image.cloudCoverOktas === undefined ? "border-dashed border-field text-muted" : "border-field"
             }`}
           >
             {image.cloudCoverOktas == null ? "Unsegmented" : oktaLabel(image.cloudCoverOktas)}

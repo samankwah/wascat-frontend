@@ -98,7 +98,7 @@ export default async function ExplorePage({
 
   return (
     <>
-      <section className="border-b border-[#d7e2e9] bg-paper">
+      <section className="border-b border-line bg-paper">
         <div className="container-shell py-12 md:py-16">
           <p className="eyebrow text-sky">ALL-SKY CLOUD SEGMENTATION CATALOG</p>
           <h1 className="display mt-3 text-5xl md:text-6xl">Explore the archive</h1>
@@ -120,7 +120,7 @@ export default async function ExplorePage({
           </div>
         ) : (
           <div className="flex min-h-[430px] flex-col items-center justify-center text-center">
-            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[#eaf4f8] text-sky"><ImageOff /></span>
+            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-sky-pale text-sky"><ImageOff /></span>
             <h2 className="display mt-5 text-3xl">No sky matches this view.</h2>
             <p className="mt-3 max-w-sm text-sm leading-6 text-muted">Try widening the cloud-cover range or clearing a filter.</p>
             <Link href="/explore" className="button-primary mt-6">Clear all filters</Link>
@@ -128,7 +128,7 @@ export default async function ExplorePage({
         )}
 
         {matchedTotal > query.limit && (
-          <nav aria-label="Pagination" className="mt-14 flex items-center justify-between gap-4 border-t border-[#d7e2e9] pt-5">
+          <nav aria-label="Pagination" className="mt-14 flex items-center justify-between gap-4 border-t border-line pt-5">
             <span className="text-xs text-muted">
               Showing {(offset + 1).toLocaleString()}–{Math.min(nextOffset, matchedTotal).toLocaleString()} of {matchedTotal.toLocaleString()}
             </span>

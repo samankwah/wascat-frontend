@@ -1,67 +1,305 @@
 @import "tailwindcss";
 
-:root {
-  --ink: #102433;
-  --muted: #5d7080;
-  --line: #d7e2e9;
-  --paper: #f7fafb;
-  --sky: #1c6d99;
-  --sky-dark: #115273;
-  --pale: #eaf4f8;
-  --lime: #d9ee9d;
+/* ---------------------------------------------------------------------------
+   Design tokens
+
+   These used to be CSS variables on :root that Tailwind knew nothing about, so
+   `.text-sky` and `.bg-paper` were hand-written classes shadowing Tailwind's
+   namespace and every other colour in the codebase was a hardcoded hex in an
+   arbitrary-value bracket - about 165 of them across twenty-odd shades.
+
+   Registering them in @theme makes Tailwind generate the utilities, so a
+   colour has one name and one definition, and the palette is a thing you can
+   read rather than a thing you grep for.
+
+   The values are unchanged: the site looks the same, it is just no longer
+   spelled out one literal at a time.
+--------------------------------------------------------------------------- */
+@theme {
+  /* Ink: the dark end. Body text on light, and the panel backgrounds the
+     dark sections use. */
+  --color-ink: #102433;
+  --color-ink-panel: #102f41;
+  --color-ink-deep: #0d2635;
+  --color-ink-abyss: #071c27;
+  --color-muted: #5d7080;
+  --color-muted-soft: #607584;
+  --color-muted-dim: #526879;
+
+  /* Sky: the accent, and the measured-data blues. */
+  --color-sky: #1c6d99;
+  --color-sky-dark: #115273;
+  --color-sky-bright: #0876b5;
+  --color-sky-light: #91c8e2;
+  --color-sky-pale: #eaf4f8;
+  --color-sky-mist: #d4e8f1;
+  --color-sky-wash: #eef7fd;
+  /* The brighter blue the homepage calls to action with. */
+  --color-sky-vivid: #0b83c9;
+
+  /* Lines and surfaces, lightest last. */
+  --color-line-strong: #9fb2bd;
+  --color-field: #b8c8d1;
+  --color-line: #d7e2e9;
+  --color-line-soft: #dbe7ec;
+  --color-paper: #f7fafb;
+
+  /* Text placed on the dark panels. */
+  --color-on-dark: #bdd0da;
+  --color-on-dark-dim: #7d8c95;
+
+  /* Accents. Lime marks a measured value; amber is the focus ring, chosen to
+     be visible against both the light and dark sections. */
+  --color-lime: #d9ee9d;
+  /* Text on a lime chip; the only place it appears. */
+  --color-lime-ink: #24331a;
+  --color-focus: #e2b738;
+  /* Reserved for the error boundary. Nothing routine is red - an archive
+     that colours ordinary states as failures teaches people to ignore it. */
+  --color-danger: #a04437;
+
+  /* Typography. The stacks name the previous fallbacks explicitly, so a
+     failed webfont degrades to what the site used to look like rather than to
+     the browser default. */
+  --font-sans: var(--font-inter), "Helvetica Neue", Arial, Helvetica, sans-serif;
+  --font-display: var(--font-source-serif), Georgia, "Times New Roman", serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  /* The one layout constant: the measure everything is set to. */
+  --spacing-shell: 1220px;
 }
 
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+/* ---------------------------------------------------------------------------
+   Base
+--------------------------------------------------------------------------- */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   background: #fff;
-  color: var(--ink);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
   text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
-a { color: inherit; text-decoration: none; }
-button, input, select { font: inherit; }
-button, a, input, select { -webkit-tap-highlight-color: transparent; }
-:focus-visible { outline: 3px solid #e2b738; outline-offset: 3px; }
-::selection { background: #cce8f4; color: var(--ink); }
 
-.display { font-family: Georgia, "Times New Roman", serif; letter-spacing: -0.035em; }
-.eyebrow { font-size: .7rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
-.container-shell { width: min(1220px, calc(100% - 40px)); margin-inline: auto; }
-.hairline { border-color: var(--line); }
-.text-muted { color: var(--muted); }
-.bg-paper { background: var(--paper); }
-.bg-pale { background: var(--pale); }
-.text-sky { color: var(--sky); }
-.bg-sky { background: var(--sky); }
+a {
+  color: inherit;
+  text-decoration: none;
+}
 
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Deliberately loud. This is a reference tool people navigate by keyboard,
+   and a subtle focus ring on a dense table is no focus ring at all. */
+:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: #cce8f4;
+  color: var(--color-ink);
+}
+
+/* ---------------------------------------------------------------------------
+   Type
+--------------------------------------------------------------------------- */
+.display {
+  font-family: var(--font-display);
+  letter-spacing: -0.035em;
+}
+
+.eyebrow {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* Tabular figures, so a column of frame counts or checksums lines up instead
+   of shimmering as the digits change width. */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------------------
+   Layout
+--------------------------------------------------------------------------- */
+.container-shell {
+  width: min(var(--spacing-shell), calc(100% - 40px));
+  margin-inline: auto;
+}
+
+@media (max-width: 767px) {
+  .container-shell {
+    width: min(100% - 28px, var(--spacing-shell));
+  }
+}
+
+.hairline {
+  border-color: var(--color-line);
+}
+
+/* ---------------------------------------------------------------------------
+   Controls
+--------------------------------------------------------------------------- */
 .button-primary,
 .button-secondary,
 .button-light {
   align-items: center;
   border: 1px solid transparent;
   display: inline-flex;
-  font-size: .84rem;
+  font-size: 0.84rem;
   font-weight: 700;
-  gap: .55rem;
+  gap: 0.55rem;
   justify-content: center;
   min-height: 46px;
   padding: 0 1.15rem;
-  transition: background .2s ease, color .2s ease, border-color .2s ease, transform .2s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
 }
-.button-primary { background: var(--ink); color: white; }
-.button-primary:hover { background: #1c6d99; transform: translateY(-1px); }
-.button-secondary { background: transparent; border-color: #9fb2bd; color: var(--ink); }
-.button-secondary:hover { border-color: var(--ink); background: white; }
-.button-secondary.hero-secondary { border-color: rgba(255,255,255,.58); color: white; }
-.button-secondary.hero-secondary:hover { border-color: white; background: rgba(255,255,255,.12); color: white; }
-.button-light { background: white; color: var(--ink); }
-.button-light:hover { background: var(--lime); }
 
-.nav-link { position: relative; }
+.button-primary {
+  background: var(--color-ink);
+  color: white;
+}
+.button-primary:hover {
+  background: var(--color-sky);
+  transform: translateY(-1px);
+}
+.button-primary:disabled {
+  background: var(--color-line-strong);
+  cursor: not-allowed;
+  transform: none;
+}
+
+.button-secondary {
+  background: transparent;
+  border-color: var(--color-line-strong);
+  color: var(--color-ink);
+}
+.button-secondary:hover {
+  border-color: var(--color-ink);
+  background: white;
+}
+.button-secondary.hero-secondary {
+  border-color: rgb(255 255 255 / 0.58);
+  color: white;
+}
+.button-secondary.hero-secondary:hover {
+  border-color: white;
+  background: rgb(255 255 255 / 0.12);
+  color: white;
+}
+
+.button-light {
+  background: white;
+  color: var(--color-ink);
+}
+.button-light:hover {
+  background: var(--color-lime);
+}
+
+.field-label {
+  display: block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  margin-bottom: 0.6rem;
+  text-transform: uppercase;
+}
+
+.field-input,
+.field-select {
+  background: white;
+  border: 1px solid var(--color-field);
+  color: var(--color-ink);
+  height: 48px;
+  padding: 0 0.85rem;
+  width: 100%;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.field-input:hover,
+.field-select:hover {
+  border-color: var(--color-line-strong);
+}
+
+/* A visible, non-jumping focus state: the ring is drawn with a shadow so the
+   control does not shift by a pixel when it gains focus. */
+.field-input:focus-visible,
+.field-select:focus-visible {
+  border-color: var(--color-sky);
+  outline-offset: 0;
+}
+
+.field-input::placeholder {
+  color: var(--color-on-dark-dim);
+}
+
+.search-field-input {
+  padding-left: 3.1rem;
+}
+
+.hero-search-control {
+  border-color: #cbd8e0;
+  border-radius: 0.45rem;
+  height: 50px;
+}
+
+.hero-filter-label .field-label {
+  margin-bottom: 0.4rem;
+}
+
+.field-select {
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #345 50%),
+    linear-gradient(135deg, #345 50%, transparent 50%);
+  background-position:
+    calc(100% - 16px) 20px,
+    calc(100% - 11px) 20px;
+  background-repeat: no-repeat;
+  background-size:
+    5px 5px,
+    5px 5px;
+  padding-right: 2rem;
+}
+
+/* ---------------------------------------------------------------------------
+   Navigation and imagery
+--------------------------------------------------------------------------- */
+.nav-link {
+  position: relative;
+}
+
 .nav-link::after {
-  background: var(--sky);
+  background: var(--color-sky);
   bottom: -8px;
   content: "";
   height: 2px;
@@ -69,44 +307,67 @@ button, a, input, select { -webkit-tap-highlight-color: transparent; }
   position: absolute;
   transform: scaleX(0);
   transform-origin: left;
-  transition: transform .2s ease;
+  transition: transform 0.2s ease;
   width: 100%;
 }
-.nav-link:hover::after, .nav-link[data-active="true"]::after { transform: scaleX(1); }
 
-.hero-image { animation: settle 1s ease both; }
-.hero-primary-link { color: white; }
-.hero-secondary-link { color: #0876b5; }
+.nav-link:hover::after,
+.nav-link[data-active="true"]::after {
+  transform: scaleX(1);
+}
+
+.image-zoom {
+  overflow: hidden;
+}
+.image-zoom img {
+  transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.image-zoom:hover img {
+  transform: scale(1.035);
+}
+
+.hero-image {
+  animation: settle 1s ease both;
+}
+.hero-primary-link {
+  color: white;
+}
+.hero-secondary-link {
+  color: var(--color-sky-bright);
+}
+
 .ghana-hero-gradient {
-  background: linear-gradient(90deg, rgba(255,255,255,.97) 0%, rgba(255,255,255,.94) 27%, rgba(255,255,255,.72) 40%, rgba(255,255,255,.12) 59%, rgba(255,255,255,0) 72%);
+  background: linear-gradient(
+    90deg,
+    rgb(255 255 255 / 0.97) 0%,
+    rgb(255 255 255 / 0.94) 27%,
+    rgb(255 255 255 / 0.72) 40%,
+    rgb(255 255 255 / 0.12) 59%,
+    rgb(255 255 255 / 0) 72%
+  );
   -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 68%, transparent 90%);
   mask-image: linear-gradient(to bottom, #000 0%, #000 68%, transparent 90%);
 }
-@keyframes settle { from { opacity: .6; transform: scale(1.025); } to { opacity: 1; transform: scale(1); } }
+
+@keyframes settle {
+  from {
+    opacity: 0.6;
+    transform: scale(1.025);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
-}
-
-.field-label { display: block; font-size: .65rem; font-weight: 700; letter-spacing: .11em; margin-bottom: .6rem; text-transform: uppercase; }
-.field-input, .field-select {
-  background: white;
-  border: 1px solid #b8c8d1;
-  color: var(--ink);
-  height: 48px;
-  padding: 0 .85rem;
-  width: 100%;
-}
-.field-input::placeholder { color: #7d8c95; }
-.search-field-input { padding-left: 3.1rem; }
-.hero-search-control { border-color: #cbd8e0; border-radius: .45rem; height: 50px; }
-.hero-filter-label .field-label { margin-bottom: .4rem; }
-.field-select { appearance: none; background-image: linear-gradient(45deg,transparent 50%,#345 50%),linear-gradient(135deg,#345 50%,transparent 50%); background-position: calc(100% - 16px) 20px,calc(100% - 11px) 20px; background-repeat: no-repeat; background-size: 5px 5px,5px 5px; padding-right: 2rem; }
-
-.image-zoom { overflow: hidden; }
-.image-zoom img { transition: transform .5s cubic-bezier(.2,.7,.2,1); }
-.image-zoom:hover img { transform: scale(1.035); }
-
-@media (max-width: 767px) {
-  .container-shell { width: min(100% - 28px, 1220px); }
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

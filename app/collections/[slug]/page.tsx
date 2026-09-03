@@ -76,18 +76,18 @@ export default async function CollectionPage({ params }: { params: Promise<{ slu
               <Link href={`/explore?collection=${collection.slug}`} className="button-secondary">Explore frames <ArrowRight size={16} /></Link>
             </div>
           </div>
-          <div className="relative aspect-[16/9] overflow-hidden bg-[#dbe7ec]">
+          <div className="relative aspect-[16/9] overflow-hidden bg-line-soft">
             <Image src={collection.image} alt={collection.imageAlt} fill priority sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
           </div>
         </div>
       </section>
 
-      <section className="border-y border-[#d7e2e9]">
+      <section className="border-y border-line">
         <div className="container-shell grid grid-cols-2 md:grid-cols-4">
           {facts.map(([Icon, label, body], index) => {
             const Graphic = Icon;
             return (
-              <div key={label} className={`min-h-36 border-[#d7e2e9] p-4 sm:p-5 ${index % 2 === 1 ? "border-l" : ""} ${index > 1 ? "border-t" : ""} md:border-l md:border-t-0 ${index === 0 ? "md:border-l-0" : ""}`}>
+              <div key={label} className={`min-h-36 border-line p-4 sm:p-5 ${index % 2 === 1 ? "border-l" : ""} ${index > 1 ? "border-t" : ""} md:border-l md:border-t-0 ${index === 0 ? "md:border-l-0" : ""}`}>
                 <Graphic size={18} className="text-sky" />
                 <p className="eyebrow mt-5 text-muted">{label}</p>
                 <p className="mt-2 text-xs leading-5">{body}</p>
@@ -107,7 +107,7 @@ export default async function CollectionPage({ params }: { params: Promise<{ slu
         </div>
         <aside>
           <p className="eyebrow text-sky">MEASURED TOTALS</p>
-          <dl className="mt-4 border-t border-[#9fb2bd]">
+          <dl className="mt-4 border-t border-line-strong">
             {([
               [collection.images.toLocaleString(), "Catalogued frames"],
               [collection.segmented.toLocaleString(), "With cloud mask"],
@@ -116,14 +116,14 @@ export default async function CollectionPage({ params }: { params: Promise<{ slu
               [collection.artifacts.toLocaleString(), "Image files"],
               [current.size, "Total size"],
             ] as [string, string][]).map(([value, label]) => (
-              <div key={label} className="flex items-end justify-between border-b border-[#d7e2e9] py-4">
+              <div key={label} className="flex items-end justify-between border-b border-line py-4">
                 <dt className="text-xs text-muted">{label}</dt>
                 <dd className="display text-2xl">{value}</dd>
               </div>
             ))}
           </dl>
           {registered.length > 0 && (
-            <div className="mt-10 border border-[#d7e2e9] bg-paper p-5">
+            <div className="mt-10 border border-line bg-paper p-5">
               <p className="eyebrow">Mask registration</p>
               <p className="mt-3 text-xs leading-5 text-muted">
                 Masks for {registered.map((entry) => entry.videoId).join(", ")} were delivered at{" "}
@@ -141,7 +141,7 @@ export default async function CollectionPage({ params }: { params: Promise<{ slu
           {citationValue && (
             <div>
               <p className="eyebrow text-sky">CITATION</p>
-              <div className="mt-4 border-l-2 border-[#1c6d99] pl-5">
+              <div className="mt-4 border-l-2 border-sky pl-5">
                 <p className="display text-xl leading-8">{collection.citation}</p>
                 {collection.doi && <p className="mt-3 font-mono text-xs text-muted">https://doi.org/{collection.doi}</p>}
                 <div className="mt-4"><CopyButton value={citationValue} label="Copy citation" /></div>
@@ -162,23 +162,23 @@ export default async function CollectionPage({ params }: { params: Promise<{ slu
         </section>
       )}
 
-      <section className="border-t border-[#d7e2e9] py-16">
+      <section className="border-t border-line py-16">
         <div className="container-shell">
           <div className="flex items-center justify-between">
             <div><p className="eyebrow text-sky">RELEASE HISTORY</p><h2 className="display mt-3 text-4xl">Stable by version</h2></div>
-            <span className="hidden rounded-full bg-[#d9ee9d] px-3 py-1 text-xs font-bold sm:block">v{current.version} is current</span>
+            <span className="hidden rounded-full bg-lime px-3 py-1 text-xs font-bold sm:block">v{current.version} is current</span>
           </div>
           <div className="mt-7 overflow-x-auto">
             <table className="w-full min-w-[650px] border-collapse text-left text-sm">
               <thead>
-                <tr className="border-b border-[#9fb2bd] text-[.65rem] uppercase tracking-[.1em] text-muted">
+                <tr className="border-b border-line-strong text-[.65rem] uppercase tracking-[.1em] text-muted">
                   <th className="py-3">Version</th><th>Published</th><th>Frames</th><th>Size</th><th></th>
                 </tr>
               </thead>
               <tbody>
                 {collection.releases.map((release) => (
-                  <tr key={release.version} className="border-b border-[#d7e2e9]">
-                    <td className="py-4 font-bold">v{release.version} {release.current && <span className="ml-2 rounded-full bg-[#d9ee9d] px-2 py-1 text-[.6rem]">CURRENT</span>}</td>
+                  <tr key={release.version} className="border-b border-line">
+                    <td className="py-4 font-bold">v{release.version} {release.current && <span className="ml-2 rounded-full bg-lime px-2 py-1 text-[.6rem]">CURRENT</span>}</td>
                     <td>{release.publishedAt ? formatDate(release.publishedAt) : "—"}</td>
                     <td>{release.images.toLocaleString()}</td>
                     <td>{release.size}</td>

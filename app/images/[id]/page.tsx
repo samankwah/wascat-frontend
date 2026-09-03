@@ -48,7 +48,7 @@ export default async function ImageDetailPage({ params }: { params: Promise<{ id
 
   return (
     <>
-      <section className="bg-[#0d2635] text-white">
+      <section className="bg-ink-deep text-white">
         <div className="container-shell py-5">
           <Link href="/explore" className="inline-flex items-center gap-2 text-xs font-bold text-white/65 hover:text-white">
             <span aria-hidden="true">←</span> Back to results
@@ -57,7 +57,7 @@ export default async function ImageDetailPage({ params }: { params: Promise<{ id
         <div className="container-shell grid gap-9 pb-14 lg:grid-cols-[1.45fr_.55fr] lg:pb-20">
           <ArtifactViewer record={record} />
           <aside className="lg:pt-12">
-            <p className="eyebrow text-[#91c8e2]">
+            <p className="eyebrow text-sky-light">
               {record.hasSource && record.hasMask ? "SOURCE + MASK" : record.hasMask ? "MASK ONLY" : "SOURCE ONLY"}
             </p>
             <h1 className="mt-3 break-all font-mono text-xl font-bold leading-7">{record.id}</h1>
@@ -67,7 +67,7 @@ export default async function ImageDetailPage({ params }: { params: Promise<{ id
                 const Graphic = Icon;
                 return (
                   <div key={label} className="grid grid-cols-[24px_1fr] gap-3 border-b border-white/15 py-4">
-                    <Graphic size={16} className="text-[#91c8e2]" />
+                    <Graphic size={16} className="text-sky-light" />
                     <div>
                       <p className="eyebrow text-white/45">{label}</p>
                       <p className="mt-1 text-xs leading-5">{body}</p>
@@ -76,7 +76,7 @@ export default async function ImageDetailPage({ params }: { params: Promise<{ id
                 );
               })}
             </div>
-            <Link href={`/collections/${record.collection}`} className="mt-6 inline-flex items-center gap-2 text-xs font-bold text-[#b9dff0]">
+            <Link href={`/collections/${record.collection}`} className="mt-6 inline-flex items-center gap-2 text-xs font-bold text-sky-light">
               View sequence <ExternalLink size={13} />
             </Link>
           </aside>
@@ -87,9 +87,9 @@ export default async function ImageDetailPage({ params }: { params: Promise<{ id
         <div className="min-w-0">
           <p className="eyebrow text-sky">AVAILABLE FILES</p>
           <h2 className="display mt-3 text-4xl">Download artifacts</h2>
-          <div className="mt-7 border-t border-[#9fb2bd]">
+          <div className="mt-7 border-t border-line-strong">
             {record.artifacts.map((artifact) => (
-              <div key={artifact.type} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-[#d7e2e9] py-4 sm:grid-cols-[minmax(0,1fr)_110px_160px_auto] sm:gap-5">
+              <div key={artifact.type} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-line py-4 sm:grid-cols-[minmax(0,1fr)_110px_160px_auto] sm:gap-5">
                 <div className="min-w-0">
                   <p className="text-sm font-bold">{artifact.type === "source" ? "Source frame" : "Segmentation mask"}</p>
                   {/* The real stored path, not a synthesised filename. */}
@@ -97,7 +97,7 @@ export default async function ImageDetailPage({ params }: { params: Promise<{ id
                 </div>
                 <span className="hidden text-xs text-muted sm:block">{(artifact.bytes / 1024).toFixed(0)} KB</span>
                 <span className="hidden font-mono text-[.62rem] text-muted sm:block">SHA-256 {artifact.checksum.slice(0, 10)}…</span>
-                <a href={artifact.url} download className="flex h-9 w-9 items-center justify-center rounded-full border border-[#9fb2bd] hover:border-[#1c6d99] hover:text-sky" aria-label={`Download ${artifact.type}`}>
+                <a href={artifact.url} download className="flex h-9 w-9 items-center justify-center rounded-full border border-line-strong hover:border-sky hover:text-sky" aria-label={`Download ${artifact.type}`}>
                   <ArrowDownToLine size={16} />
                 </a>
               </div>
@@ -132,12 +132,12 @@ export default async function ImageDetailPage({ params }: { params: Promise<{ id
           </div>
         </div>
         <aside className="min-w-0 space-y-5">
-          <div className="border border-[#d7e2e9] bg-paper p-5">
+          <div className="border border-line bg-paper p-5">
             <div className="flex items-center gap-2"><FileJson2 size={18} className="text-sky" /><h2 className="font-bold">Use this record in code</h2></div>
-            <div className="mt-4 overflow-x-auto bg-[#102433] p-4 font-mono text-[.68rem] leading-5 text-[#d4e8f1]"><code className="whitespace-nowrap">curl {apiUrl}</code></div>
+            <div className="mt-4 overflow-x-auto bg-ink p-4 font-mono text-[.68rem] leading-5 text-sky-mist"><code className="whitespace-nowrap">curl {apiUrl}</code></div>
             <div className="mt-4"><CopyButton value={apiUrl} label="Copy API URL" /></div>
           </div>
-          <div className="border border-[#d7e2e9] p-5">
+          <div className="border border-line p-5">
             <p className="eyebrow text-muted">STABLE REFERENCE</p>
             <p className="mt-3 break-all font-mono text-[.68rem] leading-5">wascat:{record.collection}:{record.release}:{record.id}</p>
             <p className="mt-3 text-xs leading-5 text-muted">Use the stable identifier and release when testing integrations so this exact record can be recovered.</p>
@@ -146,7 +146,7 @@ export default async function ImageDetailPage({ params }: { params: Promise<{ id
       </section>
 
       {related.length > 0 && (
-        <section className="border-t border-[#d7e2e9] bg-paper py-16">
+        <section className="border-t border-line bg-paper py-16">
           <div className="container-shell">
             <div className="flex items-end justify-between gap-4">
               <div><p className="eyebrow text-sky">NEARBY IN THE SEQUENCE</p><h2 className="display mt-3 text-4xl">Adjacent frames</h2></div>
