@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ExternalLink, Lock } from "lucide-react";
+import { ArtifactUpload } from "@/components/admin/artifact-upload";
 import { RecordEditor } from "@/components/admin/record-editor";
 import {
   Badge,
@@ -125,6 +126,13 @@ export default async function AdminImageDetail({
               </Facts>
             </div>
           </Panel>
+
+          <ArtifactUpload
+            recordId={record.id}
+            editable={editable}
+            expected={{ width: record.width, height: record.height }}
+            present={{ source: record.hasSource, mask: record.hasMask }}
+          />
 
           <RecordEditor
             recordId={record.id}
