@@ -1,17 +1,9 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ImageOff, Search } from "lucide-react";
-import {
-  Badge,
-  CoverBadge,
-  EmptyState,
-  Panel,
-  TableShell,
-  Td,
-  Th,
-} from "@/components/admin/ui";
+import { RecordsTable } from "@/components/admin/records-table";
+import { EmptyState, Panel } from "@/components/admin/ui";
 import { listImages } from "@/lib/admin/data";
-import { PERMISSIONS, requirePermission } from "@/lib/admin/session";
+import { PERMISSIONS, can, requirePermission } from "@/lib/admin/session";
 import { getFacets } from "@/lib/api-client";
 import { decodeOffsetCursor, encodeOffsetCursor, imageQuerySchema } from "@/lib/search";
 
@@ -24,7 +16,7 @@ export default async function AdminImages({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  await requirePermission(PERMISSIONS.catalogRead, "/admin/images");
+  const user = await requirePermission(PERMISSIONS.catalogRead, "/admin/images");
   const params = await searchParams;
 
   // The same query contract the public Explore uses, so a filter built there
@@ -153,64 +145,12 @@ export default async function AdminImages({
           />
         ) : (
           <>
-            <TableShell>
-              <thead>
-                <tr>
-                  <Th className="w-[4.5rem]">Frame</Th>
-                  <Th>Record</Th>
-                  <Th>Sequence</Th>
-                  <Th>Cloud cover</Th>
-                  <Th>Artifacts</Th>
-                  <Th>Provenance</Th>
-                  <Th align="right">Release</Th>
-                </tr>
-              </thead>
-              <tbody>
-                {page.records.map((record) => (
-                  <tr key={record.id} className="hover:bg-paper">
-                    <Td>
-                      <span className="relative block size-11 overflow-hidden bg-line-soft">
-                        <Image
-                          src={record.image}
-                          alt=""
-                          fill
-                          sizes="44px"
-                          className="object-cover"
-                        />
-                      </span>
-                    </Td>
-                    <Td>
-                      <Link
-                        href={`/admin/images/${record.id}`}
-                        className="font-mono text-[.8rem] font-medium text-sky hover:underline"
-                      >
-                        {record.id}
-                      </Link>
-                    </Td>
-                    <Td className="text-muted">
-                      {record.videoId} · frame {record.frameIndex.toLocaleString()}
-                    </Td>
-                    <Td>
-                      <CoverBadge oktas={record.cloudCoverOktas} />
-                    </Td>
-                    <Td>
-                      <span className="flex flex-wrap gap-1">
-                        {record.hasSource ? <Badge>source</Badge> : null}
-                        {record.hasMask ? <Badge>mask</Badge> : null}
-                      </span>
-                    </Td>
-                    <Td className="text-muted">
-                      {record.location ?? record.capturedAt ?? (
-                        <span className="text-muted-dim">None recorded</span>
-                      )}
-                    </Td>
-                    <Td align="right" className="font-mono text-[.78rem] text-muted">
-                      v{record.release}
-                    </Td>
-                  </tr>
-                ))}
-              </tbody>
-            </TableShell>
+            <RecordsTable
+              records={page.records}
+              editable={can(user, PERMISSIONS.catalogWrite)}
+              seasons={facets.seasons.map((entry) => String(entry.value))}
+              timesOfDay={facets.timesOfDay.map((entry) => String(entry.value))}
+            />
 
             <nav
               aria-label="Pagination"
