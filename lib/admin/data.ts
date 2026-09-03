@@ -43,6 +43,30 @@ export type AdminImage = ImageRecord & {
   release: AdminRelease | null;
 };
 
+export type VocabularyTerm = {
+  id: string;
+  kind: string;
+  slug: string;
+  label: string;
+  description: string | null;
+  position: number;
+  /** True when the public API validates against this term, so it cannot go. */
+  system: boolean;
+  retiredAt: string | null;
+  mergedIntoId: string | null;
+  /** Values that still resolve to this term after a rename or a merge. */
+  aliases: string[];
+  records: number;
+};
+
+export type Vocabulary = {
+  kind: string;
+  label: string;
+  /** True when adding a term would widen what the public API accepts. */
+  frozen: boolean;
+  terms: VocabularyTerm[];
+};
+
 export type AuditEntry = {
   id: number;
   action: string;
@@ -129,5 +153,10 @@ export async function listAudit(
   }
   const suffix = query.size ? `?${query.toString()}` : "";
   const body = await adminFetch<AuditEntry[]>(`/admin/audit${suffix}`);
+  return body?.data ?? [];
+}
+
+export async function listVocabularies(): Promise<Vocabulary[]> {
+  const body = await adminFetch<Vocabulary[]>("/admin/vocabulary");
   return body?.data ?? [];
 }

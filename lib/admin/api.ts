@@ -140,4 +140,31 @@ export const adminApi = {
     ),
   deleteRelease: (id: string) =>
     request<{ deleted: string }>(`/admin/releases/${id}`, { method: "DELETE" }),
+
+  // -- vocabulary --------------------------------------------------------
+  createVocabularyTerm: (kind: string, label: string) =>
+    request<unknown>(`/admin/vocabulary/${encodeURIComponent(kind)}`, {
+      method: "POST",
+      body: { label },
+    }),
+  renameVocabularyTerm: (termId: string, label: string) =>
+    request<unknown>(`/admin/vocabulary/terms/${termId}`, {
+      method: "PATCH",
+      body: { label },
+    }),
+  /** Moves every record onto `intoId`. Nothing is deleted. */
+  mergeVocabularyTerm: (termId: string, intoId: string) =>
+    request<{ recordsMoved: number }>(`/admin/vocabulary/terms/${termId}/merge`, {
+      method: "POST",
+      body: { intoId },
+    }),
+  retireVocabularyTerm: (termId: string) =>
+    request<unknown>(`/admin/vocabulary/terms/${termId}/retire`, { method: "POST" }),
+  restoreVocabularyTerm: (termId: string) =>
+    request<unknown>(`/admin/vocabulary/terms/${termId}/restore`, { method: "POST" }),
+  reorderVocabulary: (kind: string, ids: string[]) =>
+    request<unknown>(`/admin/vocabulary/${encodeURIComponent(kind)}/order`, {
+      method: "POST",
+      body: { ids },
+    }),
 };
