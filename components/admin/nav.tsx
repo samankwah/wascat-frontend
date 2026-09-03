@@ -10,7 +10,6 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
-  Tags,
   X,
 } from "lucide-react";
 import { adminApi } from "@/lib/admin/api";
@@ -29,7 +28,6 @@ const ITEMS: Item[] = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard },
   { href: "/admin/images", label: "Image records", icon: Images, permission: "catalog:read" },
   { href: "/admin/collections", label: "Collections", icon: Layers3, permission: "catalog:read" },
-  { href: "/admin/vocabulary", label: "Vocabulary", icon: Tags, permission: "vocab:read" },
   { href: "/admin/audit", label: "Audit log", icon: ClipboardList, permission: "audit:read" },
 ];
 
