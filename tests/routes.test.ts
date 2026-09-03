@@ -7,9 +7,9 @@
  */
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import * as imagePage from "@/app/images/[id]/page";
-import { generateMetadata as collectionMetadata } from "@/app/collections/[slug]/page";
-import { generateMetadata as imageMetadata } from "@/app/images/[id]/page";
+import * as imagePage from "@/app/(site)/images/[id]/page";
+import { generateMetadata as collectionMetadata } from "@/app/(site)/collections/[slug]/page";
+import { generateMetadata as imageMetadata } from "@/app/(site)/images/[id]/page";
 
 import { installApiMock, MASK_ONLY, PAIRED, UNSEGMENTED, type RequestLog } from "./support/api-mock";
 
@@ -32,7 +32,7 @@ describe("static generation", () => {
   // them through /api/revalidate, which also makes an edit visible sooner
   // than waiting for a rebuild.
   it("does not pre-render collection pages", async () => {
-    const collectionPage = await import("@/app/collections/[slug]/page");
+    const collectionPage = await import("@/app/(site)/collections/[slug]/page");
     expect("generateStaticParams" in collectionPage).toBe(false);
   });
 

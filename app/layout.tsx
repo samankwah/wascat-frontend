@@ -1,20 +1,14 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono, Source_Serif_4 } from "next/font/google";
-import { Footer } from "@/components/footer";
-import { Header } from "@/components/header";
 import "./globals.css";
 
 /**
- * The site loaded no fonts at all, falling back to Georgia for display and
- * Arial for everything else. These are the same pairing done properly: a
- * transitional serif for headings, a neutral grotesque for interface text,
- * and a mono for the things that must be read character by character -
- * record ids, object keys, SHA-256 digests.
+ * The root layout carries the document and the fonts, and nothing else.
  *
- * `display: "swap"` shows the fallback immediately rather than holding the
- * text hostage to the download, and each stack in globals.css names the
- * previous font as its fallback, so a blocked webfont degrades to what the
- * site looked like before rather than to Times.
+ * The public site's header and footer live in `(site)/layout.tsx` instead,
+ * because the dashboard is a different surface with its own navigation - it
+ * should not be wearing the marketing site's chrome, and a signed-in curator
+ * has no use for a "Dataset information" footer while editing a record.
  */
 const inter = Inter({
   subsets: ["latin"],
@@ -26,7 +20,6 @@ const sourceSerif = Source_Serif_4({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-source-serif",
-  // The display face is only ever used for headings.
   weight: ["400", "600"],
 });
 
@@ -53,17 +46,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       lang="en"
       className={`${inter.variable} ${sourceSerif.variable} ${jetbrainsMono.variable}`}
     >
-      <body className="min-h-screen antialiased">
-        <a
-          href="#main-content"
-          className="fixed left-4 top-[-100px] z-[100] bg-white px-4 py-3 font-bold shadow focus:top-4"
-        >
-          Skip to content
-        </a>
-        <Header />
-        <main id="main-content">{children}</main>
-        <Footer />
-      </body>
+      <body className="min-h-screen antialiased">{children}</body>
     </html>
   );
 }
