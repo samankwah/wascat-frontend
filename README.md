@@ -1,26 +1,79 @@
-# WASCAT v1.0 West African Sky Archive
+# wascat-frontend
 
-A responsive demonstration catalog for discovering, inspecting, citing, and downloading expert-labelled West African sky-image records and processed artifacts represented across Ghana, Nigeria, and Burkina Faso.
+The public WASCAT archive and its admin dashboard. Next.js 16, React 19,
+Tailwind v4.
 
-## Local development
+The catalogue itself lives in `wascat-backend`; this app reads it over HTTP and
+generates its TypeScript types from that service's OpenAPI schema, so the two
+repositories share one contract without sharing a package.
+
+## Running it
+
+The API has to be up first — see `../wascat-backend/README.md`.
 
 ```bash
 npm install
-npm run dev
+npm run dev          # http://localhost:3000
 ```
 
-Open `http://localhost:3000`. Verification commands are `npm run typecheck`, `npm run lint`, `npm test`, and `npm run build`.
+`.env.local` carries three settings:
 
-## Data architecture
+| | |
+|---|---|
+| `WASCAT_API_ORIGIN` | Where the API is. Defaults to `http://127.0.0.1:8000`. |
+| `NEXT_PUBLIC_ASSET_BASE_URL` | Where frames are served from, so `next/image` will optimise them. |
+| `WASCAT_REVALIDATE_SECRET` | Shared with the backend, so a published edit can invalidate the cache. |
 
-The production schema in `prisma/schema.prisma` models `Collection → Release → ImageRecord → Artifact`. Searchable metadata lives in PostgreSQL; binaries, manifests, and release bundles use public S3-compatible storage behind a CDN. The included catalog is a self-contained demonstration fixture, not a claim of operational stations, measurements, instruments, releases, or publications.
+## Layout
 
-## Release imports
+```
+app/
+  (site)/     the public archive - a route group, so /explore is still /explore
+  admin/      the dashboard
+  api/        revalidate webhook only; /api/v1/* is rewritten to the backend
+components/
+  admin/      dashboard-only components
+lib/
+  api-client  public reads, cached and tagged
+  admin/      session, dashboard reads, and the browser API client
+  api-types   generated; do not edit
+```
 
-Validate a trusted manifest without writing anything:
+`next.config.ts` rewrites `/api/v1/*` to the backend. That keeps every
+documented API URL on the site's own origin — so `/api-docs` stays truthful and
+the homepage's metadata download still resolves — and it keeps the dashboard's
+session cookies same-origin, which is why there is no CORS to configure.
+
+## The dashboard
+
+`/admin`, behind a sign-in. `proxy.ts` redirects signed-out visitors, but that
+is an optimistic check: the decision is made in the server-side session read
+and again in every backend endpoint.
+
+What a curator can do:
+
+- **Image records** — edit provenance, upload or replace a frame or mask, and
+  bulk-apply a field across a selection.
+- **Collections** — the editorial metadata that is empty for every sequence
+  today: site, coordinates, instrument, licence, citation, DOI. Plus the
+  release workflow.
+- **Vocabulary** — rename, merge, reorder and retire the terms that drive the
+  Explore filters.
+- **Audit log** — every change, with before and after.
+
+Two rules shape all of it. Measurements come from the masks and are not
+editable by anyone. A published release is immutable, so a citation resolves to
+the same data forever; corrections go into a new release.
+
+## Checks
 
 ```bash
-npm run import:release -- ./path/to/manifest.json
+npm run typecheck
+npm run lint
+npm test
+npm run build
+npm run types:generate   # regenerate lib/api-types.ts from the API
 ```
 
-Published releases are immutable. Deployment adapters must verify object existence and checksums before performing a transactional draft import and publish operation.
+The build deliberately needs no database: the catalogue pages `await
+connection()` so they render per request rather than at build time.
