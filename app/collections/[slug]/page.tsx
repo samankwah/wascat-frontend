@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -19,6 +20,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 }
 
 export default async function CollectionPage({ params }: { params: Promise<{ slug: string }> }) {
+  // Render at request time rather than at build. Prerendering these would
+  // make `next build` require a reachable database, coupling CI and the
+  // container build to the API. The fetch data cache still applies, so this
+  // costs a render and not a round trip.
+  await connection();
+
   const collection = await getCollection((await params).slug);
   if (!collection) notFound();
   const current = collection.releases.find((release) => release.current) ?? collection.releases[0];

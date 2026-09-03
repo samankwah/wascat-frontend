@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowDownToLine, Box, Camera, Clock3, CloudOff, CloudSun, ExternalLink, FileJson2, Film, MapPin } from "lucide-react";
@@ -17,6 +18,12 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 }
 
 export default async function ImageDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  // Render at request time rather than at build. Prerendering these would
+  // make `next build` require a reachable database, coupling CI and the
+  // container build to the API. The fetch data cache still applies, so this
+  // costs a render and not a round trip.
+  await connection();
+
   const record = await getImage((await params).id);
   if (!record) notFound();
   const apiUrl = `https://wascat.example.org/api/v1/images/${record.id}`;

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { CollectionCard } from "@/components/collection-card";
 import { getCollections } from "@/lib/api-client";
 
@@ -6,6 +7,12 @@ export const metadata: Metadata = { title: "Collections", description: "All-sky 
 
 
 export default async function CollectionsPage() {
+  // Render at request time rather than at build. Prerendering these would
+  // make `next build` require a reachable database, coupling CI and the
+  // container build to the API. The fetch data cache still applies, so this
+  // costs a render and not a round trip.
+  await connection();
+
   const collections = await getCollections();
 
   return (

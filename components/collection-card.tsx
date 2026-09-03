@@ -1,9 +1,27 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import type { Collection } from "@/lib/types";
+import type { Collection, CollectionSummary } from "@/lib/types";
 
-export function CollectionCard({ collection, priority = false }: { collection: Collection; priority?: boolean }) {
+/**
+ * A collection card.
+ *
+ * The listing endpoint replaces the release history with just the current
+ * release, while the detail endpoint returns the whole history. The card is
+ * rendered from both, so it reads whichever the payload carries.
+ */
+export function CollectionCard({
+  collection,
+  priority = false,
+}: {
+  collection: Collection | CollectionSummary;
+  priority?: boolean;
+}) {
+  const current =
+    ("currentRelease" in collection ? collection.currentRelease : undefined) ??
+    collection.releases?.find((release) => release.current) ??
+    collection.releases?.[0];
+
   return (
     <article className="group border-t border-[#9fb2bd] pt-3">
       <Link href={`/collections/${collection.slug}`} className="block">
@@ -17,7 +35,7 @@ export function CollectionCard({ collection, priority = false }: { collection: C
         <div className="mt-5 flex gap-5 border-t border-[#d7e2e9] pt-3 text-xs">
           <span><b>{collection.images.toLocaleString()}</b> frames</span>
           <span><b>{collection.segmented.toLocaleString()}</b> segmented</span>
-          <span><b>v{collection.releases[0].version}</b> current</span>
+          {current ? <span><b>v{current.version}</b> current</span> : null}
         </div>
       </Link>
     </article>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import Link from "next/link";
 import { ImageOff } from "lucide-react";
 import { ExploreShell, type ExploreOptions } from "@/components/explore-filters";
@@ -34,6 +35,12 @@ export default async function ExplorePage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  // Render at request time rather than at build. Prerendering these would
+  // make `next build` require a reachable database, coupling CI and the
+  // container build to the API. The fetch data cache still applies, so this
+  // costs a render and not a round trip.
+  await connection();
+
   const params = await searchParams;
   // Unparseable filters fall back to defaults rather than failing the page.
   const parsed = imageQuerySchema.safeParse(params);

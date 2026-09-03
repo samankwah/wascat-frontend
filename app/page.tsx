@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { connection } from "next/server";
 import Link from "next/link";
 import { ArrowRight, Check, Database, Image as ImageIcon, Layers3, MapPin, Search } from "lucide-react";
 import { CollectionCard } from "@/components/collection-card";
@@ -6,6 +7,12 @@ import { getArchiveStats, getCollections } from "@/lib/api-client";
 import { oktaValues } from "@/lib/vocab";
 
 export default async function HomePage() {
+  // Render at request time rather than at build. Prerendering these would
+  // make `next build` require a reachable database, coupling CI and the
+  // container build to the API. The fetch data cache still applies, so this
+  // costs a render and not a round trip.
+  await connection();
+
   const [stats, collections] = await Promise.all([getArchiveStats(), getCollections()]);
   const { total: archiveImageTotal, sequences: videoIds } = stats;
 
