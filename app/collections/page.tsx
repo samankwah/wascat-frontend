@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { CollectionCard } from "@/components/collection-card";
-import { collections } from "@/lib/catalog";
+import { getCollections } from "@/lib/api-client";
 
 export const metadata: Metadata = { title: "Collections", description: "All-sky capture sequences, each with its segmented frames and measured cloud cover." };
 
 
-export default function CollectionsPage() {
+export default async function CollectionsPage() {
+  const collections = await getCollections();
+
   return (
     <>
       <section className="bg-[#102f41] py-16 text-white md:py-24">

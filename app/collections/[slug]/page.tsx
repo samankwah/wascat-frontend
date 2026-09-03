@@ -5,41 +5,51 @@ import { notFound } from "next/navigation";
 import { ArrowDownToLine, ArrowLeft, ArrowRight, Camera, CloudSun, ExternalLink, Film, MapPin, ShieldCheck } from "lucide-react";
 import { CopyButton } from "@/components/copy-button";
 import { FrameCard } from "@/components/frame-card";
-import { collectionBySlug, collections, formatDate, imagesInCollection, maskRegistration, oktaLabel, type Okta } from "@/lib/catalog";
+import { getCollection, getCollectionImages } from "@/lib/api-client";
+import { formatDate } from "@/lib/format";
+import { oktaLabel } from "@/lib/vocab";
 
-export function generateStaticParams() { return collections.map((collection) => ({ slug: collection.slug })); }
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> { const collection = collectionBySlug((await params).slug); return { title: collection?.title ?? "Collection", description: collection?.description }; }
+// No generateStaticParams: pre-rendering these would make `next build` require
+// a running database, which couples CI and the container build to the API for
+// eleven pages. They are rendered on demand and cached, and a dashboard edit
+// invalidates them through /api/revalidate.
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const collection = await getCollection((await params).slug);
+  return { title: collection?.title ?? "Collection", description: collection?.description };
+}
 
 export default async function CollectionPage({ params }: { params: Promise<{ slug: string }> }) {
-  const collection = collectionBySlug((await params).slug);
+  const collection = await getCollection((await params).slug);
   if (!collection) notFound();
-  const current = collection.releases.find((release) => release.current)!;
-  const members = imagesInCollection(collection.slug);
+  const current = collection.releases.find((release) => release.current) ?? collection.releases[0];
+
+  // Enough frames to fill the sample grid and find an unsegmented one, rather
+  // than the whole sequence: the aggregates the page needs are computed by the
+  // API, so there is no reason to ship hundreds of records to render four.
+  const [segmentedSample, unsegmentedSample] = await Promise.all([
+    getCollectionImages(collection.slug, { segmented: "true", limit: 3 }),
+    getCollectionImages(collection.slug, { segmented: "false", limit: 1 }),
+  ]);
   // Show what the sequence actually holds: mostly segmented frames, plus one of
   // the sampled unsegmented ones where there are any.
-  const unsegmented = members.filter((image) => !image.hasMask);
-  const samples = (unsegmented.length > 0
-    ? [...members.filter((image) => image.hasMask).slice(0, 3), unsegmented[0]]
-    : members.slice(0, 4)
-  ).slice(0, 4);
-  const metadataUrl = `/api/v1/images?collection=${collection.slug}&release=${current.version}&limit=100`;
+  // Show what the sequence actually holds: mostly segmented frames, plus one
+  // of the sampled unsegmented ones where there are any.
+  const samples = [...segmentedSample, ...unsegmentedSample].slice(0, 4);
+  const metadataUrl = `/api/v1/images?collection=${collection.slug}&release=${current?.version ?? ""}&limit=100`;
   const citationValue = collection.citation
     ? collection.doi ? `${collection.citation} https://doi.org/${collection.doi}` : collection.citation
     : undefined;
 
-  // Averaged over the frames that actually carry a measurement.
-  const oktas = members
-    .map((image) => image.cloudCoverOktas)
-    .filter((value): value is Okta => value !== undefined);
-  const meanOktas = oktas.length ? oktas.reduce<number>((sum, value) => sum + value, 0) / oktas.length : 0;
-  const registered = collection.videoIds
-    .map((videoId) => ({ videoId, entry: maskRegistration[videoId as keyof typeof maskRegistration] }))
-    .filter(({ entry }) => entry?.corrected);
+  // Averaged by the database over the frames that actually carry a
+  // measurement, rather than by walking the sequence here.
+  const meanOktas = collection.meanCloudCoverOktas ?? 0;
+  const segmentedCount = collection.segmented;
+  const registered = collection.maskRegistration.filter((entry) => entry.corrected);
 
   // Only render facts we actually hold; a missing value is omitted, never filled in.
   const facts: [typeof MapPin, string, string][] = [
     [Film, "Sequences", collection.videoIds.join(", ")],
-    [CloudSun, "Mean cloud cover", `${oktaLabel(Math.round(meanOktas))} · over ${oktas.length.toLocaleString()} segmented frames`],
+    [CloudSun, "Mean cloud cover", `${oktaLabel(Math.round(meanOktas))} · over ${segmentedCount.toLocaleString()} segmented frames`],
     ...(collection.location ? [[MapPin, "Location", collection.location] as [typeof MapPin, string, string]] : []),
     ...(collection.instrument ? [[Camera, "Instrument", collection.instrument] as [typeof MapPin, string, string]] : []),
     ...(collection.license ? [[ShieldCheck, "License", collection.license.replace(" International", "")] as [typeof MapPin, string, string]] : []),
@@ -109,8 +119,8 @@ export default async function CollectionPage({ params }: { params: Promise<{ slu
             <div className="mt-10 border border-[#d7e2e9] bg-paper p-5">
               <p className="eyebrow">Mask registration</p>
               <p className="mt-3 text-xs leading-5 text-muted">
-                Masks for {registered.map(({ videoId }) => videoId).join(", ")} were delivered at{" "}
-                {registered[0].entry!.scale.toFixed(4)}× the scale of the frames they segment. They are served exactly as
+                Masks for {registered.map((entry) => entry.videoId).join(", ")} were delivered at{" "}
+                {registered[0].scale.toFixed(4)}× the scale of the frames they segment. They are served exactly as
                 delivered; cloud cover is measured against the camera&apos;s true field of view, and the overlay is scaled
                 back so the two line up.
               </p>

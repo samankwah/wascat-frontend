@@ -1,5 +1,16 @@
+/**
+ * The public query contract.
+ *
+ * Filtering itself moved to the API, which can use an index. What stays here
+ * is validation: Explore parses its own URL before forwarding it, so a
+ * hand-edited query string produces the default view rather than a 400 from
+ * the API rendered as an error page.
+ *
+ * The schema must stay in step with the backend query parser, which reports
+ * these same rules with these same messages.
+ */
 import { z } from "zod";
-import { artifactTypes, seasons, timesOfDay, type ImageRecord } from "./catalog";
+import { artifactTypes, seasons, timesOfDay } from "./vocab";
 
 export const imageQuerySchema = z.object({
   q: z.string().trim().max(100).optional(),
@@ -26,51 +37,25 @@ export const imageQuerySchema = z.object({
 
 export type ImageQuery = z.infer<typeof imageQuerySchema>;
 
-export function filterImages(records: ImageRecord[], query: ImageQuery) {
-  const term = query.q?.toLowerCase();
-  return records
-    .filter(
-      (record) =>
-        (!term ||
-          [record.id, record.videoId, String(record.frameIndex), record.location ?? "", ...record.tags]
-            .join(" ")
-            .toLowerCase()
-            .includes(term)) &&
-        (!query.collection || record.collection === query.collection) &&
-        (!query.release || record.release === query.release) &&
-        (!query.video || record.videoId === query.video) &&
-        (query.segmented === undefined || record.hasMask === (query.segmented === "true")) &&
-        // Cloud-cover filters describe a measurement, so an unsegmented frame
-        // cannot satisfy them -- it is excluded rather than treated as 0 oktas.
-        (query.oktas === undefined ||
-          (record.cloudCoverOktas !== undefined && record.cloudCoverOktas === query.oktas)) &&
-        (query.oktasMin === undefined ||
-          (record.cloudCoverOktas !== undefined && record.cloudCoverOktas >= query.oktasMin)) &&
-        (query.oktasMax === undefined ||
-          (record.cloudCoverOktas !== undefined && record.cloudCoverOktas <= query.oktasMax)) &&
-        (!query.season || record.season === query.season) &&
-        (!query.time || record.timeOfDay === query.time) &&
-        (!query.location || (record.location ?? "").toLowerCase().includes(query.location.toLowerCase())) &&
-        (!query.artifact || record.artifacts.some((artifact) => artifact.type === query.artifact)) &&
-        // Date filters describe a capture time, so a record without one cannot
-        // satisfy them -- it is excluded rather than treated as an early date.
-        // Coalescing to "" would let every untimestamped record pass `to`,
-        // because "" sorts before any ISO date.
-        (query.from === undefined ||
-          (record.capturedAt !== undefined && record.capturedAt.slice(0, 10) >= query.from)) &&
-        (query.to === undefined ||
-          (record.capturedAt !== undefined && record.capturedAt.slice(0, 10) <= query.to)),
-    )
-    .sort((a, b) =>
-      query.sort === "oldest" ? a.sortKey.localeCompare(b.sortKey) : b.sortKey.localeCompare(a.sortKey),
-    );
+/**
+ * Opaque page cursors.
+ *
+ * The API issues keyset cursors, which are cheap and stable but only move
+ * forward. Explore offers Previous as well as Next, so it pages by offset -
+ * a form the API still accepts, and the right one for a UI that is browsed
+ * rather than streamed. The encoding is identical either way, so a cursor
+ * from either side round-trips.
+ */
+export function encodeOffsetCursor(offset: number) {
+  return Buffer.from(JSON.stringify({ offset })).toString("base64url");
 }
 
-export function encodeCursor(offset: number) { return Buffer.from(JSON.stringify({ offset })).toString("base64url"); }
-export function decodeCursor(cursor?: string) {
+export function decodeOffsetCursor(cursor?: string) {
   if (!cursor) return 0;
   try {
     const parsed = JSON.parse(Buffer.from(cursor, "base64url").toString("utf8"));
     return Number.isInteger(parsed.offset) && parsed.offset >= 0 ? parsed.offset : 0;
-  } catch { return 0; }
+  } catch {
+    return 0;
+  }
 }

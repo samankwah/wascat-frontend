@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import type { Collection } from "@/lib/catalog";
+import type { Collection } from "@/lib/types";
 
 export function CollectionCard({ collection, priority = false }: { collection: Collection; priority?: boolean }) {
   return (

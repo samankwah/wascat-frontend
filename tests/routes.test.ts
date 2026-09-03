@@ -1,42 +1,80 @@
-import { describe, expect, it } from "vitest";
-import * as imagePage from "../app/images/[id]/page";
-import { generateMetadata as collectionMetadata, generateStaticParams as collectionParams } from "../app/collections/[slug]/page";
-import { generateMetadata as imageMetadata } from "../app/images/[id]/page";
-import { collections, images } from "../lib/catalog";
+/**
+ * Route metadata, and what the pages ask the API for.
+ *
+ * The pages no longer hold the archive, so these run against the mocked API.
+ * That makes the requests themselves worth asserting: with filtering server
+ * side, "did the page ask for the right thing" is where the bugs now live.
+ */
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-describe("routes and metadata", () => {
-  it("pre-renders one route per collection", () => {
-    expect(collectionParams()).toEqual(collections.map(({ slug }) => ({ slug })));
-    expect(collectionParams()).not.toContainEqual({ slug: "reykjavik-all-sky" });
+import * as imagePage from "@/app/images/[id]/page";
+import { generateMetadata as collectionMetadata } from "@/app/collections/[slug]/page";
+import { generateMetadata as imageMetadata } from "@/app/images/[id]/page";
+
+import { installApiMock, MASK_ONLY, PAIRED, UNSEGMENTED, type RequestLog } from "./support/api-mock";
+
+let requests: RequestLog;
+let restore: () => void;
+
+beforeEach(() => {
+  ({ requests, restore } = installApiMock());
+});
+
+afterEach(() => restore());
+
+describe("static generation", () => {
+  // Was: "pre-renders one route per collection". Inverted deliberately.
+  //
+  // generateStaticParams runs at build time, which would mean `next build`
+  // could not finish without a reachable database - coupling CI and the
+  // container build to the API in order to pre-render eleven pages. They are
+  // rendered on demand and cached instead, and a dashboard edit invalidates
+  // them through /api/revalidate, which also makes an edit visible sooner
+  // than waiting for a rebuild.
+  it("does not pre-render collection pages", async () => {
+    const collectionPage = await import("@/app/collections/[slug]/page");
+    expect("generateStaticParams" in collectionPage).toBe(false);
   });
 
-  // Record pages render on demand; pre-rendering one page per frame would put
-  // the whole catalogue into the build output.
+  // Unchanged: pre-rendering one page per frame would put the whole archive
+  // into the build output, and the archive is the thing that grows.
   it("does not pre-render a page per record", () => {
     expect("generateStaticParams" in imagePage).toBe(false);
   });
+});
 
-  it("builds collection metadata from the real sequence", async () => {
-    const collection = collections[0];
-    const metadata = await collectionMetadata({ params: Promise.resolve({ slug: collection.slug }) });
-    expect(metadata.title).toBe(collection.title);
-    expect(metadata.description).toBe(collection.description);
+describe("collection metadata", () => {
+  it("comes from the collection the API returns", async () => {
+    const metadata = await collectionMetadata({ params: Promise.resolve({ slug: "vid1" }) });
+    expect(metadata.title).toBe("Capture sequence vid1");
+    expect(metadata.description).toMatch(/all-sky frames from capture sequence vid1/);
+    expect(requests[0].url).toBe("/api/v1/collections/vid1");
   });
 
-  it("builds record metadata describing what the record actually holds", async () => {
-    const paired = images.find((image) => image.hasSource && image.hasMask)!;
-    const paired_metadata = await imageMetadata({ params: Promise.resolve({ id: paired.id }) });
-    expect(paired_metadata.title).toBe(paired.id);
-    expect(paired_metadata.description).toMatch(/All-sky camera frame/);
+  it("degrades to a generic title when the collection is gone", async () => {
+    const metadata = await collectionMetadata({
+      params: Promise.resolve({ slug: "reykjavik-all-sky" }),
+    });
+    expect(metadata.title).toBe("Collection");
+  });
+});
 
-    const maskOnly = images.find((image) => !image.hasSource)!;
-    const maskOnlyMetadata = await imageMetadata({ params: Promise.resolve({ id: maskOnly.id }) });
-    expect(maskOnlyMetadata.description).toMatch(/Binary cloud segmentation mask/);
+describe("record metadata describes what the record actually holds", () => {
+  it("names a paired frame as a camera frame with its measurement", async () => {
+    const metadata = await imageMetadata({ params: Promise.resolve({ id: PAIRED.id }) });
+    expect(metadata.title).toBe(PAIRED.id);
+    expect(metadata.description).toMatch(/All-sky camera frame/);
+    expect(metadata.description).toMatch(/cloud cover/);
+  });
 
-    const unsegmented = images.find((image) => !image.hasMask)!;
-    const unsegmentedMetadata = await imageMetadata({ params: Promise.resolve({ id: unsegmented.id }) });
-    expect(unsegmentedMetadata.description).toMatch(/not yet segmented/);
-    // No cover is claimed for a frame nobody measured.
-    expect(unsegmentedMetadata.description).not.toMatch(/cloud cover/);
+  it("names a mask-only record as a mask", async () => {
+    const metadata = await imageMetadata({ params: Promise.resolve({ id: MASK_ONLY.id }) });
+    expect(metadata.description).toMatch(/Binary cloud segmentation mask/);
+  });
+
+  it("claims no cover for a frame nobody has measured", async () => {
+    const metadata = await imageMetadata({ params: Promise.resolve({ id: UNSEGMENTED.id }) });
+    expect(metadata.description).toMatch(/not yet segmented/);
+    expect(metadata.description).not.toMatch(/cloud cover/);
   });
 });

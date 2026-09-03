@@ -5,27 +5,34 @@ import { ArrowDownToLine, Box, Camera, Clock3, CloudOff, CloudSun, ExternalLink,
 import { ArtifactViewer } from "@/components/artifact-viewer";
 import { CopyButton } from "@/components/copy-button";
 import { FrameCard } from "@/components/frame-card";
-import { collectionTitle, formatDate, imageById, imagesInCollection, oktaLabel } from "@/lib/catalog";
+import { getCollection, getCollectionImages, getImage } from "@/lib/api-client";
+import { formatDate } from "@/lib/format";
+import { oktaLabel } from "@/lib/vocab";
 
 // Detail pages render on demand: there are too many records to pre-render, and
 // `dynamicParams` defaults to true so any valid id is served.
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
-  const record = imageById((await params).id);
+  const record = await getImage((await params).id);
   return { title: record?.id ?? "Image record", description: record?.alt };
 }
 
 export default async function ImageDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const record = imageById((await params).id);
+  const record = await getImage((await params).id);
   if (!record) notFound();
   const apiUrl = `https://wascat.example.org/api/v1/images/${record.id}`;
-  const related = imagesInCollection(record.collection).filter((item) => item.id !== record.id).slice(0, 3);
+  // Four are requested so three survive filtering this record out.
+  const [neighbours, collection] = await Promise.all([
+    getCollectionImages(record.collection, { limit: 4 }),
+    getCollection(record.collection),
+  ]);
+  const related = neighbours.filter((item) => item.id !== record.id).slice(0, 3);
 
   // Facts are measured or omitted; nothing here is assigned by hand.
   const facts: [typeof Clock3, string, string][] = [
     [Film, "Sequence", `${record.videoId} · frame ${record.frameIndex.toLocaleString()}`],
-    record.cloudFraction === undefined
+    record.cloudFraction == null
       ? [CloudOff, "Cloud cover", "Not measured — this frame has no segmentation mask"]
-      : [CloudSun, "Measured cloud cover", `${oktaLabel(record.cloudCoverOktas!)} · ${(record.cloudFraction * 100).toFixed(1)}% of the field of view`],
+      : [CloudSun, "Measured cloud cover", `${oktaLabel(record.cloudCoverOktas ?? 0)} · ${(record.cloudFraction * 100).toFixed(1)}% of the field of view`],
     [Box, "Dimensions", `${record.width} × ${record.height} pixels`],
     ...(record.capturedAt ? [[Clock3, "Captured", formatDate(record.capturedAt, true)] as [typeof Clock3, string, string]] : []),
     ...(record.location ? [[MapPin, "Location", record.location] as [typeof Clock3, string, string]] : []),
@@ -47,7 +54,7 @@ export default async function ImageDetailPage({ params }: { params: Promise<{ id
               {record.hasSource && record.hasMask ? "SOURCE + MASK" : record.hasMask ? "MASK ONLY" : "SOURCE ONLY"}
             </p>
             <h1 className="mt-3 break-all font-mono text-xl font-bold leading-7">{record.id}</h1>
-            <p className="mt-3 text-sm text-white/65">{collectionTitle(record.collection)} · release {record.release}</p>
+            <p className="mt-3 text-sm text-white/65">{collection?.shortTitle ?? record.collection} · release {record.release}</p>
             <div className="mt-8 grid border-t border-white/20">
               {facts.map(([Icon, label, body]) => {
                 const Graphic = Icon;
@@ -105,7 +112,7 @@ export default async function ImageDetailPage({ params }: { params: Promise<{ id
               ) : (
                 <>
                   Cloud cover is the share of the camera&apos;s circular field of view that the binary mask marks as cloud:{" "}
-                  <strong>{(record.cloudFraction * 100).toFixed(1)}%</strong>, or {oktaLabel(record.cloudCoverOktas!)}. The
+                  <strong>{((record.cloudFraction ?? 0) * 100).toFixed(1)}%</strong>, or {oktaLabel(record.cloudCoverOktas ?? 0)}. The
                   field of view is taken from the corner-masked frame itself rather than assumed.
                   {record.maskScale !== 1 && (
                     <> This sequence&apos;s masks were delivered at {record.maskScale.toFixed(4)}× the scale of the frames

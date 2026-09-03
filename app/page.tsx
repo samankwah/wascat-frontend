@@ -2,9 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Check, Database, Image as ImageIcon, Layers3, MapPin, Search } from "lucide-react";
 import { CollectionCard } from "@/components/collection-card";
-import { archiveImageTotal, collections, oktaValues, videoIds } from "@/lib/catalog";
+import { getArchiveStats, getCollections } from "@/lib/api-client";
+import { oktaValues } from "@/lib/vocab";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [stats, collections] = await Promise.all([getArchiveStats(), getCollections()]);
+  const { total: archiveImageTotal, sequences: videoIds } = stats;
+
   return (
     <>
       <section className="relative border-b border-[#d4e2ec] bg-[#eef7fd]" aria-labelledby="home-hero-title">

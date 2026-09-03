@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import { oktaLabel, recordTimestamp, type ImageRecord } from "@/lib/catalog";
+import { recordTimestamp } from "@/lib/format";
+import type { ImageRecord } from "@/lib/types";
+import { oktaLabel } from "@/lib/vocab";
 
 /**
  * One catalogue record in a grid. Badges reflect what the record actually
@@ -38,7 +40,7 @@ export function FrameCard({ image, priority = false }: { image: ImageRecord; pri
               image.cloudCoverOktas === undefined ? "border-dashed border-[#b8c8d1] text-muted" : "border-[#b8c8d1]"
             }`}
           >
-            {image.cloudCoverOktas === undefined ? "Unsegmented" : oktaLabel(image.cloudCoverOktas)}
+            {image.cloudCoverOktas == null ? "Unsegmented" : oktaLabel(image.cloudCoverOktas)}
           </span>
         </div>
       </Link>
