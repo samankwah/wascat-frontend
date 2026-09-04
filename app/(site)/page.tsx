@@ -38,11 +38,11 @@ export default async function HomePage() {
                 <span className="block">West African skies</span>
               </h1>
               <p className="mt-6 max-w-[410px] text-[1.02rem] leading-[1.62] text-ink-panel md:text-[1.08rem]">
-                WASCAT v1.0 is an expert-labelled demonstration archive spanning Ghana, Nigeria, and Burkina Faso, built for transparent cloud, aerosol, and atmospheric-condition research.
+                WASCAT is an expert-labelled demonstration archive spanning Ghana, Nigeria, and Burkina Faso, built for transparent cloud, aerosol, and atmospheric-condition research.
               </p>
               <div className="mt-4 flex flex-col gap-3 sm:mt-2 sm:flex-row sm:gap-4">
                 <Link href="/explore" className="hero-primary-link inline-flex min-h-12 items-center justify-center rounded-[7px] bg-sky-vivid px-9 text-sm font-bold transition-colors hover:bg-sky-bright sm:min-w-[178px]">Browse images</Link>
-                <a href="/api/v1/images?limit=100" download="wascat-v1.0-metadata.json" className="hero-secondary-link inline-flex min-h-12 items-center justify-center rounded-[7px] border-2 border-sky-vivid bg-white/65 px-7 text-sm font-bold transition-colors hover:bg-white sm:min-w-[195px]">Download metadata</a>
+                <a href="/api/v1/images?limit=100" download="wascat-metadata.json" className="hero-secondary-link inline-flex min-h-12 items-center justify-center rounded-[7px] border-2 border-sky-vivid bg-white/65 px-7 text-sm font-bold transition-colors hover:bg-white sm:min-w-[195px]">Download metadata</a>
               </div>
             </div>
 

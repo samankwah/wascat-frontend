@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Check, Copy } from "lucide-react";
 
-export const metadata: Metadata = { title: "API documentation", description: "Query WASCAT v1.0 West African demonstration collections, records, artifacts, and facets." };
+export const metadata: Metadata = { title: "API documentation", description: "Query WASCAT West African demonstration collections, records, artifacts, and facets." };
 const endpoints = [
   ["GET", "/api/v1/collections", "List published collections"],
   ["GET", "/api/v1/collections/{slug}", "Retrieve collection metadata"],

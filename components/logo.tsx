@@ -9,7 +9,7 @@ export function Logo({ inverse = false }: { inverse?: boolean }) {
           <path d="M4 27h36" stroke="currentColor" strokeWidth="2"/>
         </svg>
       </span>
-      <span className={`text-[1.04rem] font-bold tracking-[.17em] ${inverse ? "text-white" : "text-ink"}`}>WASCAT <span className="text-[.62rem] tracking-[.08em] opacity-65">v1.0</span></span>
+      <span className={`text-[1.04rem] font-bold tracking-[.17em] ${inverse ? "text-white" : "text-ink"}`}>WASCAT</span>
     </Link>
   );
 }
