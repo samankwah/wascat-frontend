@@ -56,10 +56,16 @@ async function request<T>(path: string, { method = "GET", body, signal }: Option
     signal,
   });
 
-  if (response.status === 401) {
-    // The session ended while the page was open. A full navigation rather than
-    // a client route change, so the proxy sees the missing cookie and the
-    // dashboard does not try to re-render itself without one.
+  // A 401 from every other endpoint means the session ended while the page
+  // was open. The login call is the one exception: it also answers 401 for
+  // ordinary wrong credentials, which is not a session to bounce out of - it
+  // is the caller's own request, and the caller (the sign-in form) needs the
+  // rejection to fall through to its normal error handling below rather than
+  // being read as "you were signed out."
+  if (response.status === 401 && path !== "/admin/auth/login") {
+    // A full navigation rather than a client route change, so the proxy sees
+    // the missing cookie and the dashboard does not try to re-render itself
+    // without one.
     window.location.href = `/admin/login?next=${encodeURIComponent(window.location.pathname)}`;
     throw new AdminApiError(401, "unauthorized", "Your session has ended.");
   }
