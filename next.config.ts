@@ -13,7 +13,24 @@ import type { NextConfig } from "next";
  */
 const API_ORIGIN = process.env.WASCAT_API_ORIGIN ?? "http://127.0.0.1:8000";
 
-/** Where frames are served from, so next/image will optimise them. */
+/**
+ * Where the object store actually lives, for the /frames rewrite below.
+ *
+ * The API returns frame URLs as plain paths - `/frames/seq-001/5-source.jpg` -
+ * which is what the bundled catalogue served and what the recorded contract
+ * fixtures assert. Rewriting them here keeps imagery on this origin, so
+ * `next/image` treats it as a local path and needs no per-environment
+ * `remotePatterns` entry, and so a deployment can move storage without the
+ * catalogue's URLs changing.
+ */
+const ASSET_ORIGIN =
+  process.env.WASCAT_ASSET_ORIGIN ?? "http://127.0.0.1:9000/wascat";
+
+/**
+ * Only for deployments that serve frames straight off a CDN, where the API is
+ * configured with an absolute `PUBLIC_ASSET_BASE_URL` and the rewrite is not
+ * in play. Empty locally.
+ */
 const assetBase = process.env.NEXT_PUBLIC_ASSET_BASE_URL ?? "";
 const assetUrl = assetBase ? new URL(assetBase) : null;
 
@@ -41,6 +58,14 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       { source: "/api/v1/:path*", destination: `${API_ORIGIN}/api/v1/:path*` },
+      // Frames and masks, served from object storage but addressed as if they
+      // were this site's own files - the same URLs the archive published when
+      // they lived in public/frames.
+      { source: "/frames/:path*", destination: `${ASSET_ORIGIN}/frames/:path*` },
+      {
+        source: "/derivatives/:path*",
+        destination: `${ASSET_ORIGIN}/derivatives/:path*`,
+      },
     ];
   },
 

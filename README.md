@@ -21,8 +21,17 @@ npm run dev          # http://localhost:3000
 | | |
 |---|---|
 | `WASCAT_API_ORIGIN` | Where the API is. Defaults to `http://127.0.0.1:8000`. |
-| `NEXT_PUBLIC_ASSET_BASE_URL` | Where frames are served from, so `next/image` will optimise them. |
+| `WASCAT_ASSET_ORIGIN` | Where the object store is. Defaults to `http://127.0.0.1:9000/wascat`. |
 | `WASCAT_REVALIDATE_SECRET` | Shared with the backend, so a published edit can invalidate the cache. |
+
+Frames are addressed as `/frames/seq-001/5-source.jpg` — the same URLs the archive
+published when they lived in `public/frames` — and rewritten to the object
+store. Keeping them on this origin means `next/image` optimises them as local
+files, so no environment has to declare a storage host in
+`images.remotePatterns`, and storage can move without the catalogue's URLs
+changing. A CDN deployment is the one exception: set `NEXT_PUBLIC_ASSET_BASE_URL`
+and the backend's `WASCAT_PUBLIC_ASSET_BASE_URL` to the same origin, and the
+API emits absolute URLs instead.
 
 ## Layout
 
