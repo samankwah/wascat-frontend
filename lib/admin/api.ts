@@ -167,4 +167,33 @@ export const adminApi = {
       method: "POST",
       body: { ids },
     }),
+
+  // -- people -----------------------------------------------------------
+  // Create and reset return a `password` the server generated. It is the only
+  // time that value exists outside a hash, so the caller has to show it before
+  // it is gone; nothing here stores it.
+  createUser: (email: string, role: string, fullName?: string) =>
+    request<ManagedUserWithSecret>("/admin/users", {
+      method: "POST",
+      body: { email, role, ...(fullName ? { fullName } : {}) },
+    }),
+  updateUser: (id: string, changes: { fullName?: string; role?: string; isActive?: boolean }) =>
+    request<unknown>(`/admin/users/${encodeURIComponent(id)}`, {
+      method: "PATCH",
+      body: changes,
+    }),
+  resetUserPassword: (id: string) =>
+    request<ManagedUserWithSecret>(`/admin/users/${encodeURIComponent(id)}/password`, {
+      method: "POST",
+    }),
+};
+
+/** An account, plus the one-time password that will never be readable again. */
+export type ManagedUserWithSecret = {
+  id: string;
+  email: string;
+  fullName: string | null;
+  roles: string[];
+  isActive: boolean;
+  password: string;
 };

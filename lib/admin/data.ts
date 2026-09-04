@@ -160,3 +160,36 @@ export async function listVocabularies(): Promise<Vocabulary[]> {
   const body = await adminFetch<Vocabulary[]>("/admin/vocabulary");
   return body?.data ?? [];
 }
+
+export type ManagedUser = {
+  id: string;
+  email: string;
+  fullName: string | null;
+  roles: string[];
+  permissions: string[];
+  isActive: boolean;
+  lastLoginAt: string | null;
+  createdAt: string;
+};
+
+export type ManagedRole = {
+  slug: string;
+  description: string;
+  permissions: string[];
+};
+
+/**
+ * Accounts, and the roles that can be assigned to them.
+ *
+ * The roles arrive alongside in `meta` rather than from a second request,
+ * because a picker that cannot describe what it is offering is a picker that
+ * gets used wrongly.
+ */
+export async function listUsers(): Promise<{ users: ManagedUser[]; roles: ManagedRole[] }> {
+  const body = await adminFetch<ManagedUser[]>("/admin/users");
+  if (!body) return { users: [], roles: [] };
+  return {
+    users: body.data,
+    roles: (body.meta.roles as ManagedRole[] | undefined) ?? [],
+  };
+}
