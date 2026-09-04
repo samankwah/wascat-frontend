@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ArrowRight, Check, Database, Image as ImageIcon, Layers3, MapPin, Search } from "lucide-react";
 import { CollectionCard } from "@/components/collection-card";
 import { getArchiveStats, getCollections } from "@/lib/api-client";
-import { oktaValues } from "@/lib/vocab";
+import { oktaLabel, oktaValues } from "@/lib/vocab";
 
 export default async function HomePage() {
   // Render at request time rather than at build. Prerendering these would
@@ -66,8 +66,8 @@ export default async function HomePage() {
               <input name="q" type="search" className="field-input hero-search-control search-field-input" placeholder="Search by date, class or condition" />
             </label>
             <label className="hero-filter-label"><span className="field-label text-muted-dim">Sequence</span><select name="video" className="field-select hero-search-control" defaultValue=""><option value="">All sequences</option>{videoIds.map((videoId) => <option key={videoId}>{videoId}</option>)}</select></label>
-            <label className="hero-filter-label"><span className="field-label text-muted-dim">Min cloud cover</span><select name="oktasMin" className="field-select hero-search-control" defaultValue=""><option value="">Any</option>{oktaValues.map((okta) => <option key={okta} value={okta}>{okta}/8</option>)}</select></label>
-            <label className="hero-filter-label"><span className="field-label text-muted-dim">Max cloud cover</span><select name="oktasMax" className="field-select hero-search-control" defaultValue=""><option value="">Any</option>{oktaValues.map((okta) => <option key={okta} value={okta}>{okta}/8</option>)}</select></label>
+            <label className="hero-filter-label"><span className="field-label text-muted-dim">Min cloud cover</span><select name="oktasMin" className="field-select hero-search-control" defaultValue=""><option value="">Any</option>{oktaValues.map((okta) => <option key={okta} value={okta}>{oktaLabel(okta)}</option>)}</select></label>
+            <label className="hero-filter-label"><span className="field-label text-muted-dim">Max cloud cover</span><select name="oktasMax" className="field-select hero-search-control" defaultValue=""><option value="">Any</option>{oktaValues.map((okta) => <option key={okta} value={okta}>{oktaLabel(okta)}</option>)}</select></label>
             <button type="submit" className="inline-flex h-[50px] items-center justify-center self-end whitespace-nowrap rounded-[7px] bg-sky-vivid px-5 text-sm font-bold text-white transition-colors hover:bg-sky-bright sm:col-span-2 lg:col-span-1">Explore archive</button>
           </form>
         </div>

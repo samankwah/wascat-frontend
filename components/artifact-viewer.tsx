@@ -67,7 +67,10 @@ export function ArtifactViewer({ record }: { record: ImageRecord }) {
 
         <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-between bg-gradient-to-t from-black/55 to-transparent px-4 pb-3 pt-10 text-[.6rem] font-bold tracking-wide text-white/80">
           <span>{record.width} × {record.height} PX</span>
-          <span>{tab.toUpperCase()} · {record.cloudCoverOktas == null ? "NOT SEGMENTED" : oktaLabel(record.cloudCoverOktas)}</span>
+          {/* "Unsegmented" everywhere else in the archive; this bar is the one
+              place text is uppercased for a caption treatment, not a
+              different word for the same absence. */}
+          <span>{tab.toUpperCase()} · {record.cloudCoverOktas == null ? "UNSEGMENTED" : oktaLabel(record.cloudCoverOktas).toUpperCase()}</span>
         </div>
       </div>
 

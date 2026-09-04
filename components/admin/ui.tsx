@@ -10,6 +10,7 @@
  * dashboard stays as light as the public site.
  */
 import type { ReactNode } from "react";
+import { oktaLabel } from "@/lib/vocab";
 
 /** Merge class names, dropping the falsy ones. */
 export function cx(...parts: (string | false | null | undefined)[]): string {
@@ -119,8 +120,10 @@ export function CoverBadge({ oktas }: { oktas: number | null | undefined }) {
       </Badge>
     );
   }
-  const label = oktas === 0 ? "0/8 · clear" : oktas === 8 ? "8/8 · overcast" : `${oktas}/8`;
-  return <Badge tone="measured">{label}</Badge>;
+  // Lowercased to sit with the other badges, but the terms and the bands come
+  // from the one place that defines them, so the dashboard and the public site
+  // cannot drift apart on what 5/8 is called.
+  return <Badge tone="measured">{oktaLabel(oktas).toLowerCase()}</Badge>;
 }
 
 // ---------------------------------------------------------------------------

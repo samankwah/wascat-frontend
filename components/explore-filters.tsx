@@ -1,8 +1,9 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Filter, Search, SlidersHorizontal, X } from "lucide-react";
+import { Filter, Search, SlidersHorizontal, TriangleAlert, X } from "lucide-react";
 import { useState } from "react";
+import { oktaLabel } from "@/lib/vocab";
 
 /**
  * Filter controls for /explore.
@@ -22,6 +23,14 @@ export type ExploreOptions = {
   hasTimestamps: boolean;
   /** True when the catalogue holds frames that have not been segmented. */
   hasUnsegmented: boolean;
+  /**
+   * How many segmented frames land in each okta bucket, 0-8. The archive's
+   * measured range does not necessarily span the whole scale - today nothing
+   * falls below 4/8 - and a bucket with nothing in it is still worth showing
+   * rather than hiding, the same way the scale itself does not skip numbers.
+   * Mirrors the count admin's own oktas filter already shows.
+   */
+  oktaCounts: number[];
 };
 
 const chipFields = ["q", "collection", "release", "video", "segmented", "oktasMin", "oktasMax", "season", "time", "location", "artifact", "from", "to"] as const;
@@ -43,6 +52,13 @@ const chipLabels: Record<string, string> = {
 };
 
 const oktaOptions = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+
+/** True once both ends of the range are set and the range is empty by construction. */
+function oktaRangeInverted(value: (key: string) => string): boolean {
+  const min = value("oktasMin");
+  const max = value("oktasMax");
+  return min !== "" && max !== "" && Number(min) > Number(max);
+}
 
 function Panel({
   options,
@@ -115,17 +131,33 @@ function Panel({
             <span className="sr-only">Minimum oktas</span>
             <select className="field-select" value={value("oktasMin")} onChange={(event) => update("oktasMin", event.target.value)}>
               <option value="">Min</option>
-              {oktaOptions.map((okta) => <option key={okta} value={okta}>{okta}/8</option>)}
+              {oktaOptions.map((okta) => (
+                <option key={okta} value={okta} disabled={options.oktaCounts[okta] === 0}>
+                  {oktaLabel(okta)} ({options.oktaCounts[okta].toLocaleString()})
+                </option>
+              ))}
             </select>
           </label>
           <label>
             <span className="sr-only">Maximum oktas</span>
             <select className="field-select" value={value("oktasMax")} onChange={(event) => update("oktasMax", event.target.value)}>
               <option value="">Max</option>
-              {oktaOptions.map((okta) => <option key={okta} value={okta}>{okta}/8</option>)}
+              {oktaOptions.map((okta) => (
+                <option key={okta} value={okta} disabled={options.oktaCounts[okta] === 0}>
+                  {oktaLabel(okta)} ({options.oktaCounts[okta].toLocaleString()})
+                </option>
+              ))}
             </select>
           </label>
         </div>
+        {/* A minimum above the maximum can't match anything - said here rather
+            than left for the results grid to explain after the fact. */}
+        {oktaRangeInverted(value) && (
+          <p role="alert" className="mt-2 flex items-start gap-1.5 text-xs leading-5 text-danger">
+            <TriangleAlert size={13} className="mt-0.5 shrink-0" aria-hidden="true" />
+            Minimum is above maximum, so no frame can match. Swap them or clear one.
+          </p>
+        )}
       </fieldset>
 
       <label>
@@ -250,7 +282,9 @@ export function ExploreShell({
                     ? collectionLabel(value(field))
                     : field === "segmented"
                       ? value(field) === "true" ? "Segmented" : "Not segmented"
-                      : value(field)}{" "}
+                      : field === "oktasMin" || field === "oktasMax"
+                        ? oktaLabel(Number(value(field)))
+                        : value(field)}{" "}
                   <X size={13} />
                 </button>
               ))}
