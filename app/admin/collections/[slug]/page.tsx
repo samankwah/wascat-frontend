@@ -7,6 +7,7 @@ import { Fact, Facts, Panel, PanelHeader } from "@/components/admin/ui";
 import { listAudit, listCollections } from "@/lib/admin/data";
 import { PERMISSIONS, can, requirePermission } from "@/lib/admin/session";
 import { formatDate } from "@/lib/format";
+import { oktaLabel } from "@/lib/vocab";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   return { title: (await params).slug };
@@ -102,7 +103,7 @@ export default async function AdminCollectionDetail({
                 <Fact label="Mean cover">
                   {collection.meanCloudCoverOktas == null
                     ? undefined
-                    : `${Math.round(collection.meanCloudCoverOktas)}/8`}
+                    : oktaLabel(Math.round(collection.meanCloudCoverOktas))}
                 </Fact>
                 <Fact label="Sequences" mono>
                   {collection.videoIds.join(", ")}

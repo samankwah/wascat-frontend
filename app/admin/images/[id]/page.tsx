@@ -16,6 +16,7 @@ import { getImage, listAudit } from "@/lib/admin/data";
 import { PERMISSIONS, can, requirePermission } from "@/lib/admin/session";
 import { formatDate } from "@/lib/format";
 import { getFacets } from "@/lib/api-client";
+import { oktaLabel } from "@/lib/vocab";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   return { title: (await params).id };
@@ -100,7 +101,7 @@ export default async function AdminImageDetail({
                       No mask, so no measurement. Not zero.
                     </span>
                   ) : (
-                    `${record.cloudCoverOktas}/8 · ${((record.cloudFraction ?? 0) * 100).toFixed(1)}% of the field of view`
+                    `${oktaLabel(record.cloudCoverOktas)} · ${((record.cloudFraction ?? 0) * 100).toFixed(1)}% of the field of view`
                   )}
                 </Fact>
                 <Fact label="Mask scale" mono>

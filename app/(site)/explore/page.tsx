@@ -17,8 +17,11 @@ const values = (facet: FacetValue[]) => facet.map((entry) => String(entry.value)
 /** Only offer a filter that can actually match something. */
 const populated = (facet: FacetValue[]) =>
   facet.filter((entry) => entry.count > 0).map((entry) => String(entry.value));
+// `entry.value` is `string | number` - a segmentation facet's values are
+// strings ("segmented"), an okta facet's are numbers (5) - so the comparison
+// normalises both sides rather than assuming which.
 const countOf = (facet: FacetValue[], value: string) =>
-  facet.find((entry) => entry.value === value)?.count ?? 0;
+  facet.find((entry) => String(entry.value) === value)?.count ?? 0;
 
 function pageHref(params: Record<string, string | string[] | undefined>, cursor?: string) {
   const query = new URLSearchParams();
@@ -83,6 +86,7 @@ export default async function ExplorePage({
     artifactTypes: values(facets.artifacts),
     hasTimestamps: timestamped.total > 0,
     hasUnsegmented: countOf(facets.segmentation, "unsegmented") > 0,
+    oktaCounts: Array.from({ length: 9 }, (_, okta) => countOf(facets.cloudCoverOktas, String(okta))),
   };
 
   const segmentedImageTotal = countOf(facets.segmentation, "segmented");
@@ -122,7 +126,14 @@ export default async function ExplorePage({
           <div className="flex min-h-[430px] flex-col items-center justify-center text-center">
             <span className="flex h-14 w-14 items-center justify-center rounded-full bg-sky-pale text-sky"><ImageOff /></span>
             <h2 className="display mt-5 text-3xl">No sky matches this view.</h2>
-            <p className="mt-3 max-w-sm text-sm leading-6 text-muted">Try widening the cloud-cover range or clearing a filter.</p>
+            <p className="mt-3 max-w-sm text-sm leading-6 text-muted">
+              {query.oktasMin != null && query.oktasMax != null && query.oktasMin > query.oktasMax
+                ? // Distinct from an ordinary empty result: this range can never
+                  // match anything, by construction, so say that rather than
+                  // suggesting a widen that would not fix it.
+                  `Minimum cover (${query.oktasMin}/8) is above maximum (${query.oktasMax}/8), so no frame can satisfy both.`
+                : "Try widening the cloud-cover range or clearing a filter."}
+            </p>
             <Link href="/explore" className="button-primary mt-6">Clear all filters</Link>
           </div>
         )}
