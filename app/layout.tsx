@@ -42,8 +42,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
+    // `data-scroll-behavior` opts back into Next's override of the global
+    // `scroll-behavior: smooth`. Without it, changing route animates a scroll
+    // to the top instead of arriving there - slow, and disorienting on a long
+    // table. In-page anchors still glide.
     <html
       lang="en"
+      data-scroll-behavior="smooth"
       className={`${inter.variable} ${sourceSerif.variable} ${jetbrainsMono.variable}`}
     >
       <body className="min-h-screen antialiased">{children}</body>
