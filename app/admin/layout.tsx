@@ -21,10 +21,13 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   if (!user) return <>{children}</>;
 
   return (
-    <div className="min-h-[80vh] bg-paper">
-      <div className="mx-auto flex w-full max-w-[110rem] flex-col lg:flex-row">
+    <div className="min-h-screen bg-paper">
+      {/* `items-start` keeps the sidebar from being stretched to the height of
+          the content: a stretched flex child has no room to move, which is
+          what stops `position: sticky` from doing anything. */}
+      <div className="mx-auto flex w-full max-w-[110rem] flex-col items-start lg:flex-row">
         <AdminNav user={user} />
-        <div className="min-w-0 flex-1 px-5 py-7 sm:px-7 lg:px-9 lg:py-9">{children}</div>
+        <div className="w-full min-w-0 flex-1 px-5 py-7 sm:px-7 lg:px-9 lg:py-9">{children}</div>
       </div>
     </div>
   );
