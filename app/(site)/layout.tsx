@@ -1,5 +1,6 @@
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
+import { ScrollToTop } from "@/components/scroll-to-top";
 
 /**
  * The public archive's chrome.
@@ -20,6 +21,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
       <Header />
       <main id="main-content">{children}</main>
       <Footer />
+      <ScrollToTop />
     </>
   );
 }

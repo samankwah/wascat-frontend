@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AdminNav } from "@/components/admin/nav";
+import { ScrollToTop } from "@/components/scroll-to-top";
 import { getSession } from "@/lib/admin/session";
 
 export const metadata: Metadata = {
@@ -29,6 +30,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <AdminNav user={user} />
         <div className="w-full min-w-0 flex-1 px-5 py-7 sm:px-7 lg:px-9 lg:py-9">{children}</div>
       </div>
+      <ScrollToTop />
     </div>
   );
 }
