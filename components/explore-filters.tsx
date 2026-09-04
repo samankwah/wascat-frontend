@@ -82,7 +82,7 @@ function Panel({
         <span className="field-label">Search</span>
         <span className="relative block">
           <Search size={18} strokeWidth={1.75} aria-hidden="true" className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-dim" />
-          <input className="field-input pl-11" defaultValue={value("q")} onBlur={(event) => update("q", event.target.value)} placeholder="Record ID, sequence, or frame" />
+          <input className="field-input search-field-input" defaultValue={value("q")} onBlur={(event) => update("q", event.target.value)} placeholder="Record ID, sequence, or frame" />
         </span>
       </label>
 

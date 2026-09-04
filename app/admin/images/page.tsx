@@ -82,7 +82,7 @@ export default async function AdminImages({
                 name="q"
                 defaultValue={current("q")}
                 placeholder="Record id, sequence, frame…"
-                className="field-input pl-9"
+                className="field-input search-field-input"
               />
             </span>
           </label>
