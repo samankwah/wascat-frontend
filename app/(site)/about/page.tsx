@@ -42,41 +42,57 @@ export default function AboutPage() {
           </div>
 
           <ul className="mt-11 grid gap-5 md:grid-cols-2 lg:grid-cols-6" aria-label="WASCAT team members">
-            {teamMembers.map((member, index) => (
-              <li
-                key={member.name}
-                className={`group flex min-h-[390px] flex-col overflow-hidden border border-line bg-white shadow-[0_8px_24px_rgba(16,47,65,.05)] transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-1 hover:border-on-dark hover:shadow-[0_14px_34px_rgba(16,47,65,.11)] lg:col-span-2 ${index === 3 ? "lg:col-start-2" : ""} ${index === 4 ? "lg:col-start-4" : ""}`}
-              >
-                <TeamPortrait member={member} />
-                <div className="flex flex-1 items-end justify-between gap-4 p-6">
-                  <div>
-                    <h3 className="display text-[1.55rem] leading-tight text-ink">{member.name}</h3>
-                    <p className="mt-2 text-sm leading-6 text-muted">{member.role}</p>
+            {teamMembers.map((member, index) => {
+              // Each card spans 2 of 6 columns, so 3 fit per row. A partial
+              // last row is centered rather than left-hung: one leftover card
+              // sits in the middle pair of columns, two leftover cards flank
+              // it symmetrically.
+              const remainder = teamMembers.length % 3;
+              const lastRowStart = teamMembers.length - remainder;
+              const centerStart =
+                remainder === 1 && index === lastRowStart
+                  ? "lg:col-start-3"
+                  : remainder === 2 && index === lastRowStart
+                    ? "lg:col-start-2"
+                    : remainder === 2 && index === lastRowStart + 1
+                      ? "lg:col-start-4"
+                      : "";
+              return (
+                <li
+                  key={member.name}
+                  className={`group flex min-h-[390px] flex-col overflow-hidden border border-line bg-white shadow-[0_8px_24px_rgba(16,47,65,.05)] transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-1 hover:border-on-dark hover:shadow-[0_14px_34px_rgba(16,47,65,.11)] lg:col-span-2 ${centerStart}`}
+                >
+                  <TeamPortrait member={member} />
+                  <div className="flex flex-1 items-end justify-between gap-4 p-6">
+                    <div>
+                      <h3 className="display text-[1.55rem] leading-tight text-ink">{member.name}</h3>
+                      <p className="mt-2 text-sm leading-6 text-muted">{member.role}</p>
+                    </div>
+                    {member.linkedin ? (
+                      <a
+                        href={member.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`${member.name} on LinkedIn (opens in a new tab)`}
+                        className="inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-field text-sky transition-colors hover:border-[#0a66c2] hover:bg-[#0a66c2] hover:text-white focus-visible:border-[#0a66c2] focus-visible:bg-[#0a66c2] focus-visible:text-white"
+                      >
+                        <Linkedin size={18} strokeWidth={1.8} aria-hidden="true" />
+                      </a>
+                    ) : (
+                      <span
+                        role="link"
+                        aria-label={`${member.name} LinkedIn profile coming soon`}
+                        aria-disabled="true"
+                        title="LinkedIn profile coming soon"
+                        className="inline-flex size-10 shrink-0 cursor-not-allowed items-center justify-center rounded-full border border-on-dark text-on-dark-dim"
+                      >
+                        <Linkedin size={18} strokeWidth={1.8} aria-hidden="true" />
+                      </span>
+                    )}
                   </div>
-                  {member.linkedin ? (
-                    <a
-                      href={member.linkedin}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={`${member.name} on LinkedIn (opens in a new tab)`}
-                      className="inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-field text-sky transition-colors hover:border-[#0a66c2] hover:bg-[#0a66c2] hover:text-white focus-visible:border-[#0a66c2] focus-visible:bg-[#0a66c2] focus-visible:text-white"
-                    >
-                      <Linkedin size={18} strokeWidth={1.8} aria-hidden="true" />
-                    </a>
-                  ) : (
-                    <span
-                      role="link"
-                      aria-label={`${member.name} LinkedIn profile coming soon`}
-                      aria-disabled="true"
-                      title="LinkedIn profile coming soon"
-                      className="inline-flex size-10 shrink-0 cursor-not-allowed items-center justify-center rounded-full border border-on-dark text-on-dark-dim"
-                    >
-                      <Linkedin size={18} strokeWidth={1.8} aria-hidden="true" />
-                    </span>
-                  )}
-                </div>
-              </li>
-            ))}
+                </li>
+              );
+            })}
           </ul>
         </div>
       </section>

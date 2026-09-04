@@ -1,9 +1,9 @@
 import type { StaticImageData } from "next/image";
-import adwoaPortrait from "@/public/images/team/adwoa-gyasi-generated.png";
+import edemPortrait from "@/public/images/team/edem-appiah-yeboah.jpg";
 import oliverPortrait from "@/public/images/team/oliver-kornyo-generated.png";
 import princePortrait from "@/public/images/team/prince-asilevi-generated.png";
 import richmondPortrait from "@/public/images/team/richmond-owusu-generated.png";
-import stephenPortrait from "@/public/images/team/stephen-amankwah-generated.png";
+import stephenPortrait from "@/public/images/team/stephen-amankwah.jpg";
 
 export type TeamMember = {
   name: string;
@@ -16,10 +16,12 @@ export type TeamMember = {
   linkedin?: string;
 };
 
+// The WASCAT team, Department of Meteorology and Climate Science / Department
+// of Computer Science, KNUST, Kumasi, and the Ghana Meteorological Agency.
 export const teamMembers = [
   {
     name: "Dr Prince Junior Asilevi",
-    role: "Scientific Lead & Atmospheric Scientist",
+    role: "Project Lead, Department of Meteorology and Climate Science, KNUST, Kumasi",
     initials: "PJA",
     image: {
       src: princePortrait,
@@ -28,40 +30,51 @@ export const teamMembers = [
     linkedin: "https://gh.linkedin.com/in/prince-junior-asilevi-ab5966259",
   },
   {
-    name: "Mr Stephen Amankwah",
-    role: "Software Developer & Agrometeorologist",
-    initials: "SA",
-    image: {
-      src: stephenPortrait,
-      alt: "Temporary generated editorial portrait representing Mr Stephen Amankwah's WASCAT contribution.",
-    },
+    name: "Prof. Emmanuel Quansah",
+    role: "Co-Lead, Department of Meteorology and Climate Science, KNUST, Kumasi",
+    initials: "EQ",
   },
   {
-    name: "Richmond Owusu",
-    role: "Data Engineer & Web Platform Developer",
-    initials: "RO",
-    image: {
-      src: richmondPortrait,
-      alt: "Temporary generated editorial portrait representing Richmond Owusu's WASCAT contribution.",
-    },
-  },
-  {
-    name: "Adwoa Gyasi",
-    role: "Climate Data Analyst & Curator",
-    initials: "AG",
-    image: {
-      src: adwoaPortrait,
-      alt: "Temporary generated editorial portrait representing Adwoa Gyasi's WASCAT contribution.",
-    },
-  },
-  {
-    name: "Oliver Kornyo",
-    role: "Research Computing & Machine Learning",
+    name: "Dr Oliver Kornyo",
+    role: "Co-Lead, Department of Computer Science, KNUST, Kumasi",
     initials: "OK",
     image: {
       src: oliverPortrait,
-      alt: "Temporary generated editorial portrait representing Oliver Kornyo's WASCAT contribution.",
+      alt: "Temporary generated editorial portrait representing Dr Oliver Kornyo's WASCAT contribution.",
     },
     linkedin: "https://gh.linkedin.com/in/oliver-kornyo-phd-lecturer-comp-sci-knust-28644879",
+  },
+  {
+    name: "Sandra Adjetey",
+    role: "Meteorologist, Ghana Meteorological Agency",
+    initials: "SA",
+  },
+  {
+    name: "Richmond Owusu Agyei",
+    role: "Graduate Researcher and IT Technician, Department of Computer Science, KNUST, Kumasi",
+    initials: "ROA",
+    image: {
+      src: richmondPortrait,
+      alt: "Temporary generated editorial portrait representing Richmond Owusu Agyei's WASCAT contribution.",
+    },
+  },
+  {
+    name: "Edem Junior Appiah-Yeboah",
+    role: "Graduate Researcher, Department of Meteorology and Climate Science, KNUST, Kumasi",
+    initials: "EJA",
+    image: {
+      src: edemPortrait,
+      alt: "Portrait of Edem Junior Appiah-Yeboah.",
+    },
+  },
+  {
+    name: "Stephen Amankwah",
+    role: "Principal Meteorologist Technician, Ghana Meteorological Agency",
+    initials: "SA",
+    image: {
+      src: stephenPortrait,
+      alt: "Portrait of Stephen Amankwah.",
+    },
+    linkedin: "https://www.linkedin.com/in/stephenamankwah/",
   },
 ] satisfies readonly TeamMember[];
