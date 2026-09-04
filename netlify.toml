@@ -1,0 +1,17 @@
+# Netlify's Next.js Runtime auto-detects the framework from package.json and
+# handles SSR, image optimisation, and next.config.ts's rewrites without
+# extra plugin config - the entries below are just the build command, the
+# directory it reads from, and a pinned Node version so a Netlify platform
+# default change doesn't silently pick a different one than local dev used.
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Every WASCAT_*/NEXT_PUBLIC_* var this build needs (WASCAT_API_ORIGIN,
+# WASCAT_ASSET_ORIGIN, WASCAT_REVALIDATE_SECRET, and NEXT_PUBLIC_ASSET_BASE_URL
+# only if serving frames off a CDN rather than through the /frames rewrite -
+# see .env.example) is set in the Netlify dashboard's own environment
+# variables UI, not here: this file is public in the repo, those are not.

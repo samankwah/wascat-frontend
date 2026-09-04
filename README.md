@@ -86,3 +86,16 @@ npm run types:generate   # regenerate lib/api-types.ts from the API
 
 The build deliberately needs no database: the catalogue pages `await
 connection()` so they render per request rather than at build time.
+
+## Deploy
+
+`netlify.toml` builds this on Netlify's own Next.js Runtime, which
+auto-detects the framework and handles SSR, image optimisation, and
+`next.config.ts`'s external `rewrites()` without extra plugin config. Connect
+the repo (**Add new site → Import an existing project**, or `netlify init`
+from this directory), then set the same three vars `.env.local` carries
+locally - `WASCAT_API_ORIGIN`, `WASCAT_ASSET_ORIGIN`,
+`WASCAT_REVALIDATE_SECRET` - in the site's own environment variables, pointed
+at the backend's and object store's real production URLs rather than
+`127.0.0.1`. Nothing else changes: the same rewrites, the same same-origin
+cookie handling, just against different origins.
