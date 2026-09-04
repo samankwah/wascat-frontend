@@ -14,7 +14,7 @@ import {
 } from "@/components/admin/ui";
 import { getImage, listAudit } from "@/lib/admin/data";
 import { PERMISSIONS, can, requirePermission } from "@/lib/admin/session";
-import { formatDate } from "@/lib/format";
+import { formatDate, sequenceLabel } from "@/lib/format";
 import { getFacets } from "@/lib/api-client";
 import { oktaLabel } from "@/lib/vocab";
 
@@ -56,7 +56,7 @@ export default async function AdminImageDetail({
           <div>
             <h1 className="display font-mono text-2xl leading-tight">{record.id}</h1>
             <p className="mt-1 text-sm text-muted">
-              {record.videoId} · frame {record.frameIndex.toLocaleString()} ·{" "}
+              Sequence {sequenceLabel(record.sequenceId)} · frame {record.frameIndex.toLocaleString()} ·{" "}
               {record.width}×{record.height}
             </p>
           </div>

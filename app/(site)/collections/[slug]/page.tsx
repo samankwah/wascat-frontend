@@ -7,7 +7,7 @@ import { ArrowDownToLine, ArrowLeft, ArrowRight, Camera, CloudSun, ExternalLink,
 import { CopyButton } from "@/components/copy-button";
 import { FrameCard } from "@/components/frame-card";
 import { getCollection, getCollectionImages } from "@/lib/api-client";
-import { formatDate } from "@/lib/format";
+import { formatDate, sequenceLabel } from "@/lib/format";
 import { oktaLabel } from "@/lib/vocab";
 
 // No generateStaticParams: pre-rendering these would make `next build` require
@@ -55,7 +55,7 @@ export default async function CollectionPage({ params }: { params: Promise<{ slu
 
   // Only render facts we actually hold; a missing value is omitted, never filled in.
   const facts: [typeof MapPin, string, string][] = [
-    [Film, "Sequences", collection.videoIds.join(", ")],
+    [Film, "Sequences", collection.sequenceIds.map(sequenceLabel).join(", ")],
     [CloudSun, "Mean cloud cover", `${oktaLabel(Math.round(meanOktas))} · over ${segmentedCount.toLocaleString()} segmented frames`],
     ...(collection.location ? [[MapPin, "Location", collection.location] as [typeof MapPin, string, string]] : []),
     ...(collection.instrument ? [[Camera, "Instrument", collection.instrument] as [typeof MapPin, string, string]] : []),
@@ -126,7 +126,7 @@ export default async function CollectionPage({ params }: { params: Promise<{ slu
             <div className="mt-10 border border-line bg-paper p-5">
               <p className="eyebrow">Mask registration</p>
               <p className="mt-3 text-xs leading-5 text-muted">
-                Masks for {registered.map((entry) => entry.videoId).join(", ")} were delivered at{" "}
+                Masks for sequences {registered.map((entry) => sequenceLabel(entry.sequenceId)).join(", ")} were delivered at{" "}
                 {registered[0].scale.toFixed(4)}× the scale of the frames they segment. They are served exactly as
                 delivered; cloud cover is measured against the camera&apos;s true field of view, and the overlay is scaled
                 back so the two line up.

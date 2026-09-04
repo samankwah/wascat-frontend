@@ -6,7 +6,7 @@ import { ReleaseList } from "@/components/admin/release-list";
 import { Fact, Facts, Panel, PanelHeader } from "@/components/admin/ui";
 import { listAudit, listCollections } from "@/lib/admin/data";
 import { PERMISSIONS, can, requirePermission } from "@/lib/admin/session";
-import { formatDate } from "@/lib/format";
+import { formatDate, sequenceLabel } from "@/lib/format";
 import { oktaLabel } from "@/lib/vocab";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
@@ -44,7 +44,8 @@ export default async function AdminCollectionDetail({
         <div className="mt-3 flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="display text-3xl leading-tight">
-              {collection.locationName ?? `Capture sequence ${collection.slug}`}
+              {collection.locationName ??
+                `Capture sequence ${collection.sequenceIds.map(sequenceLabel).join(", ")}`}
             </h1>
             <p className="mt-1 font-mono text-sm text-muted">{collection.slug}</p>
           </div>
@@ -106,13 +107,13 @@ export default async function AdminCollectionDetail({
                     : oktaLabel(Math.round(collection.meanCloudCoverOktas))}
                 </Fact>
                 <Fact label="Sequences" mono>
-                  {collection.videoIds.join(", ")}
+                  {collection.sequenceIds.join(", ")}
                 </Fact>
                 <Fact label="Mask registration">
                   {collection.maskRegistration.some((entry) => entry.corrected)
                     ? collection.maskRegistration
                         .filter((entry) => entry.corrected)
-                        .map((entry) => `${entry.videoId} at ${entry.scale.toFixed(4)}×`)
+                        .map((entry) => `Sequence ${sequenceLabel(entry.sequenceId)} at ${entry.scale.toFixed(4)}×`)
                         .join(", ")
                     : "Delivered at the same scale as the frames"}
                 </Fact>

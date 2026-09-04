@@ -17,35 +17,35 @@ import type { Collection, CollectionSummary, Facets, ImageRecord } from "@/lib/t
 
 export const PAIRED: ImageRecord = {
   id: "WAS-V01-F5",
-  collection: "vid1",
+  collection: "seq-001",
   release: "1.0",
-  videoId: "vid1",
+  sequenceId: "seq-001",
   frameIndex: 5,
   cloudFraction: 0.525588,
   cloudCoverOktas: 4,
   maskScale: 1,
   width: 640,
   height: 360,
-  image: "/frames/vid1/5-source.jpg",
-  sourceUrl: "/frames/vid1/5-source.jpg",
-  maskUrl: "/frames/vid1/5-mask.jpg",
+  image: "/frames/seq-001/5-source.jpg",
+  sourceUrl: "/frames/seq-001/5-source.jpg",
+  maskUrl: "/frames/seq-001/5-mask.jpg",
   hasSource: true,
   hasMask: true,
-  alt: "All-sky camera frame 5 of sequence vid1, measured at 4/8 cloud cover.",
-  tags: ["vid1", "4/8", "source + mask"],
+  alt: "All-sky camera frame 5 of sequence 01, measured at 4/8 cloud cover.",
+  tags: ["seq-001", "4/8", "source + mask"],
   artifacts: [
     {
       type: "source",
-      url: "/frames/vid1/5-source.jpg",
-      objectKey: "frames/vid1/5-source.jpg",
+      url: "/frames/seq-001/5-source.jpg",
+      objectKey: "frames/seq-001/5-source.jpg",
       bytes: 23133,
       checksum: "f".repeat(64),
       mediaType: "image/jpeg",
     },
     {
       type: "mask",
-      url: "/frames/vid1/5-mask.jpg",
-      objectKey: "frames/vid1/5-mask.jpg",
+      url: "/frames/seq-001/5-mask.jpg",
+      objectKey: "frames/seq-001/5-mask.jpg",
       bytes: 21265,
       checksum: "a".repeat(64),
       mediaType: "image/jpeg",
@@ -57,18 +57,18 @@ export const PAIRED: ImageRecord = {
 export const MASK_ONLY: ImageRecord = {
   ...PAIRED,
   id: "WAS-V05-F17",
-  collection: "vid5",
-  videoId: "vid5",
+  collection: "seq-005",
+  sequenceId: "seq-005",
   frameIndex: 17,
   // Delivered larger than the frame it segments; the viewer scales it back.
   maskScale: 1.146497,
-  image: "/frames/vid5/17-mask.jpg",
+  image: "/frames/seq-005/17-mask.jpg",
   sourceUrl: undefined,
-  maskUrl: "/frames/vid5/17-mask.jpg",
+  maskUrl: "/frames/seq-005/17-mask.jpg",
   hasSource: false,
   hasMask: true,
-  alt: "Binary cloud segmentation mask for frame 17 of sequence vid5, measured at 4/8 cloud cover.",
-  tags: ["vid5", "4/8", "mask only"],
+  alt: "Binary cloud segmentation mask for frame 17 of sequence 05, measured at 4/8 cloud cover.",
+  tags: ["seq-005", "4/8", "mask only"],
   artifacts: [PAIRED.artifacts[1]],
   sortKey: "005-0000017",
 };
@@ -76,19 +76,19 @@ export const MASK_ONLY: ImageRecord = {
 /** No mask, so no measurement: the two cover fields are absent, not zero. */
 export const UNSEGMENTED: ImageRecord = {
   id: "WAS-V01-F2",
-  collection: "vid1",
+  collection: "seq-001",
   release: "1.0",
-  videoId: "vid1",
+  sequenceId: "seq-001",
   frameIndex: 2,
   maskScale: 1,
   width: 640,
   height: 360,
-  image: "/frames/vid1/2-source.jpg",
-  sourceUrl: "/frames/vid1/2-source.jpg",
+  image: "/frames/seq-001/2-source.jpg",
+  sourceUrl: "/frames/seq-001/2-source.jpg",
   hasSource: true,
   hasMask: false,
-  alt: "All-sky camera frame 2 of sequence vid1, not yet segmented.",
-  tags: ["vid1", "unsegmented", "source only"],
+  alt: "All-sky camera frame 2 of sequence 01, not yet segmented.",
+  tags: ["seq-001", "unsegmented", "source only"],
   artifacts: [PAIRED.artifacts[0]],
   sortKey: "001-0000002",
 };
@@ -96,22 +96,22 @@ export const UNSEGMENTED: ImageRecord = {
 export const RECORDS = [PAIRED, MASK_ONLY, UNSEGMENTED];
 
 export const COLLECTION: Collection = {
-  slug: "vid1",
-  title: "Capture sequence vid1",
-  shortTitle: "vid1",
-  kicker: "ALL-SKY CLOUD SEGMENTATION · VID1",
-  description: "323 all-sky frames from capture sequence vid1.",
+  slug: "seq-001",
+  title: "Capture sequence 01",
+  shortTitle: "Sequence 01",
+  kicker: "ALL-SKY CLOUD SEGMENTATION · SEQUENCE 01",
+  description: "323 all-sky frames from capture sequence 01.",
   coverage: "Frames 2–3,611 · 223 of 323 segmented",
-  videoIds: ["vid1"],
+  sequenceIds: ["seq-001"],
   images: 323,
   artifacts: 493,
   withSource: 270,
   segmented: 223,
-  image: "/frames/vid1/5-source.jpg",
+  image: "/frames/seq-001/5-source.jpg",
   imageAlt: PAIRED.alt,
   releases: [{ version: "1.0", images: 323, size: "10.4 MB", current: true }],
   meanCloudCoverOktas: 4.2,
-  maskRegistration: [{ videoId: "vid1", scale: 1, corrected: false }],
+  maskRegistration: [{ sequenceId: "seq-001", scale: 1, corrected: false }],
 };
 
 export const COLLECTION_SUMMARY: CollectionSummary = {
@@ -120,8 +120,8 @@ export const COLLECTION_SUMMARY: CollectionSummary = {
 };
 
 export const FACETS: Facets = {
-  collections: [{ value: "vid1", label: "vid1", count: 323 }],
-  sequences: [{ value: "vid1", count: 323 }],
+  collections: [{ value: "seq-001", label: "Sequence 01", count: 323 }],
+  sequences: [{ value: "seq-001", label: "Sequence 01", count: 323 }],
   cloudCoverOktas: Array.from({ length: 9 }, (_, okta) => ({
     value: okta,
     label: okta === 0 ? "0/8 · Clear" : okta === 8 ? "8/8 · Overcast" : `${okta}/8`,
@@ -190,9 +190,9 @@ export function installApiMock(): { requests: RequestLog; restore: () => void } 
       return json(envelope([COLLECTION_SUMMARY], { count: 1 }));
     }
 
-    if (url.pathname === "/api/v1/collections/vid1") return json(envelope(COLLECTION));
-    if (url.pathname === "/api/v1/collections/vid1/releases") {
-      return json(envelope(COLLECTION.releases, { collection: "vid1", count: 1 }));
+    if (url.pathname === "/api/v1/collections/seq-001") return json(envelope(COLLECTION));
+    if (url.pathname === "/api/v1/collections/seq-001/releases") {
+      return json(envelope(COLLECTION.releases, { collection: "seq-001", count: 1 }));
     }
     if (url.pathname.startsWith("/api/v1/collections/")) {
       return json({ error: { code: "not_found", message: "Collection not found" } }, 404);

@@ -16,8 +16,12 @@ export const imageQuerySchema = z.object({
   q: z.string().trim().max(100).optional(),
   collection: z.string().trim().max(80).optional(),
   release: z.string().trim().max(20).optional(),
-  /** Capture sequence, e.g. "vid7". */
-  video: z.string().trim().regex(/^vid\d+$/).optional(),
+  /** Capture sequence, e.g. "seq-007", or dated once one carries a timestamp. */
+  sequence: z
+    .string()
+    .trim()
+    .regex(/^seq-(?:\d{8}-)?\d{3}$/)
+    .optional(),
   /** Measured cloud cover in oktas, 0–8. Only segmented records can match. */
   oktas: z.coerce.number().int().min(0).max(8).optional(),
   oktasMin: z.coerce.number().int().min(0).max(8).optional(),

@@ -49,10 +49,10 @@ describe("reading image records", () => {
   });
 
   it("forwards filters to the API rather than filtering locally", async () => {
-    await getImages({ collection: "vid1", segmented: "true", limit: 3 });
+    await getImages({ collection: "seq-001", segmented: "true", limit: 3 });
     const [request] = requests;
     expect(request.url).toBe("/api/v1/images");
-    expect(request.params.get("collection")).toBe("vid1");
+    expect(request.params.get("collection")).toBe("seq-001");
     expect(request.params.get("segmented")).toBe("true");
     expect(request.params.get("limit")).toBe("3");
   });
@@ -79,9 +79,9 @@ describe("reading image records", () => {
   });
 
   it("scopes a sequence request to its collection", async () => {
-    const records = await getCollectionImages("vid1", { limit: 4 });
-    expect(records.every((record) => record.collection === "vid1")).toBe(true);
-    expect(requests[0].params.get("collection")).toBe("vid1");
+    const records = await getCollectionImages("seq-001", { limit: 4 });
+    expect(records.every((record) => record.collection === "seq-001")).toBe(true);
+    expect(requests[0].params.get("collection")).toBe("seq-001");
   });
 });
 
@@ -116,8 +116,8 @@ describe("collections", () => {
   });
 
   it("fetches one collection with its release history", async () => {
-    const collection = await getCollection("vid1");
-    expect(collection?.slug).toBe("vid1");
+    const collection = await getCollection("seq-001");
+    expect(collection?.slug).toBe("seq-001");
     expect(collection?.releases[0].current).toBe(true);
   });
 
@@ -146,7 +146,7 @@ describe("facets and archive totals", () => {
     expect(stats.segmented).toBe(223);
     expect(stats.unsegmented).toBe(100);
     expect(stats.total).toBe(323);
-    expect(stats.sequences).toEqual(["vid1"]);
+    expect(stats.sequences).toEqual(["seq-001"]);
   });
 
   it("knows no frame carries a capture time yet", async () => {

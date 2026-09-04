@@ -89,11 +89,11 @@ export default async function AdminImages({
 
           <label className="block">
             <span className="field-label">Sequence</span>
-            <select name="video" defaultValue={current("video")} className="field-select">
+            <select name="sequence" defaultValue={current("sequence")} className="field-select">
               <option value="">All</option>
               {facets.sequences.map((entry) => (
                 <option key={String(entry.value)} value={String(entry.value)}>
-                  {String(entry.value)} ({entry.count.toLocaleString()})
+                  {entry.label ?? String(entry.value)} ({entry.count.toLocaleString()})
                 </option>
               ))}
             </select>

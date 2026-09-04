@@ -3,6 +3,7 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Filter, Search, SlidersHorizontal, TriangleAlert, X } from "lucide-react";
 import { useState } from "react";
+import { sequenceLabel } from "@/lib/format";
 import { oktaLabel } from "@/lib/vocab";
 
 /**
@@ -15,7 +16,7 @@ import { oktaLabel } from "@/lib/vocab";
 export type ExploreOptions = {
   collections: { slug: string; shortTitle: string }[];
   releases: string[];
-  videoIds: string[];
+  sequenceIds: string[];
   locations: string[];
   seasons: string[];
   timesOfDay: string[];
@@ -33,13 +34,13 @@ export type ExploreOptions = {
   oktaCounts: number[];
 };
 
-const chipFields = ["q", "collection", "release", "video", "segmented", "oktasMin", "oktasMax", "season", "time", "location", "artifact", "from", "to"] as const;
+const chipFields = ["q", "collection", "release", "sequence", "segmented", "oktasMin", "oktasMax", "season", "time", "location", "artifact", "from", "to"] as const;
 
 const chipLabels: Record<string, string> = {
   q: "Search",
   collection: "Collection",
   release: "Release",
-  video: "Sequence",
+  sequence: "Sequence",
   segmented: "Segmentation",
   oktasMin: "Min cover",
   oktasMax: "Max cover",
@@ -104,9 +105,11 @@ function Panel({
         </label>
         <label>
           <span className="field-label">Sequence</span>
-          <select className="field-select" value={value("video")} onChange={(event) => update("video", event.target.value)}>
+          <select className="field-select" value={value("sequence")} onChange={(event) => update("sequence", event.target.value)}>
             <option value="">Any</option>
-            {options.videoIds.map((videoId) => <option key={videoId}>{videoId}</option>)}
+            {options.sequenceIds.map((sequenceId) => (
+              <option key={sequenceId} value={sequenceId}>Sequence {sequenceLabel(sequenceId)}</option>
+            ))}
           </select>
         </label>
       </div>
@@ -280,11 +283,13 @@ export function ExploreShell({
                   {chipLabels[field]}:{" "}
                   {field === "collection"
                     ? collectionLabel(value(field))
-                    : field === "segmented"
-                      ? value(field) === "true" ? "Segmented" : "Not segmented"
-                      : field === "oktasMin" || field === "oktasMax"
-                        ? oktaLabel(Number(value(field)))
-                        : value(field)}{" "}
+                    : field === "sequence"
+                      ? sequenceLabel(value(field))
+                      : field === "segmented"
+                        ? value(field) === "true" ? "Segmented" : "Not segmented"
+                        : field === "oktasMin" || field === "oktasMax"
+                          ? oktaLabel(Number(value(field)))
+                          : value(field)}{" "}
                   <X size={13} />
                 </button>
               ))}

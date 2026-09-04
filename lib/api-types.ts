@@ -629,8 +629,8 @@ export interface components {
             description: string;
             /** Coverage */
             coverage: string;
-            /** Videoids */
-            videoIds: string[];
+            /** Sequenceids */
+            sequenceIds: string[];
             /** Images */
             images: number;
             /** Artifacts */
@@ -692,8 +692,8 @@ export interface components {
             description: string;
             /** Coverage */
             coverage: string;
-            /** Videoids */
-            videoIds: string[];
+            /** Sequenceids */
+            sequenceIds: string[];
             /** Images */
             images: number;
             /** Artifacts */
@@ -881,8 +881,8 @@ export interface components {
             collection: string;
             /** Release */
             release: string;
-            /** Videoid */
-            videoId: string;
+            /** Sequenceid */
+            sequenceId: string;
             /** Frameindex */
             frameIndex: number;
             /** Cloudfraction */
@@ -974,8 +974,8 @@ export interface components {
         };
         /** MaskRegistration */
         MaskRegistration: {
-            /** Videoid */
-            videoId: string;
+            /** Sequenceid */
+            sequenceId: string;
             /**
              * Scale
              * @description Mask size relative to the frame it segments. 1 when registered.

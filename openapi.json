@@ -1802,12 +1802,12 @@
             "type": "string",
             "title": "Coverage"
           },
-          "videoIds": {
+          "sequenceIds": {
             "items": {
               "type": "string"
             },
             "type": "array",
-            "title": "Videoids"
+            "title": "Sequenceids"
           },
           "images": {
             "type": "integer",
@@ -1947,7 +1947,7 @@
           "kicker",
           "description",
           "coverage",
-          "videoIds",
+          "sequenceIds",
           "images",
           "artifacts",
           "withSource",
@@ -1983,12 +1983,12 @@
             "type": "string",
             "title": "Coverage"
           },
-          "videoIds": {
+          "sequenceIds": {
             "items": {
               "type": "string"
             },
             "type": "array",
-            "title": "Videoids"
+            "title": "Sequenceids"
           },
           "images": {
             "type": "integer",
@@ -2138,7 +2138,7 @@
           "kicker",
           "description",
           "coverage",
-          "videoIds",
+          "sequenceIds",
           "images",
           "artifacts",
           "withSource",
@@ -2618,9 +2618,9 @@
             "type": "string",
             "title": "Release"
           },
-          "videoId": {
+          "sequenceId": {
             "type": "string",
-            "title": "Videoid"
+            "title": "Sequenceid"
           },
           "frameIndex": {
             "type": "integer",
@@ -2792,7 +2792,7 @@
           "id",
           "collection",
           "release",
-          "videoId",
+          "sequenceId",
           "frameIndex",
           "maskScale",
           "width",
@@ -2962,9 +2962,9 @@
       },
       "MaskRegistration": {
         "properties": {
-          "videoId": {
+          "sequenceId": {
             "type": "string",
-            "title": "Videoid"
+            "title": "Sequenceid"
           },
           "scale": {
             "type": "number",
@@ -2978,7 +2978,7 @@
         },
         "type": "object",
         "required": [
-          "videoId",
+          "sequenceId",
           "scale",
           "corrected"
         ],

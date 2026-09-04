@@ -15,9 +15,21 @@ export const formatDate = (value: string, withTime = false) =>
     ...(withTime ? { hour: "2-digit", minute: "2-digit", timeZone: "UTC", timeZoneName: "short" } : {}),
   }).format(new Date(value));
 
+/**
+ * The reader-facing name of a capture sequence: "seq-007" -> "07".
+ *
+ * sequenceId is a filter token and a URL segment - it does not belong in a
+ * heading or a sentence, so every human-facing string is built from this
+ * instead. Two digits minimum, more once the archive passes ninety-nine.
+ */
+export const sequenceLabel = (sequenceId: string) => {
+  const match = /(\d{3})$/.exec(sequenceId);
+  return match ? String(Number(match[1])).padStart(2, "0") : sequenceId;
+};
+
 /** How a frame is labelled in listings when there is no capture timestamp yet. */
 export const frameLabel = (image: ImageRecord) =>
-  `${image.videoId} · frame ${image.frameIndex.toLocaleString()}`;
+  `Sequence ${sequenceLabel(image.sequenceId)} · frame ${image.frameIndex.toLocaleString()}`;
 
 export const recordTimestamp = (image: ImageRecord) =>
   image.capturedAt ? formatDate(image.capturedAt, true) : frameLabel(image);

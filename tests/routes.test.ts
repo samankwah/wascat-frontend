@@ -45,10 +45,10 @@ describe("static generation", () => {
 
 describe("collection metadata", () => {
   it("comes from the collection the API returns", async () => {
-    const metadata = await collectionMetadata({ params: Promise.resolve({ slug: "vid1" }) });
-    expect(metadata.title).toBe("Capture sequence vid1");
-    expect(metadata.description).toMatch(/all-sky frames from capture sequence vid1/);
-    expect(requests[0].url).toBe("/api/v1/collections/vid1");
+    const metadata = await collectionMetadata({ params: Promise.resolve({ slug: "seq-001" }) });
+    expect(metadata.title).toBe("Capture sequence 01");
+    expect(metadata.description).toMatch(/all-sky frames from capture sequence 01/);
+    expect(requests[0].url).toBe("/api/v1/collections/seq-001");
   });
 
   it("degrades to a generic title when the collection is gone", async () => {

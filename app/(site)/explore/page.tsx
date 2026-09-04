@@ -79,7 +79,7 @@ export default async function ExplorePage({
           .filter((version): version is string => Boolean(version)),
       ),
     ],
-    videoIds: values(facets.sequences),
+    sequenceIds: values(facets.sequences),
     locations: values(facets.locations),
     seasons: populated(facets.seasons),
     timesOfDay: populated(facets.timesOfDay),

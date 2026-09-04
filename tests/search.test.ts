@@ -51,10 +51,12 @@ describe("accepted vocabularies", () => {
     }
   });
 
-  it("accepts sequence identifiers and rejects near-misses", () => {
-    expect(imageQuerySchema.safeParse({ video: "vid11" }).success).toBe(true);
-    expect(imageQuerySchema.safeParse({ video: "video1" }).success).toBe(false);
-    expect(imageQuerySchema.safeParse({ video: "VID1" }).success).toBe(false);
+  it("accepts sequence identifiers, dated or not, and rejects near-misses", () => {
+    expect(imageQuerySchema.safeParse({ sequence: "seq-011" }).success).toBe(true);
+    expect(imageQuerySchema.safeParse({ sequence: "seq-20260904-001" }).success).toBe(true);
+    expect(imageQuerySchema.safeParse({ sequence: "vid1" }).success).toBe(false);
+    expect(imageQuerySchema.safeParse({ sequence: "seq-1" }).success).toBe(false);
+    expect(imageQuerySchema.safeParse({ sequence: "SEQ-001" }).success).toBe(false);
   });
 });
 

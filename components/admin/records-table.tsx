@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { BulkEditBar } from "@/components/admin/bulk-edit";
 import { Badge, CoverBadge, TableShell, Td, Th } from "@/components/admin/ui";
+import { frameLabel } from "@/lib/format";
 import type { ImageRecord } from "@/lib/types";
 
 /**
@@ -111,9 +112,7 @@ export function RecordsTable({
                   {record.id}
                 </Link>
               </Td>
-              <Td className="text-muted">
-                {record.videoId} · frame {record.frameIndex.toLocaleString()}
-              </Td>
+              <Td className="text-muted">{frameLabel(record)}</Td>
               <Td>
                 <CoverBadge oktas={record.cloudCoverOktas} />
               </Td>

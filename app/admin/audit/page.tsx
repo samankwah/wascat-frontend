@@ -54,7 +54,7 @@ export default async function AdminAudit({
               type="text"
               name="entityId"
               defaultValue={entityId ?? ""}
-              placeholder="vid1 or WAS-V01-F5"
+              placeholder="seq-001 or WAS-V01-F5"
               className="field-input h-10 w-56 font-mono text-[.8rem]"
             />
           </label>

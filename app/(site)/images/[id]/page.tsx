@@ -7,7 +7,7 @@ import { ArtifactViewer } from "@/components/artifact-viewer";
 import { CopyButton } from "@/components/copy-button";
 import { FrameCard } from "@/components/frame-card";
 import { getCollection, getCollectionImages, getImage } from "@/lib/api-client";
-import { formatDate } from "@/lib/format";
+import { formatDate, sequenceLabel } from "@/lib/format";
 import { oktaLabel } from "@/lib/vocab";
 
 // Detail pages render on demand: there are too many records to pre-render, and
@@ -36,7 +36,7 @@ export default async function ImageDetailPage({ params }: { params: Promise<{ id
 
   // Facts are measured or omitted; nothing here is assigned by hand.
   const facts: [typeof Clock3, string, string][] = [
-    [Film, "Sequence", `${record.videoId} · frame ${record.frameIndex.toLocaleString()}`],
+    [Film, "Sequence", `${sequenceLabel(record.sequenceId)} · frame ${record.frameIndex.toLocaleString()}`],
     record.cloudFraction == null
       ? [CloudOff, "Cloud cover", "Not measured — this frame has no segmentation mask"]
       : [CloudSun, "Measured cloud cover", `${oktaLabel(record.cloudCoverOktas ?? 0)} · ${(record.cloudFraction * 100).toFixed(1)}% of the field of view`],
@@ -113,7 +113,7 @@ export default async function ImageDetailPage({ params }: { params: Promise<{ id
                   Cloud cover is measured from the binary segmentation mask, and this frame has not been segmented, so no
                   cover is reported for it. Estimating one from the photograph alone would be a guess, so the field is left
                   empty and the frame is excluded from cloud-cover filters. It is one of a sample drawn evenly across{" "}
-                  {record.videoId}{" "}
+                  sequence {sequenceLabel(record.sequenceId)}{" "}
                   so the unsegmented part of the sequence is visible rather than hidden.
                 </>
               ) : (
