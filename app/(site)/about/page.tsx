@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, BookOpen, Linkedin, Mail, ShieldCheck } from "lucide-react";
+import { PartnerCarousel } from "@/components/partner-carousel";
+import { partners } from "@/lib/partners";
 import { teamMembers, type TeamMember } from "@/lib/team";
 
 export const metadata: Metadata = { title: "About", description: "About the scope and responsible use of the WASCAT v1.0 West African demonstration archive." };
@@ -94,6 +96,20 @@ export default function AboutPage() {
               );
             })}
           </ul>
+        </div>
+      </section>
+      <section id="partners" className="border-t border-line bg-sky-pale py-16 md:py-24" aria-labelledby="partners-title">
+        <div className="container-shell">
+          <div className="grid gap-5 md:grid-cols-[.7fr_1.3fr] md:gap-10">
+            <p className="eyebrow text-sky">OUR PARTNERS</p>
+            <div>
+              <h2 id="partners-title" className="display text-4xl leading-tight md:text-5xl">Institutions supporting WASCAT.</h2>
+              <p className="mt-4 max-w-2xl text-sm leading-6 text-muted">WASCAT is built with the support of KNUST&apos;s research administration and Ghana&apos;s national weather service. Each logo is that institution&apos;s own mark, shown here only to credit their support.</p>
+            </div>
+          </div>
+          <div className="mt-11">
+            <PartnerCarousel partners={partners} />
+          </div>
         </div>
       </section>
       <section id="using-the-data" className="container-shell grid gap-12 py-16 md:grid-cols-[.75fr_1.25fr] md:py-24"><div><p className="eyebrow text-sky">USING THE DATA</p><h2 className="display mt-3 text-4xl">License and cite with care.</h2></div><div className="space-y-9"><div><h3 className="font-bold">Check the collection license</h3><p className="mt-3 text-sm leading-6 text-muted">The collection page, release fixture, and metadata response identify the governing license. Attribution requirements apply to derived work as well as redistributed files.</p></div><div><h3 className="font-bold">Cite an explicit release</h3><p className="mt-3 text-sm leading-6 text-muted">Use the prepared demonstration citation and include the version number. A publication link appears only when a verified DOI is available; this fixture does not invent one.</p></div><div><h3 className="font-bold">Do not infer beyond the metadata</h3><p className="mt-3 text-sm leading-6 text-muted">These records demonstrate an archive structure, not observed climatology. A segmentation mask represents a modelled pipeline decision, not error-free physical truth.</p></div></div></section>
