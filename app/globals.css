@@ -370,4 +370,67 @@ textarea {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+  .skeleton::after {
+    /* The blanket rule above would still leave a 0.01ms flicker running on a
+       loop; a loading screen is exactly the surface where that reads as
+       broken rather than reduced, so it is switched off outright. */
+    display: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Skeletons
+
+   One shape, one sweep. A skeleton is drawn at the size of whatever it
+   stands in for -- a frame, a line of text, a badge -- so the layout it
+   belongs to does not move when the real content swaps in; see
+   components/skeleton.tsx for the shapes built on top of it.
+
+   The sweep is a light crossing the surface rather than a pulse: a soft
+   highlight travels once every 1.8s left to right. `background-color` is the
+   resting tone so the shape still reads before the animation's first frame
+   paints.
+--------------------------------------------------------------------------- */
+.skeleton {
+  background-color: var(--color-line-soft);
+  overflow: hidden;
+  position: relative;
+}
+
+.skeleton::after {
+  animation: skeleton-sweep 1.8s ease-in-out infinite;
+  background-image: linear-gradient(
+    100deg,
+    transparent 24%,
+    rgb(255 255 255 / 0.55) 48%,
+    rgb(255 255 255 / 0.55) 52%,
+    transparent 76%
+  );
+  content: "";
+  inset: 0;
+  position: absolute;
+  transform: translateX(-100%);
+}
+
+/* On the archive's dark panels (ink, ink-panel, ink-deep), the light
+   resting tone and white sweep would both read as an error state rather
+   than a placeholder, so both invert to sit on the dark surface instead. */
+.skeleton-on-dark {
+  background-color: rgb(255 255 255 / 0.08);
+}
+
+.skeleton-on-dark::after {
+  background-image: linear-gradient(
+    100deg,
+    transparent 24%,
+    rgb(255 255 255 / 0.14) 48%,
+    rgb(255 255 255 / 0.14) 52%,
+    transparent 76%
+  );
+}
+
+@keyframes skeleton-sweep {
+  100% {
+    transform: translateX(100%);
+  }
 }
