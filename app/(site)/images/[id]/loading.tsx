@@ -9,7 +9,7 @@ export default function ImageDetailLoading() {
         </div>
       </div>
       <section className="bg-ink-deep text-white">
-        <div className="container-shell grid gap-9 pb-14 lg:grid-cols-[1.45fr_.55fr] lg:pb-20">
+        <div className="container-shell grid gap-9 pb-14 lg:grid-cols-[1.45fr_.55fr] lg:pb-20 lg:pt-14">
           <div>
             <div className="flex gap-5 border-b border-white/20">
               <Skeleton onDark className="h-12 w-16" />

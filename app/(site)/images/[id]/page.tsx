@@ -58,7 +58,7 @@ export default async function ImageDetailPage({ params }: { params: Promise<{ id
         ]}
       />
       <section className="bg-ink-deep text-white">
-        <div className="container-shell grid gap-9 pb-14 lg:grid-cols-[1.45fr_.55fr] lg:pb-20">
+        <div className="container-shell grid gap-9 pb-14 lg:grid-cols-[1.45fr_.55fr] lg:pb-20 lg:pt-14">
           <ArtifactViewer record={record} />
           <aside className="lg:pt-12">
             <p className="eyebrow text-sky-light">

@@ -73,7 +73,7 @@ export default async function CollectionPage({ params }: { params: Promise<{ slu
         ]}
       />
       <section className="bg-paper">
-        <div className="container-shell grid gap-10 pb-14 md:grid-cols-[1.03fr_.97fr] md:items-end md:pb-20">
+        <div className="container-shell grid gap-10 pb-14 lg:pt-14 md:grid-cols-[1.03fr_.97fr] md:items-end md:pb-20">
           <div className="pb-2">
             <p className="eyebrow text-sky">{collection.kicker}</p>
             <h1 className="display mt-4 text-5xl leading-[.98] md:text-7xl">{collection.title}</h1>

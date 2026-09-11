@@ -20,7 +20,7 @@ export default function CollectionDetailLoading() {
         </div>
       </div>
       <section className="border-b border-line bg-paper">
-        <div className="container-shell grid gap-10 pb-14 md:grid-cols-[1.03fr_.97fr] md:items-end md:pb-20">
+        <div className="container-shell grid gap-10 pb-14 lg:pt-14 md:grid-cols-[1.03fr_.97fr] md:items-end md:pb-20">
           <div className="pb-2">
             <Skeleton className="h-2.5 w-40" />
             <Skeleton className="mt-4 h-12 w-full sm:h-16" />
