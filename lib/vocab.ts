@@ -46,5 +46,8 @@ const oktaTerms: Record<number, string> = {
 export const oktaLabel = (okta: number) =>
   oktaTerms[okta] ? `${okta}/8 · ${oktaTerms[okta]}` : `${okta}/8`;
 
+/** Just the synoptic term (e.g. "Broken"), for a display that already shows the fraction itself. */
+export const oktaTerm = (okta: number) => oktaTerms[okta] ?? "";
+
 export const oktasFromFraction = (fraction: number) =>
   Math.min(8, Math.max(0, Math.round(fraction * 8)));

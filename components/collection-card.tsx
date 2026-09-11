@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import type { Collection, CollectionSummary } from "@/lib/types";
+import { oktaTerm } from "@/lib/vocab";
 
 /**
  * A collection card.
@@ -9,6 +10,13 @@ import type { Collection, CollectionSummary } from "@/lib/types";
  * The listing endpoint replaces the release history with just the current
  * release, while the detail endpoint returns the whole history. The card is
  * rendered from both, so it reads whichever the payload carries.
+ *
+ * Shows only what actually differs from one collection to the next - frame
+ * count, segmented share, measured cloud cover - rather than the catalogue's
+ * generated description sentence, which is near-identical across every
+ * collection and just restates these same three numbers in prose. That
+ * description still has its place as the one paragraph on the collection's
+ * own page; repeated across a grid of cards it was noise, not content.
  */
 export function CollectionCard({
   collection,
@@ -17,10 +25,10 @@ export function CollectionCard({
   collection: Collection | CollectionSummary;
   priority?: boolean;
 }) {
-  const current =
-    ("currentRelease" in collection ? collection.currentRelease : undefined) ??
-    collection.releases?.find((release) => release.current) ??
-    collection.releases?.[0];
+  const segmentedShare = collection.images > 0 ? Math.round((collection.segmented / collection.images) * 100) : 0;
+  // Absent, not zero, when nothing has been measured yet - see the archive's
+  // core rule that an unmeasured value is never assumed to be clear sky.
+  const meanOktas = collection.meanCloudCoverOktas != null ? Math.round(collection.meanCloudCoverOktas) : null;
 
   return (
     <article className="group border-t border-line-strong pt-3">
@@ -31,11 +39,10 @@ export function CollectionCard({
         </div>
         <p className="eyebrow mt-5 text-muted-soft">{collection.kicker}</p>
         <h3 className="display mt-2 text-[1.7rem] leading-tight">{collection.title}</h3>
-        <p className="mt-3 text-sm leading-6 text-muted">{collection.description}</p>
-        <div className="mt-5 flex gap-5 border-t border-line pt-3 text-xs">
+        <div className="mt-4 flex gap-5 border-t border-line pt-3 text-xs">
           <span><b>{collection.images.toLocaleString()}</b> frames</span>
-          <span><b>{collection.segmented.toLocaleString()}</b> segmented</span>
-          {current ? <span><b>v{current.version}</b> current</span> : null}
+          <span><b>{segmentedShare}%</b> segmented</span>
+          {meanOktas != null ? <span><b>{meanOktas}/8</b> {oktaTerm(meanOktas).toLowerCase()}</span> : null}
         </div>
       </Link>
     </article>
