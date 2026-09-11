@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { connection } from "next/server";
 import Link from "next/link";
 import { ImageOff } from "lucide-react";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { ExploreShell, type ExploreOptions } from "@/components/explore-filters";
 import { FrameCard } from "@/components/frame-card";
 import { getCollections, getFacets, getImages } from "@/lib/api-client";
@@ -102,6 +103,7 @@ export default async function ExplorePage({
 
   return (
     <>
+      <Breadcrumbs trail={[{ label: "Home", href: "/" }, { label: "Explore" }]} />
       <section className="border-b border-line bg-paper">
         <div className="container-shell py-12 md:py-16">
           <p className="eyebrow text-sky">ALL-SKY CLOUD SEGMENTATION CATALOG</p>
@@ -139,18 +141,18 @@ export default async function ExplorePage({
         )}
 
         {matchedTotal > query.limit && (
-          <nav aria-label="Pagination" className="mt-14 flex items-center justify-between gap-4 border-t border-line pt-5">
+          <nav aria-label="Pagination" className="mt-14 flex flex-col gap-4 border-t border-line pt-5 sm:flex-row sm:items-center sm:justify-between">
             <span className="text-xs text-muted">
               Showing {(offset + 1).toLocaleString()}–{Math.min(nextOffset, matchedTotal).toLocaleString()} of {matchedTotal.toLocaleString()}
             </span>
             <div className="flex gap-2">
               {hasPrevious ? (
-                <Link href={pageHref(params, previousOffset > 0 ? encodeOffsetCursor(previousOffset) : undefined)} className="button-secondary min-h-10">
+                <Link href={pageHref(params, previousOffset > 0 ? encodeOffsetCursor(previousOffset) : undefined)} className="button-secondary min-h-10 flex-1 whitespace-nowrap sm:flex-none">
                   <span aria-hidden="true">←</span> Previous
                 </Link>
               ) : null}
               {hasNext ? (
-                <Link href={pageHref(params, encodeOffsetCursor(nextOffset))} className="button-secondary min-h-10">
+                <Link href={pageHref(params, encodeOffsetCursor(nextOffset))} className="button-secondary min-h-10 flex-1 whitespace-nowrap sm:flex-none">
                   Next page <span aria-hidden="true">→</span>
                 </Link>
               ) : null}

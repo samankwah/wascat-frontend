@@ -46,6 +46,11 @@ function FilterPanelSkeleton() {
 export default function ExploreLoading() {
   return (
     <SkeletonPage>
+      <div className="border-b border-line bg-paper lg:hidden">
+        <div className="container-shell py-3">
+          <Skeleton className="h-3.5 w-32" />
+        </div>
+      </div>
       <section className="border-b border-line bg-paper">
         <div className="container-shell py-12 md:py-16">
           <Skeleton className="h-2.5 w-72" />
