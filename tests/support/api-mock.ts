@@ -149,6 +149,7 @@ export const FACETS: Facets = {
     { value: "Afternoon", count: 0 },
     { value: "Evening", count: 0 },
   ],
+  skyClasses: [],
   locations: [],
 };
 

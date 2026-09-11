@@ -84,6 +84,7 @@ export default async function ExplorePage({
     locations: values(facets.locations),
     seasons: populated(facets.seasons),
     timesOfDay: populated(facets.timesOfDay),
+    skyClasses: values(facets.skyClasses),
     artifactTypes: values(facets.artifacts),
     hasTimestamps: timestamped.total > 0,
     hasUnsegmented: countOf(facets.segmentation, "unsegmented") > 0,

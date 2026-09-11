@@ -171,6 +171,7 @@ export async function getFacets(): Promise<Facets> {
       artifacts: [],
       seasons: [],
       timesOfDay: [],
+      skyClasses: [],
       locations: [],
     }
   );

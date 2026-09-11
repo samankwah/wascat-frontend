@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { connection } from "next/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowDownToLine, Box, Camera, Clock3, CloudOff, CloudSun, ExternalLink, FileJson2, Film, MapPin } from "lucide-react";
+import { ArrowDownToLine, Box, Camera, Cloud, Clock3, CloudOff, CloudSun, ExternalLink, FileJson2, Film, MapPin } from "lucide-react";
 import { ArtifactViewer } from "@/components/artifact-viewer";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { CopyButton } from "@/components/copy-button";
@@ -44,6 +44,7 @@ export default async function ImageDetailPage({ params }: { params: Promise<{ id
     [Box, "Dimensions", `${record.width} × ${record.height} pixels`],
     ...(record.capturedAt ? [[Clock3, "Captured", formatDate(record.capturedAt, true)] as [typeof Clock3, string, string]] : []),
     ...(record.location ? [[MapPin, "Location", record.location] as [typeof Clock3, string, string]] : []),
+    ...(record.skyClass ? [[Cloud, "Sky class", record.skyClass] as [typeof Clock3, string, string]] : []),
     ...(record.instrument ? [[Camera, "Instrument", record.instrument] as [typeof Clock3, string, string]] : []),
   ];
 
