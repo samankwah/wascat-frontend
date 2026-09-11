@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { connection } from "next/server";
 import Link from "next/link";
-import { ArrowRight, Check, Database, Image as ImageIcon, Layers3, MapPin, Search } from "lucide-react";
+import { ArrowRight, Check, ChevronDown, Database, Download, Image as ImageIcon, Layers3, MapPin, Search, SlidersHorizontal } from "lucide-react";
 import { CollectionCard } from "@/components/collection-card";
 import { getArchiveStats, getCollections } from "@/lib/api-client";
 import { sequenceLabel } from "@/lib/format";
@@ -41,13 +41,24 @@ export default async function HomePage() {
               <p className="mt-6 max-w-[410px] text-[1.02rem] leading-[1.62] text-ink-panel md:text-[1.08rem]">
                 WASCAT is an expert-labelled demonstration archive spanning Ghana, Nigeria, and Burkina Faso, built for transparent cloud, aerosol, and atmospheric-condition research.
               </p>
-              <div className="mt-4 flex flex-col gap-3 sm:mt-2 sm:flex-row sm:gap-4">
-                <Link href="/explore" className="hero-primary-link inline-flex min-h-12 items-center justify-center rounded-[7px] bg-sky-vivid px-9 text-sm font-bold transition-colors hover:bg-sky-bright sm:min-w-[178px]">Browse images</Link>
-                <a href="/api/v1/images?limit=100" download="wascat-metadata.json" className="hero-secondary-link inline-flex min-h-12 items-center justify-center rounded-[7px] border-2 border-sky-vivid bg-white/65 px-7 text-sm font-bold transition-colors hover:bg-white sm:min-w-[195px]">Download metadata</a>
+
+              {/* Mobile/tablet: one dominant action, the download deliberately
+                  lighter-weight so it doesn't compete with it - the desktop
+                  pair below (lg+) is untouched. */}
+              <div className="mt-5 flex flex-col gap-3 lg:hidden">
+                <Link href="/explore" className="hero-primary-link inline-flex min-h-12 items-center justify-center rounded-[7px] bg-sky-vivid px-9 text-sm font-bold transition-colors hover:bg-sky-bright">Browse images</Link>
+                <a href="/api/v1/images?limit=100" download="wascat-metadata.json" className="inline-flex min-h-11 items-center justify-center gap-1.5 text-[.84rem] font-bold text-sky-bright transition-colors hover:text-sky-dark">
+                  <Download size={15} strokeWidth={2.25} aria-hidden="true" />
+                  Download metadata
+                </a>
+              </div>
+              <div className="mt-2 hidden gap-4 lg:flex">
+                <Link href="/explore" className="hero-primary-link inline-flex min-h-12 min-w-[178px] items-center justify-center rounded-[7px] bg-sky-vivid px-9 text-sm font-bold transition-colors hover:bg-sky-bright">Browse images</Link>
+                <a href="/api/v1/images?limit=100" download="wascat-metadata.json" className="hero-secondary-link inline-flex min-h-12 min-w-[195px] items-center justify-center rounded-[7px] border-2 border-sky-vivid bg-white/65 px-7 text-sm font-bold transition-colors hover:bg-white">Download metadata</a>
               </div>
             </div>
 
-            <div className="relative mt-10 aspect-[16/10] overflow-hidden rounded-sm bg-on-dark shadow-[0_12px_30px_rgba(19,65,91,.12)] md:aspect-[2/1] lg:hidden">
+            <div className="relative mt-8 aspect-[16/10] overflow-hidden rounded-2xl bg-on-dark shadow-[0_12px_30px_rgba(19,65,91,.12)] ring-1 ring-ink/5 md:aspect-[2/1] lg:hidden">
               <Image
                 src="/images/kumasi-hero.png"
                 alt="Bright cumulus clouds above the green urban skyline of Kumasi, Ghana."
@@ -58,9 +69,42 @@ export default async function HomePage() {
                 className="hero-image object-cover object-center saturate-[1.12]"
               />
             </div>
+
+            {/* Mobile/tablet search: the query field stays in reach; the three
+                secondary filters live behind a native disclosure (no JS, and a
+                closed <details>'s <select> values still submit normally) so the
+                hero doesn't open with five stacked form rows. The desktop form
+                below (lg+) is the original, untouched. */}
+            <div className="relative z-20 mx-auto mt-8 w-full lg:hidden">
+              <form action="/explore" method="get" role="search" aria-label="Search the WASCAT image archive" className="rounded-xl bg-white shadow-[0_5px_13px_rgba(27,73,103,.18)]">
+                <label className="relative block px-4 py-4">
+                  <span className="sr-only">Search by date, class, or condition</span>
+                  <Search size={20} strokeWidth={1.75} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted-dim" aria-hidden="true" />
+                  <input name="q" type="search" className="field-input hero-search-control search-field-input" placeholder="Search by date, class or condition" />
+                </label>
+
+                <details className="group border-t border-line-soft">
+                  <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3.5 text-sm font-bold text-ink [&::-webkit-details-marker]:hidden">
+                    <span className="flex items-center gap-2"><SlidersHorizontal size={15} className="text-muted-dim" aria-hidden="true" />Filters</span>
+                    <ChevronDown size={18} className="text-muted-dim transition-transform group-open:rotate-180" aria-hidden="true" />
+                  </summary>
+                  <div className="grid gap-4 px-4 pb-5 pt-1.5">
+                    <label className="hero-filter-label"><span className="field-label text-muted-dim">Sequence</span><select name="sequence" className="field-select hero-search-control" defaultValue=""><option value="">All sequences</option>{sequenceIds.map((sequenceId) => <option key={sequenceId} value={sequenceId}>Sequence {sequenceLabel(sequenceId)}</option>)}</select></label>
+                    <div className="grid grid-cols-2 gap-4">
+                      <label className="hero-filter-label"><span className="field-label text-muted-dim">Min cloud cover</span><select name="oktasMin" className="field-select hero-search-control" defaultValue=""><option value="">Any</option>{oktaValues.map((okta) => <option key={okta} value={okta}>{oktaLabel(okta)}</option>)}</select></label>
+                      <label className="hero-filter-label"><span className="field-label text-muted-dim">Max cloud cover</span><select name="oktasMax" className="field-select hero-search-control" defaultValue=""><option value="">Any</option>{oktaValues.map((okta) => <option key={okta} value={okta}>{oktaLabel(okta)}</option>)}</select></label>
+                    </div>
+                  </div>
+                </details>
+
+                <div className="border-t border-line-soft p-4">
+                  <button type="submit" className="flex h-12 w-full items-center justify-center rounded-[7px] bg-sky-vivid text-sm font-bold text-white transition-colors hover:bg-sky-bright">Explore archive</button>
+                </div>
+              </form>
+            </div>
           </div>
 
-          <form action="/explore" method="get" role="search" aria-label="Search the WASCAT image archive" className="relative z-20 mx-auto mt-8 grid w-[min(1128px,calc(100%-32px))] gap-4 rounded-xl bg-white px-5 py-5 shadow-[0_5px_13px_rgba(27,73,103,.18)] sm:w-[min(1128px,calc(100%-64px))] sm:grid-cols-2 sm:px-6 lg:absolute lg:bottom-[-40px] lg:left-1/2 lg:mt-0 lg:-translate-x-1/2 lg:grid-cols-[2.05fr_.95fr_.95fr_.95fr_1fr] lg:items-end lg:gap-5 lg:py-[22px]">
+          <form action="/explore" method="get" role="search" aria-label="Search the WASCAT image archive" className="relative z-20 mx-auto mt-8 hidden w-[min(1128px,calc(100%-32px))] gap-4 rounded-xl bg-white px-5 py-5 shadow-[0_5px_13px_rgba(27,73,103,.18)] sm:w-[min(1128px,calc(100%-64px))] sm:grid-cols-2 sm:px-6 lg:absolute lg:bottom-[-40px] lg:left-1/2 lg:mt-0 lg:-translate-x-1/2 lg:grid lg:grid-cols-[2.05fr_.95fr_.95fr_.95fr_1fr] lg:items-end lg:gap-5 lg:py-[22px]">
             <label className="relative block sm:col-span-2 lg:col-span-1">
               <span className="sr-only">Search by date, class, or condition</span>
               <Search size={24} strokeWidth={1.75} className="pointer-events-none absolute left-4 top-3.5 text-muted-dim" aria-hidden="true" />
@@ -73,20 +117,20 @@ export default async function HomePage() {
           </form>
         </div>
 
-        <div className="mx-auto grid w-[min(970px,calc(100%-32px))] gap-y-5 pb-7 pt-7 sm:w-[min(970px,calc(100%-80px))] sm:grid-cols-3 sm:pt-8 lg:pb-6 lg:pt-[62px]" aria-label="Archive statistics">
-          <div className="flex min-h-[64px] items-center gap-5 sm:justify-start sm:pr-7">
-            <ImageIcon size={43} strokeWidth={1.25} className="shrink-0 text-sky-vivid" aria-hidden="true" />
-            <strong className="display text-[2rem] font-normal text-ink">{archiveImageTotal.toLocaleString()}</strong>
-            <span className="text-[.66rem] font-bold uppercase tracking-[.14em] text-muted-dim">Images</span>
+        <div className="mx-auto grid w-[min(970px,calc(100%-32px))] grid-cols-3 gap-x-2 pb-7 pt-7 sm:w-[min(970px,calc(100%-80px))] sm:gap-y-5 sm:pt-8 lg:pb-6 lg:pt-[62px]" aria-label="Archive statistics">
+          <div className="flex flex-col items-center gap-1.5 text-center sm:min-h-[64px] sm:flex-row sm:items-center sm:justify-start sm:gap-5 sm:pr-7 sm:text-left">
+            <ImageIcon strokeWidth={1.25} className="size-6 shrink-0 text-sky-vivid sm:size-11" aria-hidden="true" />
+            <strong className="display text-xl font-normal text-ink sm:text-[2rem]">{archiveImageTotal.toLocaleString()}</strong>
+            <span className="text-[.6rem] font-bold uppercase tracking-[.1em] text-muted-dim sm:text-[.66rem] sm:tracking-[.14em]">Images</span>
           </div>
-          <div className="flex min-h-[64px] items-center gap-5 border-t border-on-dark pt-5 sm:justify-center sm:border-l sm:border-t-0 sm:px-7 sm:pt-0">
-            <Layers3 size={43} strokeWidth={1.25} className="shrink-0 text-sky-vivid" aria-hidden="true" />
-            <strong className="display text-[2rem] font-normal text-ink">{sequenceIds.length}</strong>
-            <span className="text-[.66rem] font-bold uppercase tracking-[.14em] text-muted-dim">Sequences</span>
+          <div className="flex flex-col items-center gap-1.5 border-l border-on-dark text-center sm:min-h-[64px] sm:flex-row sm:items-center sm:justify-center sm:gap-5 sm:border-t-0 sm:px-7 sm:text-left">
+            <Layers3 strokeWidth={1.25} className="size-6 shrink-0 text-sky-vivid sm:size-11" aria-hidden="true" />
+            <strong className="display text-xl font-normal text-ink sm:text-[2rem]">{sequenceIds.length}</strong>
+            <span className="text-[.6rem] font-bold uppercase tracking-[.1em] text-muted-dim sm:text-[.66rem] sm:tracking-[.14em]">Sequences</span>
           </div>
-          <div className="flex min-h-[64px] items-center gap-5 border-t border-on-dark pt-5 sm:justify-end sm:border-l sm:border-t-0 sm:pl-7 sm:pt-0">
-            <MapPin size={43} strokeWidth={1.25} className="shrink-0 text-sky-vivid" aria-hidden="true" />
-            <strong className="display text-[1.55rem] font-normal text-ink md:text-[1.72rem]">West Africa</strong>
+          <div className="flex flex-col items-center gap-1.5 border-l border-on-dark text-center sm:min-h-[64px] sm:flex-row sm:items-center sm:justify-end sm:gap-5 sm:border-t-0 sm:pl-7 sm:text-left">
+            <MapPin strokeWidth={1.25} className="size-6 shrink-0 text-sky-vivid sm:size-11" aria-hidden="true" />
+            <strong className="display text-base font-normal text-ink sm:text-[1.55rem] md:text-[1.72rem]">West Africa</strong>
             <span className="sr-only">Region</span>
           </div>
         </div>
