@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { connection } from "next/server";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { CollectionCard } from "@/components/collection-card";
 import { getCollections } from "@/lib/api-client";
 
@@ -17,6 +18,7 @@ export default async function CollectionsPage() {
 
   return (
     <>
+      <Breadcrumbs trail={[{ label: "Home", href: "/" }, { label: "Collections" }]} />
       <section className="bg-ink-panel py-16 text-white md:py-24">
         <div className="container-shell grid gap-8 md:grid-cols-[1.15fr_.85fr] md:items-end"><div><p className="eyebrow text-sky-light">CAPTURE SEQUENCES</p><h1 className="display mt-4 text-5xl md:text-7xl">{collections.length} sequences, one measured archive.</h1></div><p className="max-w-lg leading-7 text-on-dark">Each collection is a continuous all-sky capture sequence. Segmented frames keep their cloud mask and its measured cloud cover; every file carries a checksum.</p></div>
       </section>

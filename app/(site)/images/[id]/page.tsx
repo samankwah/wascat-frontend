@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowDownToLine, Box, Camera, Clock3, CloudOff, CloudSun, ExternalLink, FileJson2, Film, MapPin } from "lucide-react";
 import { ArtifactViewer } from "@/components/artifact-viewer";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { CopyButton } from "@/components/copy-button";
 import { FrameCard } from "@/components/frame-card";
 import { getCollection, getCollectionImages, getImage } from "@/lib/api-client";
@@ -48,12 +49,15 @@ export default async function ImageDetailPage({ params }: { params: Promise<{ id
 
   return (
     <>
+      <Breadcrumbs
+        trail={[
+          { label: "Home", href: "/" },
+          { label: "Collections", href: "/collections" },
+          { label: collection?.shortTitle ?? record.collection, href: `/collections/${record.collection}` },
+          { label: record.id, mono: true },
+        ]}
+      />
       <section className="bg-ink-deep text-white">
-        <div className="container-shell py-5">
-          <Link href="/explore" className="inline-flex items-center gap-2 text-xs font-bold text-white/65 hover:text-white">
-            <span aria-hidden="true">←</span> Back to results
-          </Link>
-        </div>
         <div className="container-shell grid gap-9 pb-14 lg:grid-cols-[1.45fr_.55fr] lg:pb-20">
           <ArtifactViewer record={record} />
           <aside className="lg:pt-12">

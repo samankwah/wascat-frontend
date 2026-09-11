@@ -14,10 +14,12 @@ function FactTileSkeleton({ bordered = true }: { bordered?: boolean }) {
 export default function CollectionDetailLoading() {
   return (
     <SkeletonPage>
-      <section className="border-b border-line bg-paper">
-        <div className="container-shell py-5">
+      <div className="border-b border-line bg-paper lg:hidden">
+        <div className="container-shell py-3">
           <Skeleton className="h-3.5 w-32" />
         </div>
+      </div>
+      <section className="border-b border-line bg-paper">
         <div className="container-shell grid gap-10 pb-14 md:grid-cols-[1.03fr_.97fr] md:items-end md:pb-20">
           <div className="pb-2">
             <Skeleton className="h-2.5 w-40" />

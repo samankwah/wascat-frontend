@@ -105,54 +105,58 @@ export function Header() {
             <Menu size={21} />
           </button>
         </div>
+      </header>
 
-        <div className={`fixed inset-0 z-[90] md:hidden ${open ? "pointer-events-auto" : "pointer-events-none"}`} aria-hidden={!open} inert={!open}>
-          <button
-            type="button"
-            aria-label="Close navigation"
-            tabIndex={open ? 0 : -1}
-            onClick={() => { closeDrawer(); triggerRef.current?.focus(); }}
-            className={`absolute inset-0 bg-ink-abyss/65 backdrop-blur-[2px] transition-opacity duration-300 ${open ? "opacity-100" : "opacity-0"}`}
-          />
-          <div
-            ref={drawerRef}
-            id="mobile-navigation"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Mobile navigation"
-            className={`absolute inset-y-0 right-0 flex w-[min(88vw,370px)] flex-col bg-white shadow-[-18px_0_50px_rgba(7,27,39,.24)] transition-transform duration-300 ease-out ${open ? "translate-x-0" : "translate-x-full"}`}
-          >
-            <div className="flex h-[76px] items-center justify-between border-b border-line px-5">
-              <span className="eyebrow text-sky">NAVIGATION</span>
-              <button ref={closeRef} type="button" onClick={() => { closeDrawer(); triggerRef.current?.focus(); }} aria-label="Close navigation" className="inline-flex size-10 items-center justify-center rounded-full border border-line transition-colors hover:border-sky hover:bg-sky-pale hover:text-sky">
-                <X size={20} />
-              </button>
-            </div>
+      {/* Rendered as a sibling of <header>, not nested inside it: `header` carries
+          backdrop-blur-md, and a `backdrop-filter` on an ancestor turns it into the
+          containing block for `position: fixed` descendants - which would anchor
+          this overlay to the header's own short box instead of the viewport. */}
+      <div className={`fixed inset-0 z-[90] md:hidden ${open ? "pointer-events-auto" : "pointer-events-none"}`} aria-hidden={!open} inert={!open}>
+        <button
+          type="button"
+          aria-label="Close navigation"
+          tabIndex={open ? 0 : -1}
+          onClick={() => { closeDrawer(); triggerRef.current?.focus(); }}
+          className={`absolute inset-0 bg-ink-abyss/65 backdrop-blur-[2px] transition-opacity duration-300 ${open ? "opacity-100" : "opacity-0"}`}
+        />
+        <div
+          ref={drawerRef}
+          id="mobile-navigation"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Mobile navigation"
+          className={`absolute inset-y-0 right-0 flex w-[min(88vw,370px)] flex-col bg-white shadow-[-18px_0_50px_rgba(7,27,39,.24)] transition-transform duration-300 ease-out ${open ? "translate-x-0" : "translate-x-full"}`}
+        >
+          <div className="flex h-[76px] items-center justify-between border-b border-line px-5">
+            <span className="eyebrow text-sky">NAVIGATION</span>
+            <button ref={closeRef} type="button" onClick={() => { closeDrawer(); triggerRef.current?.focus(); }} aria-label="Close navigation" className="inline-flex size-10 items-center justify-center rounded-full border border-line transition-colors hover:border-sky hover:bg-sky-pale hover:text-sky">
+              <X size={20} />
+            </button>
+          </div>
 
-            <nav aria-label="Mobile primary navigation" className="flex-1 overflow-y-auto px-5 py-5">
-              {links.map(([label, href], index) => {
-                const active = pathname.startsWith(href);
-                return (
-                  <Link key={href} href={href} onClick={closeDrawer} data-active={active} className="group flex items-center justify-between border-b border-line-soft py-5">
-                    <span className="flex items-baseline gap-4">
-                      <span className="font-mono text-[.65rem] text-on-dark-dim">0{index + 1}</span>
-                      <span className={`display text-[1.8rem] leading-none transition-colors ${active ? "text-sky" : "text-ink group-hover:text-sky"}`}>{label}</span>
-                    </span>
-                    <ArrowRight size={18} className={`transition-transform group-hover:translate-x-1 ${active ? "text-sky" : "text-line-strong"}`} aria-hidden="true" />
-                  </Link>
-                );
-              })}
-            </nav>
+          <nav aria-label="Mobile primary navigation" className="flex-1 overflow-y-auto px-5 py-5">
+            {links.map(([label, href], index) => {
+              const active = pathname.startsWith(href);
+              return (
+                <Link key={href} href={href} onClick={closeDrawer} data-active={active} className="group flex items-center justify-between border-b border-line-soft py-5">
+                  <span className="flex items-baseline gap-4">
+                    <span className="font-mono text-[.65rem] text-on-dark-dim">0{index + 1}</span>
+                    <span className={`display text-[1.8rem] leading-none transition-colors ${active ? "text-sky" : "text-ink group-hover:text-sky"}`}>{label}</span>
+                  </span>
+                  <ArrowRight size={18} className={`transition-transform group-hover:translate-x-1 ${active ? "text-sky" : "text-line-strong"}`} aria-hidden="true" />
+                </Link>
+              );
+            })}
+          </nav>
 
-            <div className="border-t border-line bg-paper p-5">
-              <Link href="/about#using-the-data" onClick={closeDrawer} className="flex items-start gap-3 rounded-lg bg-white p-4 shadow-[0_5px_18px_rgba(16,47,65,.07)]">
-                <CircleHelp size={20} className="mt-0.5 shrink-0 text-sky" aria-hidden="true" />
-                <span><strong className="block text-sm">Dataset information</strong><span className="mt-1 block text-xs leading-5 text-muted">Scope, licensing, citation, and responsible use.</span></span>
-              </Link>
-            </div>
+          <div className="border-t border-line bg-paper p-5">
+            <Link href="/about#using-the-data" onClick={closeDrawer} className="flex items-start gap-3 rounded-lg bg-white p-4 shadow-[0_5px_18px_rgba(16,47,65,.07)]">
+              <CircleHelp size={20} className="mt-0.5 shrink-0 text-sky" aria-hidden="true" />
+              <span><strong className="block text-sm">Dataset information</strong><span className="mt-1 block text-xs leading-5 text-muted">Scope, licensing, citation, and responsible use.</span></span>
+            </Link>
           </div>
         </div>
-      </header>
+      </div>
     </>
   );
 }

@@ -3,10 +3,12 @@ import { Skeleton, SkeletonPage } from "@/components/skeleton";
 export default function ImageDetailLoading() {
   return (
     <SkeletonPage>
-      <section className="bg-ink-deep text-white">
-        <div className="container-shell py-5">
-          <Skeleton onDark className="h-3.5 w-32" />
+      <div className="border-b border-line bg-paper lg:hidden">
+        <div className="container-shell py-3">
+          <Skeleton className="h-3.5 w-32" />
         </div>
+      </div>
+      <section className="bg-ink-deep text-white">
         <div className="container-shell grid gap-9 pb-14 lg:grid-cols-[1.45fr_.55fr] lg:pb-20">
           <div>
             <div className="flex gap-5 border-b border-white/20">
