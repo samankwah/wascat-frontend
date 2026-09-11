@@ -1,8 +1,10 @@
 import type { StaticImageData } from "next/image";
 import edemPortrait from "@/public/images/team/edem-appiah-yeboah.jpg";
+import emmanuelPortrait from "@/public/images/team/emmanuel-quansah.jpg";
 import oliverPortrait from "@/public/images/team/oliver-kornyo-generated.png";
 import princePortrait from "@/public/images/team/prince-asilevi-generated.png";
-import richmondPortrait from "@/public/images/team/richmond-owusu-generated.png";
+import richmondPortrait from "@/public/images/team/richmond-owusu-agyei.jpg";
+import sandraPortrait from "@/public/images/team/sandra-adjetey.jpg";
 import stephenPortrait from "@/public/images/team/stephen-amankwah.jpg";
 
 export type TeamMember = {
@@ -33,6 +35,10 @@ export const teamMembers = [
     name: "Prof. Emmanuel Quansah",
     role: "Co-Lead, Department of Meteorology and Climate Science, KNUST, Kumasi",
     initials: "EQ",
+    image: {
+      src: emmanuelPortrait,
+      alt: "Portrait of Prof. Emmanuel Quansah.",
+    },
   },
   {
     name: "Dr Oliver Kornyo",
@@ -48,6 +54,10 @@ export const teamMembers = [
     name: "Sandra Adjetey",
     role: "Meteorologist, Ghana Meteorological Agency",
     initials: "SA",
+    image: {
+      src: sandraPortrait,
+      alt: "Portrait of Sandra Adjetey.",
+    },
   },
   {
     name: "Richmond Owusu Agyei",
@@ -55,7 +65,7 @@ export const teamMembers = [
     initials: "ROA",
     image: {
       src: richmondPortrait,
-      alt: "Temporary generated editorial portrait representing Richmond Owusu Agyei's WASCAT contribution.",
+      alt: "Portrait of Richmond Owusu Agyei.",
     },
   },
   {
