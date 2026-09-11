@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Github, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
 import { Logo } from "./logo";
 
 export function Footer() {
@@ -20,7 +20,6 @@ export function Footer() {
           <p className="eyebrow text-line-strong">Connect</p>
           <div className="mt-4 grid gap-3 text-sm">
             <a href="mailto:data@wascat.org" className="flex items-center gap-2"><Mail size={15} /> data@wascat.org</a>
-            <a href="https://github.com" className="flex items-center gap-2"><Github size={15} /> Source repository</a>
           </div>
         </div>
       </div>
