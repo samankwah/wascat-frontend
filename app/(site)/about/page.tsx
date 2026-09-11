@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, BookOpen, Linkedin, Mail, ShieldCheck } from "lucide-react";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { PartnerCarousel } from "@/components/partner-carousel";
 import { partners } from "@/lib/partners";
 import { teamMembers, type TeamMember } from "@/lib/team";
@@ -31,6 +32,7 @@ function TeamPortrait({ member }: { member: TeamMember }) {
 export default function AboutPage() {
   return (
     <>
+      <Breadcrumbs trail={[{ label: "Home", href: "/" }, { label: "About" }]} />
       <section className="container-shell grid gap-10 py-16 md:grid-cols-[.7fr_1.3fr] md:py-24"><p className="eyebrow text-sky">ABOUT WASCAT</p><div><h1 className="display max-w-4xl text-5xl leading-tight md:text-7xl">A transparent demonstration archive for West African sky research.</h1><p className="mt-7 max-w-2xl text-lg leading-8 text-muted">WASCAT makes expert-labelled atmospheric imagery easier to find, understand, cite, and reuse through examples represented across Ghana, Nigeria, and Burkina Faso.</p><p className="mt-5 max-w-2xl border-l-2 border-sky pl-5 text-sm leading-6 text-muted"><strong className="text-ink">Demonstration scope:</strong> the catalog records, station profiles, release details, measurements, and citations are fixtures for evaluating the archive experience. They do not describe operational observing stations or published datasets.</p></div></section>
       <section className="border-y border-line bg-sky-pale py-16"><div className="container-shell grid grid-cols-2 gap-x-5 gap-y-9 md:grid-cols-3 md:gap-8">{[[BookOpen, "Open by default", "Demonstration images, artifacts, and metadata are directly inspectable without an account."], [ShieldCheck, "Stable by design", "Numbered fixture releases illustrate how citations, checksums, and download links remain recoverable."], [Mail, "Expert labelled", "The catalog models a curator-reviewed label vocabulary for regional cloud, haze, dust, and seasonal conditions."]].map(([Icon, title, body], index) => { const Graphic = Icon as typeof BookOpen; return <div key={String(title)} className={index === 2 ? "col-span-2 md:col-span-1" : ""}><Graphic size={23} className="text-sky" /><h2 className="display mt-5 text-2xl">{String(title)}</h2><p className="mt-3 text-sm leading-6 text-muted">{String(body)}</p></div>; })}</div></section>
       <section className="bg-paper py-16 md:py-24" aria-labelledby="team-title">

@@ -3,7 +3,8 @@ import { connection } from "next/server";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowDownToLine, ArrowLeft, ArrowRight, Camera, CloudSun, ExternalLink, Film, MapPin, ShieldCheck } from "lucide-react";
+import { ArrowDownToLine, ArrowRight, Camera, CloudSun, ExternalLink, Film, MapPin, ShieldCheck } from "lucide-react";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { CopyButton } from "@/components/copy-button";
 import { FrameCard } from "@/components/frame-card";
 import { getCollection, getCollectionImages } from "@/lib/api-client";
@@ -64,8 +65,14 @@ export default async function CollectionPage({ params }: { params: Promise<{ slu
 
   return (
     <>
+      <Breadcrumbs
+        trail={[
+          { label: "Home", href: "/" },
+          { label: "Collections", href: "/collections" },
+          { label: collection.shortTitle ?? collection.title },
+        ]}
+      />
       <section className="bg-paper">
-        <div className="container-shell py-5"><Link href="/collections" className="inline-flex items-center gap-2 text-xs font-bold text-muted hover:text-sky"><ArrowLeft size={14} /> All collections</Link></div>
         <div className="container-shell grid gap-10 pb-14 md:grid-cols-[1.03fr_.97fr] md:items-end md:pb-20">
           <div className="pb-2">
             <p className="eyebrow text-sky">{collection.kicker}</p>

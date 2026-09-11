@@ -4,6 +4,11 @@ import { Skeleton, SkeletonPage } from "@/components/skeleton";
 export default function CollectionsLoading() {
   return (
     <SkeletonPage>
+      <div className="border-b border-line bg-paper lg:hidden">
+        <div className="container-shell py-3">
+          <Skeleton className="h-3.5 w-32" />
+        </div>
+      </div>
       <section className="bg-ink-panel py-16 text-white md:py-24">
         <div className="container-shell grid gap-8 md:grid-cols-[1.15fr_.85fr] md:items-end">
           <div>
