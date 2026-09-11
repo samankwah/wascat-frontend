@@ -78,6 +78,10 @@
 
 html {
   scroll-behavior: smooth;
+  /* The header is `sticky top-0`, up to 76px tall - without this, jumping
+     to an anchor (the API docs sidebar, `/about#using-the-data`, ...)
+     lands the target flush under it, hidden behind the header. */
+  scroll-padding-top: 96px;
 }
 
 body {
