@@ -33,6 +33,7 @@ export function FrameCard({ image, priority = false }: { image: ImageRecord; pri
             <p className="mt-1 text-[.68rem] leading-4 text-muted sm:text-xs">
               {recordTimestamp(image)}
               {image.location ? ` · ${image.location}` : ""}
+              {image.skyClass ? ` · ${image.skyClass}` : ""}
             </p>
           </div>
           <span

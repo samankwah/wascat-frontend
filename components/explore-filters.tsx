@@ -20,6 +20,7 @@ export type ExploreOptions = {
   locations: string[];
   seasons: string[];
   timesOfDay: string[];
+  skyClasses: string[];
   artifactTypes: string[];
   hasTimestamps: boolean;
   /** True when the catalogue holds frames that have not been segmented. */
@@ -34,7 +35,7 @@ export type ExploreOptions = {
   oktaCounts: number[];
 };
 
-const chipFields = ["q", "collection", "release", "sequence", "segmented", "oktasMin", "oktasMax", "season", "time", "location", "artifact", "from", "to"] as const;
+const chipFields = ["q", "collection", "release", "sequence", "segmented", "oktasMin", "oktasMax", "season", "time", "location", "skyClass", "artifact", "from", "to"] as const;
 
 const chipLabels: Record<string, string> = {
   q: "Search",
@@ -47,6 +48,7 @@ const chipLabels: Record<string, string> = {
   season: "Season",
   time: "Time of day",
   location: "Location",
+  skyClass: "Sky class",
   artifact: "Artifact",
   from: "From",
   to: "To",
@@ -181,6 +183,16 @@ function Panel({
           <select className="field-select" value={value("location")} onChange={(event) => update("location", event.target.value)}>
             <option value="">All locations</option>
             {options.locations.map((location) => <option key={location}>{location}</option>)}
+          </select>
+        </label>
+      )}
+
+      {options.skyClasses.length > 0 && (
+        <label>
+          <span className="field-label">Sky class</span>
+          <select className="field-select" value={value("skyClass")} onChange={(event) => update("skyClass", event.target.value)}>
+            <option value="">Any</option>
+            {options.skyClasses.map((skyClass) => <option key={skyClass}>{skyClass}</option>)}
           </select>
         </label>
       )}

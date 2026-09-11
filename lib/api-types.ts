@@ -501,6 +501,58 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Every account */
+        get: operations["admin_users_list_users"];
+        put?: never;
+        /** Invite someone */
+        post: operations["admin_users_create_user"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/users/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Change a name, a role, or access */
+        patch: operations["admin_users_update_user"];
+        trace?: never;
+    };
+    "/api/v1/admin/users/{user_id}/password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reset a password */
+        post: operations["admin_users_reset_password"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/health": {
         parameters: {
             query?: never;
@@ -844,6 +896,8 @@ export interface components {
             seasons: components["schemas"]["FacetValue"][];
             /** Timesofday */
             timesOfDay: components["schemas"]["FacetValue"][];
+            /** Skyclasses */
+            skyClasses: components["schemas"]["FacetValue"][];
             /** Locations */
             locations: components["schemas"]["FacetValue"][];
         };
@@ -931,6 +985,8 @@ export interface components {
             season?: string | null;
             /** Timeofday */
             timeOfDay?: string | null;
+            /** Skyclass */
+            skyClass?: string | null;
             /** Instrument */
             instrument?: string | null;
         };
@@ -1079,6 +1135,33 @@ export interface components {
              * @default true
              */
             current: boolean;
+        };
+        /**
+         * UserCreate
+         * @description Invite someone. The generated password comes back once in the response.
+         */
+        UserCreate: {
+            /** Email */
+            email: string;
+            /** Fullname */
+            fullName?: string | null;
+            /** Role */
+            role: string;
+        };
+        /**
+         * UserUpdate
+         * @description Change a name, a role, or whether the account may sign in.
+         *
+         *     Every field is optional and the router reads ``exclude_unset``, so omitting
+         *     a field leaves it alone rather than clearing it.
+         */
+        UserUpdate: {
+            /** Fullname */
+            fullName?: string | null;
+            /** Role */
+            role?: string | null;
+            /** Isactive */
+            isActive?: boolean | null;
         };
         /** ValidationError */
         ValidationError: {
@@ -2172,6 +2255,125 @@ export interface operations {
                 "application/json": components["schemas"]["VocabularyReorder"];
             };
         };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_users_list_users: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    admin_users_create_user: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UserCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_users_update_user: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UserUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    admin_users_reset_password: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             /** @description Successful Response */
             200: {

@@ -31,6 +31,8 @@ export const imageQuerySchema = z.object({
   season: z.enum(seasons).optional(),
   time: z.enum(timesOfDay).optional(),
   location: z.string().trim().max(80).optional(),
+  /** A curator's read of the sequence's dominant sky condition, not a closed enum. */
+  skyClass: z.string().trim().max(80).optional(),
   artifact: z.enum(artifactTypes).optional(),
   from: z.string().date().optional(),
   to: z.string().date().optional(),
