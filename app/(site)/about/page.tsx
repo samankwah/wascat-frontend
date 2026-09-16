@@ -41,7 +41,7 @@ export default function AboutPage() {
             <p className="eyebrow text-sky">MEET THE TEAM</p>
             <div>
               <h2 id="team-title" className="display text-4xl leading-tight md:text-5xl">The people shaping WASCAT.</h2>
-              <p className="mt-4 max-w-2xl text-sm leading-6 text-muted">These contribution labels describe each member&apos;s work on WASCAT and are not formal employer titles. The generated portrait illustrations are temporary visual placeholders, not depictions of the named team members, and will be replaced with approved photographs.</p>
+              <p className="mt-4 max-w-2xl text-sm leading-6 text-muted">These contribution labels describe each member&apos;s work on WASCAT and are not formal employer titles.</p>
             </div>
           </div>
 
