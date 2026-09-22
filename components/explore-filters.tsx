@@ -35,7 +35,7 @@ export type ExploreOptions = {
   oktaCounts: number[];
 };
 
-const chipFields = ["q", "collection", "release", "sequence", "segmented", "oktasMin", "oktasMax", "season", "time", "location", "skyClass", "artifact", "from", "to"] as const;
+const chipFields = ["q", "collection", "release", "sequence", "segmented", "oktas", "oktasMin", "oktasMax", "season", "time", "location", "skyClass", "artifact", "from", "to"] as const;
 
 const chipLabels: Record<string, string> = {
   q: "Search",
@@ -43,6 +43,11 @@ const chipLabels: Record<string, string> = {
   release: "Release",
   sequence: "Sequence",
   segmented: "Segmentation",
+  // The home page's quick search asks for one exact okta count rather than a
+  // range, so `oktas` arrives here with no control of its own in the panel.
+  // The chip is what makes it visible and removable; without it the results
+  // would be filtered by something the reader cannot see.
+  oktas: "Cloud cover",
   oktasMin: "Min cover",
   oktasMax: "Max cover",
   season: "Season",
@@ -299,7 +304,7 @@ export function ExploreShell({
                       ? sequenceLabel(value(field))
                       : field === "segmented"
                         ? value(field) === "true" ? "Segmented" : "Not segmented"
-                        : field === "oktasMin" || field === "oktasMax"
+                        : field === "oktas" || field === "oktasMin" || field === "oktasMax"
                           ? oktaLabel(Number(value(field)))
                           : value(field)}{" "}
                   <X size={13} />
