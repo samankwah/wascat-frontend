@@ -25,6 +25,11 @@ export type Coordinates = Schemas["Coordinates"];
  */
 export type ImageRecord = Schemas["ImageRecordOut"];
 
+/** One model's full probability vector for a frame, ranked. */
+export type Prediction = Schemas["PredictionOut"];
+export type PredictionModel = Schemas["PredictionModelOut"];
+export type ClassProbability = Schemas["ClassProbabilityOut"];
+
 export type Collection = Schemas["CollectionOut"];
 export type CollectionSummary = Schemas["CollectionSummaryOut"];
 

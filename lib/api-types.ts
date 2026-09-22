@@ -625,6 +625,16 @@ export interface components {
              */
             tagMode: "add" | "replace" | "remove";
         };
+        /** ClassProbabilityOut */
+        ClassProbabilityOut: {
+            /**
+             * Skyclass
+             * @description A SKY_CLASS vocabulary label, e.g. 'Stratocumulus'.
+             */
+            skyClass: string;
+            /** Probability */
+            probability: number;
+        };
         /** CollectionCreate */
         CollectionCreate: {
             /** Title */
@@ -927,6 +937,15 @@ export interface components {
          *     that carries no mask: cloud cover is measured from the mask, so without one
          *     there is no measurement to report. They are never defaulted to zero, which
          *     would invent a clear sky.
+         *
+         *     ``observedCloudCoverOktas`` is the separate, human-supplied count that
+         *     travels with the observer's cloud-genus label. It is never reconciled
+         *     against the measured pair: the two can and do differ, and which one a
+         *     reader wants depends on what they are checking.
+         *
+         *     ``predictions`` appears on the single-record read only. The list endpoints
+         *     omit it rather than serialise one entry per class per model for every card
+         *     on the page.
          */
         ImageRecordOut: {
             /** Id */
@@ -943,6 +962,8 @@ export interface components {
             cloudFraction?: number | null;
             /** Cloudcoveroktas */
             cloudCoverOktas?: number | null;
+            /** Observedcloudcoveroktas */
+            observedCloudCoverOktas?: number | null;
             /**
              * Maskscale
              * @description Scale at which the mask was delivered relative to its frame. 1 for a correctly registered sequence; greater where the mask was rendered larger and the viewer must scale it back.
@@ -987,6 +1008,8 @@ export interface components {
             timeOfDay?: string | null;
             /** Skyclass */
             skyClass?: string | null;
+            /** Predictions */
+            predictions?: components["schemas"]["PredictionOut"][] | null;
             /** Instrument */
             instrument?: string | null;
         };
@@ -994,10 +1017,16 @@ export interface components {
          * ImageRecordWrite
          * @description Provenance a curator supplies for a frame.
          *
-         *     Nothing here can invent a measurement: cloud cover comes from the mask and
-         *     is not settable. What a person knows and a pipeline does not - where the
-         *     camera was, when it was pointed at the sky, what it was - is what this
+         *     Nothing here can invent a measurement: the cloud cover derived from the
+         *     mask is not settable, and there is no field for it. What a person knows
+         *     and a pipeline does not - where the camera was, when it was pointed at the
+         *     sky, what it was, what they saw when they looked up - is what this
          *     carries.
+         *
+         *     ``observedCloudCoverOktas`` is the one number here, and it is an
+         *     observation rather than a measurement: a count a person read off the sky,
+         *     correcting or supplying what the label table loaded. It writes to its own
+         *     column and leaves ``cloudCoverOktas`` alone.
          */
         ImageRecordWrite: {
             /** Capturedat */
@@ -1016,6 +1045,8 @@ export interface components {
             timeOfDay?: string | null;
             /** Skyclass */
             skyClass?: string | null;
+            /** Observedcloudcoveroktas */
+            observedCloudCoverOktas?: number | null;
             /** Conditiontags */
             conditionTags?: string[] | null;
             /** Custom */
@@ -1074,6 +1105,37 @@ export interface components {
             limit: number;
             /** Nextcursor */
             nextCursor?: string | null;
+        };
+        /**
+         * PredictionModelOut
+         * @description The classifier a probability vector came from.
+         */
+        PredictionModelOut: {
+            /** Slug */
+            slug: string;
+            /** Name */
+            name: string;
+            /**
+             * Version
+             * @description The model's own version string: a tag, a date or a commit.
+             */
+            version: string;
+            /** Description */
+            description?: string | null;
+        };
+        /**
+         * PredictionOut
+         * @description One model's reading of one frame.
+         *
+         *     ``classes`` is the whole vector, ranked by probability descending - every
+         *     class the model scored, not just the winner. An all-sky frame routinely
+         *     holds several genera at once, so the runners-up are the point: they are
+         *     what makes the reading comparable with the observer's own.
+         */
+        PredictionOut: {
+            model: components["schemas"]["PredictionModelOut"];
+            /** Classes */
+            classes: components["schemas"]["ClassProbabilityOut"][];
         };
         /** ReleaseCreate */
         ReleaseCreate: {
