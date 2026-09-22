@@ -146,10 +146,13 @@ export default async function AdminImageDetail({
               instrument: record.instrument ?? "",
               season: record.season ?? "",
               timeOfDay: record.timeOfDay ?? "",
+              skyClass: record.skyClass ?? "",
+              observedCloudCoverOktas: record.observedCloudCoverOktas ?? null,
               conditionTags: record.conditionTags ?? [],
             }}
             seasons={facets.seasons.map((entry) => String(entry.value))}
             timesOfDay={facets.timesOfDay.map((entry) => String(entry.value))}
+            skyClasses={facets.skyClasses.map((entry) => String(entry.value))}
           />
         </div>
 

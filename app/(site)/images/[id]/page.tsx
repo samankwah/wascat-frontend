@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import { connection } from "next/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowDownToLine, Box, Camera, Cloud, Clock3, CloudOff, CloudSun, ExternalLink, FileJson2, Film, MapPin } from "lucide-react";
+import { ArrowDownToLine, Box, Camera, Cloud, Clock3, CloudOff, CloudSun, Eye, ExternalLink, FileJson2, Film, MapPin } from "lucide-react";
 import { ArtifactViewer } from "@/components/artifact-viewer";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { CopyButton } from "@/components/copy-button";
 import { FrameCard } from "@/components/frame-card";
+import { PredictionPanel } from "@/components/prediction-panel";
 import { getCollection, getCollectionImages, getImage } from "@/lib/api-client";
 import { formatDate, sequenceLabel } from "@/lib/format";
 import { oktaLabel } from "@/lib/vocab";
@@ -35,16 +36,20 @@ export default async function ImageDetailPage({ params }: { params: Promise<{ id
   ]);
   const related = neighbours.filter((item) => item.id !== record.id).slice(0, 3);
 
-  // Facts are measured or omitted; nothing here is assigned by hand.
+  // Facts are measured, observed or omitted; nothing here is assigned by hand.
+  // Measured and observed cloud cover are two different readings of the same
+  // sky - one counted off the segmentation mask, one written down by a person -
+  // so they sit next to each other rather than one standing in for the other.
   const facts: [typeof Clock3, string, string][] = [
     [Film, "Sequence", `${sequenceLabel(record.sequenceId)} · frame ${record.frameIndex.toLocaleString()}`],
     record.cloudFraction == null
       ? [CloudOff, "Cloud cover", "Not measured — this frame has no segmentation mask"]
       : [CloudSun, "Measured cloud cover", `${oktaLabel(record.cloudCoverOktas ?? 0)} · ${(record.cloudFraction * 100).toFixed(1)}% of the field of view`],
+    ...(record.observedCloudCoverOktas != null ? [[Eye, "Observed cloud cover", `${oktaLabel(record.observedCloudCoverOktas)} · recorded by an observer`] as [typeof Clock3, string, string]] : []),
     [Box, "Dimensions", `${record.width} × ${record.height} pixels`],
     ...(record.capturedAt ? [[Clock3, "Captured", formatDate(record.capturedAt, true)] as [typeof Clock3, string, string]] : []),
     ...(record.location ? [[MapPin, "Location", record.location] as [typeof Clock3, string, string]] : []),
-    ...(record.skyClass ? [[Cloud, "Sky class", record.skyClass] as [typeof Clock3, string, string]] : []),
+    ...(record.skyClass ? [[Cloud, "Observed cloud type", record.skyClass] as [typeof Clock3, string, string]] : []),
     ...(record.instrument ? [[Camera, "Instrument", record.instrument] as [typeof Clock3, string, string]] : []),
   ];
 
@@ -60,7 +65,10 @@ export default async function ImageDetailPage({ params }: { params: Promise<{ id
       />
       <section className="bg-ink-deep text-white">
         <div className="container-shell grid gap-9 pb-14 lg:grid-cols-[1.45fr_.55fr] lg:pb-20 lg:pt-14">
-          <ArtifactViewer record={record} />
+          <div className="min-w-0">
+            <ArtifactViewer record={record} />
+            <PredictionPanel record={record} />
+          </div>
           <aside className="lg:pt-12">
             <p className="eyebrow text-sky-light">
               {record.hasSource && record.hasMask ? "SOURCE + MASK" : record.hasMask ? "MASK ONLY" : "SOURCE ONLY"}
