@@ -90,10 +90,7 @@ export default async function HomePage() {
                   </summary>
                   <div className="grid gap-4 px-4 pb-5 pt-1.5">
                     <label className="hero-filter-label"><span className="field-label text-muted-dim">Sequence</span><select name="sequence" className="field-select hero-search-control" defaultValue=""><option value="">All sequences</option>{sequenceIds.map((sequenceId) => <option key={sequenceId} value={sequenceId}>Sequence {sequenceLabel(sequenceId)}</option>)}</select></label>
-                    <div className="grid grid-cols-2 gap-4">
-                      <label className="hero-filter-label"><span className="field-label text-muted-dim">Min cloud cover</span><select name="oktasMin" className="field-select hero-search-control" defaultValue=""><option value="">Any</option>{oktaValues.map((okta) => <option key={okta} value={okta}>{oktaLabel(okta)}</option>)}</select></label>
-                      <label className="hero-filter-label"><span className="field-label text-muted-dim">Max cloud cover</span><select name="oktasMax" className="field-select hero-search-control" defaultValue=""><option value="">Any</option>{oktaValues.map((okta) => <option key={okta} value={okta}>{oktaLabel(okta)}</option>)}</select></label>
-                    </div>
+                    <label className="hero-filter-label"><span className="field-label text-muted-dim">Cloud cover</span><select name="oktas" className="field-select hero-search-control" defaultValue=""><option value="">Any</option>{oktaValues.map((okta) => <option key={okta} value={okta}>{oktaLabel(okta)}</option>)}</select></label>
                   </div>
                 </details>
 
@@ -104,15 +101,14 @@ export default async function HomePage() {
             </div>
           </div>
 
-          <form action="/explore" method="get" role="search" aria-label="Search the WASCAT image archive" className="relative z-20 mx-auto mt-8 hidden w-[min(1128px,calc(100%-32px))] gap-4 rounded-xl bg-white px-5 py-5 shadow-[0_5px_13px_rgba(27,73,103,.18)] sm:w-[min(1128px,calc(100%-64px))] sm:grid-cols-2 sm:px-6 lg:absolute lg:bottom-[-40px] lg:left-1/2 lg:mt-0 lg:-translate-x-1/2 lg:grid lg:grid-cols-[2.05fr_.95fr_.95fr_.95fr_1fr] lg:items-end lg:gap-5 lg:py-[22px]">
+          <form action="/explore" method="get" role="search" aria-label="Search the WASCAT image archive" className="relative z-20 mx-auto mt-8 hidden w-[min(1128px,calc(100%-32px))] gap-4 rounded-xl bg-white px-5 py-5 shadow-[0_5px_13px_rgba(27,73,103,.18)] sm:w-[min(1128px,calc(100%-64px))] sm:grid-cols-2 sm:px-6 lg:absolute lg:bottom-[-40px] lg:left-1/2 lg:mt-0 lg:-translate-x-1/2 lg:grid lg:grid-cols-[2.05fr_1.1fr_1.1fr_1fr] lg:items-end lg:gap-5 lg:py-[22px]">
             <label className="relative block sm:col-span-2 lg:col-span-1">
               <span className="sr-only">Search by date, class, or condition</span>
               <Search size={24} strokeWidth={1.75} className="pointer-events-none absolute left-4 top-3.5 text-muted-dim" aria-hidden="true" />
               <input name="q" type="search" className="field-input hero-search-control search-field-input" placeholder="Search by date, class or condition" />
             </label>
             <label className="hero-filter-label"><span className="field-label text-muted-dim">Sequence</span><select name="sequence" className="field-select hero-search-control" defaultValue=""><option value="">All sequences</option>{sequenceIds.map((sequenceId) => <option key={sequenceId} value={sequenceId}>Sequence {sequenceLabel(sequenceId)}</option>)}</select></label>
-            <label className="hero-filter-label"><span className="field-label text-muted-dim">Min cloud cover</span><select name="oktasMin" className="field-select hero-search-control" defaultValue=""><option value="">Any</option>{oktaValues.map((okta) => <option key={okta} value={okta}>{oktaLabel(okta)}</option>)}</select></label>
-            <label className="hero-filter-label"><span className="field-label text-muted-dim">Max cloud cover</span><select name="oktasMax" className="field-select hero-search-control" defaultValue=""><option value="">Any</option>{oktaValues.map((okta) => <option key={okta} value={okta}>{oktaLabel(okta)}</option>)}</select></label>
+            <label className="hero-filter-label"><span className="field-label text-muted-dim">Cloud cover</span><select name="oktas" className="field-select hero-search-control" defaultValue=""><option value="">Any</option>{oktaValues.map((okta) => <option key={okta} value={okta}>{oktaLabel(okta)}</option>)}</select></label>
             <button type="submit" className="inline-flex h-[50px] items-center justify-center self-end whitespace-nowrap rounded-[7px] bg-sky-vivid px-5 text-sm font-bold text-white transition-colors hover:bg-sky-bright sm:col-span-2 lg:col-span-1">Explore archive</button>
           </form>
         </div>
