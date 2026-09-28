@@ -86,7 +86,7 @@ export function PredictionPanel({ record }: { record: ImageRecord }) {
                 <span className="truncate">{entry.skyClass}</span>
                 {observed && (
                   <span
-                    className="shrink-0 border border-lime/60 px-1.5 py-0.5 text-[.55rem] font-bold uppercase tracking-wider text-lime"
+                    className="shrink-0 border border-lime/60 px-1.5 py-0.5 text-[.6rem] font-bold uppercase tracking-wider text-lime"
                     title="This is also the cloud type the observer recorded"
                   >
                     Observed

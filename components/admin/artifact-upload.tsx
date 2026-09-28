@@ -353,7 +353,7 @@ function ArtifactSlot({
             ) : null}
 
             {editable ? (
-              <p className="mt-2 text-[.68rem] text-muted-dim">or drop a file here</p>
+              <p className="mt-2 text-[.73rem] text-muted-dim">or drop a file here</p>
             ) : null}
           </>
         )}

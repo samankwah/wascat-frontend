@@ -7,7 +7,7 @@ function FieldSkeleton({ className = "" }: { className?: string }) {
   return (
     <div className={className}>
       <Skeleton className="h-2.5 w-20" />
-      <Skeleton className="mt-2.5 h-12 w-full" />
+      <Skeleton className="mt-2.5 h-12 w-full rounded-lg" />
     </div>
   );
 }
@@ -26,13 +26,7 @@ function FilterPanelSkeleton() {
         <FieldSkeleton />
       </div>
       <FieldSkeleton />
-      <div>
-        <Skeleton className="h-2.5 w-32" />
-        <div className="mt-2.5 grid grid-cols-2 gap-3">
-          <Skeleton className="h-12 w-full" />
-          <Skeleton className="h-12 w-full" />
-        </div>
-      </div>
+      <FieldSkeleton />
       <FieldSkeleton />
       <FieldSkeleton />
       <div className="grid grid-cols-2 gap-3">
@@ -51,34 +45,45 @@ export default function ExploreLoading() {
           <Skeleton className="h-3.5 w-32" />
         </div>
       </div>
-      <section className="border-b border-line bg-paper">
-        <div className="container-shell py-12 md:py-16">
-          <Skeleton className="h-2.5 w-72" />
-          <Skeleton className="mt-4 h-12 w-full max-w-lg sm:h-14" />
-          <div className="mt-5 grid max-w-2xl gap-2">
-            <Skeleton className="h-3.5 w-full" />
-            <Skeleton className="h-3.5 w-full" />
-            <Skeleton className="h-3.5 w-1/2" />
+      <div className="bg-paper">
+        <section className="container-shell pb-2 pt-12 md:pt-16">
+          <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+            <div className="w-full max-w-2xl">
+              <Skeleton className="h-6 w-32 rounded-full" />
+              <Skeleton className="mt-4 h-12 w-full max-w-md" />
+              <div className="mt-4 grid gap-2">
+                <Skeleton className="h-3.5 w-full" />
+                <Skeleton className="h-3.5 w-2/3" />
+              </div>
+            </div>
+            <div className="grid grid-cols-3 divide-x divide-line rounded-xl border border-line bg-white lg:min-w-[440px]">
+              {Array.from({ length: 3 }, (_, index) => (
+                <div key={index} className="px-4 py-4 sm:px-5">
+                  <Skeleton className="h-2.5 w-16" />
+                  <Skeleton className="mt-2.5 h-6 w-14" />
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <div className="container-shell py-9 md:py-14">
-        <div className="grid gap-10 lg:grid-cols-[260px_1fr]">
-          <aside className="hidden lg:block">
-            <div className="sticky top-6">
-              <FilterPanelSkeleton />
-            </div>
-          </aside>
+        <div className="container-shell pb-14 pt-8 md:pb-20 md:pt-10">
+          <div className="grid gap-8 lg:grid-cols-[272px_1fr]">
+            <aside className="hidden lg:block">
+              <div className="sticky top-20 rounded-2xl border border-line bg-white p-5">
+                <FilterPanelSkeleton />
+              </div>
+            </aside>
 
-          <div>
-            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-line pb-5">
-              <Skeleton className="h-3.5 w-28" />
-              <Skeleton className="h-10 w-32" />
-            </div>
+            <div className="min-w-0">
+              <div className="flex items-center justify-between gap-3 rounded-xl border border-line bg-white px-4 py-3 sm:px-5">
+                <Skeleton className="h-3.5 w-28" />
+                <Skeleton className="h-10 w-36 rounded-lg" />
+              </div>
 
-            <div className="mt-7 grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-5 sm:gap-y-9 xl:grid-cols-3">
-              {Array.from({ length: 9 }, (_, index) => <FrameCardSkeleton key={index} />)}
+              <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3">
+                {Array.from({ length: 9 }, (_, index) => <FrameCardSkeleton key={index} />)}
+              </div>
             </div>
           </div>
         </div>

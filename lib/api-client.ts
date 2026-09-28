@@ -18,6 +18,7 @@ import type {
   ImagePage,
   ImageRecord,
   Release,
+  Stats,
 } from "./types";
 
 /**
@@ -173,6 +174,24 @@ export async function getFacets(): Promise<Facets> {
       timesOfDay: [],
       skyClasses: [],
       locations: [],
+    }
+  );
+}
+
+/**
+ * Archive-wide statistics. Tagged like the facets: it counts the same records,
+ * so anything that invalidates one has invalidated both.
+ */
+export async function getStats(): Promise<Stats> {
+  const envelope = await request<Stats>("/api/v1/stats", { tags: [TAGS.facets, TAGS.images] });
+  return (
+    envelope?.data ?? {
+      totals: { images: 0, sites: 0, sitesBasis: "collections", processedPct: null, avgCoveragePct: null, measured: 0 },
+      byLocation: { basis: "collections", items: [] },
+      cloudTypes: { basis: "collections", items: [] },
+      byHourUtc: { hasTimestamps: false, items: [] },
+      coverageHistogram: [],
+      growth: { basis: "capturedOrIngested", items: [] },
     }
   );
 }

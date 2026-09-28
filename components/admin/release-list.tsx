@@ -85,7 +85,7 @@ export function ReleaseList({
               value={version}
               onChange={(event) => setVersion(event.target.value)}
               placeholder="1.1"
-              className="field-input h-10 w-32 font-mono text-[.8rem]"
+              className="field-input h-10 w-32 font-mono text-[.85rem]"
             />
           </label>
           <button

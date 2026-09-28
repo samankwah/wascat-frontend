@@ -2031,6 +2031,18 @@
             "title": "Maskregistration",
             "default": []
           },
+          "skyClass": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Skyclass",
+            "description": "Observed cloud type, when every labelled frame shares one."
+          },
           "locationName": {
             "anyOf": [
               {
@@ -2211,6 +2223,18 @@
             "type": "array",
             "title": "Maskregistration",
             "default": []
+          },
+          "skyClass": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Skyclass",
+            "description": "Observed cloud type, when every labelled frame shares one."
           },
           "locationName": {
             "anyOf": [

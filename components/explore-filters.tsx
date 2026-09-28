@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Filter, Search, SlidersHorizontal, TriangleAlert, X } from "lucide-react";
+import { Filter, Search, SlidersHorizontal, X } from "lucide-react";
 import { useState } from "react";
 import { sequenceLabel } from "@/lib/format";
 import { oktaLabel } from "@/lib/vocab";
@@ -35,7 +35,7 @@ export type ExploreOptions = {
   oktaCounts: number[];
 };
 
-const chipFields = ["q", "collection", "release", "sequence", "segmented", "oktas", "oktasMin", "oktasMax", "season", "time", "location", "skyClass", "artifact", "from", "to"] as const;
+const chipFields = ["q", "collection", "release", "sequence", "segmented", "oktas", "oktasMin", "oktasMax", "season", "time", "location", "skyClass", "cloudType", "artifact", "from", "to"] as const;
 
 const chipLabels: Record<string, string> = {
   q: "Search",
@@ -43,17 +43,16 @@ const chipLabels: Record<string, string> = {
   release: "Release",
   sequence: "Sequence",
   segmented: "Segmentation",
-  // The home page's quick search asks for one exact okta count rather than a
-  // range, so `oktas` arrives here with no control of its own in the panel.
-  // The chip is what makes it visible and removable; without it the results
-  // would be filtered by something the reader cannot see.
   oktas: "Cloud cover",
+  // No longer offered in the panel, but older links may still carry them;
+  // the chips keep such a filter visible and removable.
   oktasMin: "Min cover",
   oktasMax: "Max cover",
   season: "Season",
   time: "Time of day",
   location: "Location",
   skyClass: "Sky class",
+  cloudType: "Cloud type",
   artifact: "Artifact",
   from: "From",
   to: "To",
@@ -61,42 +60,37 @@ const chipLabels: Record<string, string> = {
 
 const oktaOptions = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 
-/** True once both ends of the range are set and the range is empty by construction. */
-function oktaRangeInverted(value: (key: string) => string): boolean {
-  const min = value("oktasMin");
-  const max = value("oktasMax");
-  return min !== "" && max !== "" && Number(min) > Number(max);
-}
-
 function Panel({
   options,
   value,
   update,
   clear,
+  activeCount,
 }: {
   options: ExploreOptions;
   value: (key: string) => string;
   update: (key: string, next: string) => void;
   clear: () => void;
+  activeCount: number;
 }) {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between border-b border-line pb-4">
-        <span className="flex items-center gap-2 text-sm font-bold"><SlidersHorizontal size={16} /> Filters</span>
-        <button onClick={clear} className="text-xs font-bold text-sky hover:underline">Clear all</button>
+        <span className="flex items-center gap-2 text-sm font-semibold text-ink"><SlidersHorizontal size={16} className="text-sky" aria-hidden="true" /> Filters</span>
+        <button type="button" onClick={clear} disabled={activeCount === 0} className="text-xs font-semibold text-sky hover:underline disabled:cursor-default disabled:text-muted-dim disabled:no-underline">Clear all</button>
       </div>
 
       <label>
         <span className="field-label">Search</span>
         <span className="relative block">
           <Search size={18} strokeWidth={1.75} aria-hidden="true" className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-dim" />
-          <input className="field-input search-field-input" defaultValue={value("q")} onBlur={(event) => update("q", event.target.value)} placeholder="Record ID, sequence, or frame" />
+          <input className="field-input search-field-input rounded-lg" defaultValue={value("q")} onBlur={(event) => update("q", event.target.value)} placeholder="Record ID, sequence, or frame" />
         </span>
       </label>
 
       <label>
         <span className="field-label">Collection</span>
-        <select className="field-select" value={value("collection")} onChange={(event) => update("collection", event.target.value)}>
+        <select className="field-select rounded-lg" value={value("collection")} onChange={(event) => update("collection", event.target.value)}>
           <option value="">All collections</option>
           {options.collections.map((item) => <option key={item.slug} value={item.slug}>{item.shortTitle}</option>)}
         </select>
@@ -105,14 +99,14 @@ function Panel({
       <div className="grid grid-cols-2 gap-3">
         <label>
           <span className="field-label">Release</span>
-          <select className="field-select" value={value("release")} onChange={(event) => update("release", event.target.value)}>
+          <select className="field-select rounded-lg" value={value("release")} onChange={(event) => update("release", event.target.value)}>
             <option value="">Any</option>
             {options.releases.map((release) => <option key={release}>{release}</option>)}
           </select>
         </label>
         <label>
           <span className="field-label">Sequence</span>
-          <select className="field-select" value={value("sequence")} onChange={(event) => update("sequence", event.target.value)}>
+          <select className="field-select rounded-lg" value={value("sequence")} onChange={(event) => update("sequence", event.target.value)}>
             <option value="">Any</option>
             {options.sequenceIds.map((sequenceId) => (
               <option key={sequenceId} value={sequenceId}>Sequence {sequenceLabel(sequenceId)}</option>
@@ -126,7 +120,7 @@ function Panel({
       {options.hasUnsegmented && (
         <label>
           <span className="field-label">Segmentation</span>
-          <select className="field-select" value={value("segmented")} onChange={(event) => update("segmented", event.target.value)}>
+          <select className="field-select rounded-lg" value={value("segmented")} onChange={(event) => update("segmented", event.target.value)}>
             <option value="">All frames</option>
             <option value="true">Segmented (has cloud mask)</option>
             <option value="false">Not yet segmented</option>
@@ -134,45 +128,21 @@ function Panel({
         </label>
       )}
 
-      <fieldset>
-        <legend className="field-label">Cloud cover (oktas)</legend>
-        <div className="grid grid-cols-2 gap-3">
-          <label>
-            <span className="sr-only">Minimum oktas</span>
-            <select className="field-select" value={value("oktasMin")} onChange={(event) => update("oktasMin", event.target.value)}>
-              <option value="">Min</option>
-              {oktaOptions.map((okta) => (
-                <option key={okta} value={okta} disabled={options.oktaCounts[okta] === 0}>
-                  {oktaLabel(okta)} ({options.oktaCounts[okta].toLocaleString()})
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            <span className="sr-only">Maximum oktas</span>
-            <select className="field-select" value={value("oktasMax")} onChange={(event) => update("oktasMax", event.target.value)}>
-              <option value="">Max</option>
-              {oktaOptions.map((okta) => (
-                <option key={okta} value={okta} disabled={options.oktaCounts[okta] === 0}>
-                  {oktaLabel(okta)} ({options.oktaCounts[okta].toLocaleString()})
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-        {/* A minimum above the maximum can't match anything - said here rather
-            than left for the results grid to explain after the fact. */}
-        {oktaRangeInverted(value) && (
-          <p role="alert" className="mt-2 flex items-start gap-1.5 text-xs leading-5 text-danger">
-            <TriangleAlert size={13} className="mt-0.5 shrink-0" aria-hidden="true" />
-            Minimum is above maximum, so no frame can match. Swap them or clear one.
-          </p>
-        )}
-      </fieldset>
+      <label>
+        <span className="field-label">Cloud cover</span>
+        <select className="field-select rounded-lg" value={value("oktas")} onChange={(event) => update("oktas", event.target.value)}>
+          <option value="">Any</option>
+          {oktaOptions.map((okta) => (
+            <option key={okta} value={okta} disabled={options.oktaCounts[okta] === 0}>
+              {oktaLabel(okta)} ({options.oktaCounts[okta].toLocaleString("en-GB")})
+            </option>
+          ))}
+        </select>
+      </label>
 
       <label>
         <span className="field-label">Required artifact</span>
-        <select className="field-select" value={value("artifact")} onChange={(event) => update("artifact", event.target.value)}>
+        <select className="field-select rounded-lg" value={value("artifact")} onChange={(event) => update("artifact", event.target.value)}>
           <option value="">Any artifact</option>
           {options.artifactTypes.map((artifact) => (
             <option key={artifact} value={artifact}>{artifact === "source" ? "Source frame" : "Segmentation mask"}</option>
@@ -185,7 +155,7 @@ function Panel({
       {options.locations.length > 0 && (
         <label>
           <span className="field-label">Location</span>
-          <select className="field-select" value={value("location")} onChange={(event) => update("location", event.target.value)}>
+          <select className="field-select rounded-lg" value={value("location")} onChange={(event) => update("location", event.target.value)}>
             <option value="">All locations</option>
             {options.locations.map((location) => <option key={location}>{location}</option>)}
           </select>
@@ -195,7 +165,7 @@ function Panel({
       {options.skyClasses.length > 0 && (
         <label>
           <span className="field-label">Sky class</span>
-          <select className="field-select" value={value("skyClass")} onChange={(event) => update("skyClass", event.target.value)}>
+          <select className="field-select rounded-lg" value={value("skyClass")} onChange={(event) => update("skyClass", event.target.value)}>
             <option value="">Any</option>
             {options.skyClasses.map((skyClass) => <option key={skyClass}>{skyClass}</option>)}
           </select>
@@ -207,7 +177,7 @@ function Panel({
           {options.seasons.length > 0 && (
             <label>
               <span className="field-label">Season</span>
-              <select className="field-select" value={value("season")} onChange={(event) => update("season", event.target.value)}>
+              <select className="field-select rounded-lg" value={value("season")} onChange={(event) => update("season", event.target.value)}>
                 <option value="">Any</option>
                 {options.seasons.map((season) => <option key={season}>{season}</option>)}
               </select>
@@ -216,7 +186,7 @@ function Panel({
           {options.timesOfDay.length > 0 && (
             <label>
               <span className="field-label">Time of day</span>
-              <select className="field-select" value={value("time")} onChange={(event) => update("time", event.target.value)}>
+              <select className="field-select rounded-lg" value={value("time")} onChange={(event) => update("time", event.target.value)}>
                 <option value="">Any</option>
                 {options.timesOfDay.map((time) => <option key={time}>{time}</option>)}
               </select>
@@ -229,8 +199,8 @@ function Panel({
         <fieldset>
           <legend className="field-label">Capture date</legend>
           <div className="grid grid-cols-2 gap-3">
-            <label><span className="sr-only">From date</span><input type="date" className="field-input text-xs" defaultValue={value("from")} onBlur={(event) => update("from", event.target.value)} /></label>
-            <label><span className="sr-only">To date</span><input type="date" className="field-input text-xs" defaultValue={value("to")} onBlur={(event) => update("to", event.target.value)} /></label>
+            <label><span className="sr-only">From date</span><input type="date" className="field-input rounded-lg text-xs" defaultValue={value("from")} onBlur={(event) => update("from", event.target.value)} /></label>
+            <label><span className="sr-only">To date</span><input type="date" className="field-input rounded-lg text-xs" defaultValue={value("to")} onBlur={(event) => update("to", event.target.value)} /></label>
           </div>
         </fieldset>
       )}
@@ -268,24 +238,37 @@ export function ExploreShell({
 
   const active = chipFields.filter((field) => value(field));
   const collectionLabel = (slug: string) => options.collections.find((item) => item.slug === slug)?.shortTitle ?? slug;
+  const chipValue = (field: string) => {
+    const raw = value(field);
+    if (field === "collection") return collectionLabel(raw);
+    if (field === "sequence") return sequenceLabel(raw);
+    if (field === "segmented") return raw === "true" ? "Segmented" : "Not segmented";
+    if (field === "oktas" || field === "oktasMin" || field === "oktasMax") return oktaLabel(Number(raw));
+    return raw;
+  };
 
   return (
-    <div className="container-shell py-9 md:py-14">
-      <div className="grid gap-10 lg:grid-cols-[260px_1fr]">
+    <div className="container-shell relative pb-14 pt-8 md:pb-20 md:pt-10">
+      <div className="grid gap-8 lg:grid-cols-[272px_1fr]">
         <aside className="hidden lg:block">
-          <div className="sticky top-6"><Panel options={options} value={value} update={update} clear={clear} /></div>
+          <div className="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-2xl border border-line bg-white p-5 shadow-[0_2px_8px_rgba(27,73,103,.06)]">
+            <Panel options={options} value={value} update={update} clear={clear} activeCount={active.length} />
+          </div>
         </aside>
 
-        <div>
-          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-line pb-5">
-            <p className="text-sm"><strong>{resultCount.toLocaleString()}</strong> record{resultCount === 1 ? "" : "s"} match</p>
-            <div className="flex gap-2">
-              <button onClick={() => setDrawerOpen(true)} className="button-secondary min-h-10 px-3 lg:hidden">
-                <Filter size={16} /> Filters {active.length ? `(${active.length})` : ""}
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-line bg-white px-4 py-3 shadow-[0_2px_8px_rgba(27,73,103,.06)] sm:px-5">
+            <p className="text-sm text-muted" aria-live="polite">
+              <span className="tabular font-semibold text-ink">{resultCount.toLocaleString("en-GB")}</span> frame{resultCount === 1 ? "" : "s"} found
+            </p>
+            <div className="flex items-center gap-2">
+              <button type="button" onClick={() => setDrawerOpen(true)} className="inline-flex h-10 items-center gap-2 rounded-lg border border-line-strong bg-white px-3 text-sm font-semibold text-ink hover:border-sky hover:text-sky lg:hidden">
+                <Filter size={16} aria-hidden="true" /> Filters
+                {active.length > 0 && <span className="tabular rounded-full bg-sky px-1.5 text-[.71rem] font-bold leading-5 text-white">{active.length}</span>}
               </button>
-              <label className="flex items-center gap-2 text-xs font-bold">
-                <span>Sort</span>
-                <select className="h-10 border border-field bg-white px-3" value={value("sort") || "newest"} onChange={(event) => update("sort", event.target.value === "newest" ? "" : event.target.value)}>
+              <label className="flex items-center gap-2 text-xs font-semibold text-muted">
+                <span className="sr-only sm:not-sr-only">Sort by</span>
+                <select className="field-select explore-sort h-10 w-auto rounded-lg text-sm" value={value("sort") || "newest"} onChange={(event) => update("sort", event.target.value === "newest" ? "" : event.target.value)}>
                   <option value="newest">Latest first</option>
                   <option value="oldest">Earliest first</option>
                 </select>
@@ -294,22 +277,21 @@ export function ExploreShell({
           </div>
 
           {active.length > 0 && (
-            <div className="flex flex-wrap gap-2 border-b border-line py-4" aria-label="Active filters">
+            <div className="mt-4 flex flex-wrap items-center gap-2" aria-label="Active filters">
               {active.map((field) => (
-                <button key={field} onClick={() => update(field, "")} className="flex items-center gap-1.5 rounded-full bg-sky-pale px-3 py-1.5 text-xs font-bold text-sky-dark">
-                  {chipLabels[field]}:{" "}
-                  {field === "collection"
-                    ? collectionLabel(value(field))
-                    : field === "sequence"
-                      ? sequenceLabel(value(field))
-                      : field === "segmented"
-                        ? value(field) === "true" ? "Segmented" : "Not segmented"
-                        : field === "oktas" || field === "oktasMin" || field === "oktasMax"
-                          ? oktaLabel(Number(value(field)))
-                          : value(field)}{" "}
-                  <X size={13} />
+                <button
+                  type="button"
+                  key={field}
+                  onClick={() => update(field, "")}
+                  aria-label={`Remove filter ${chipLabels[field]}: ${chipValue(field)}`}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-sky/25 bg-sky-pale py-1 pl-3 pr-2 text-xs text-sky-dark transition-colors hover:border-sky hover:bg-sky-mist"
+                >
+                  <span className="text-muted">{chipLabels[field]}</span>
+                  <span className="font-semibold">{chipValue(field)}</span>
+                  <X size={13} aria-hidden="true" />
                 </button>
               ))}
+              <button type="button" onClick={clear} className="px-2 text-xs font-semibold text-sky hover:underline">Clear all</button>
             </div>
           )}
 
@@ -320,13 +302,19 @@ export function ExploreShell({
       {drawerOpen && (
         <div className="fixed inset-0 z-[80] lg:hidden" role="dialog" aria-modal="true" aria-label="Image filters">
           <button aria-label="Close filters" className="absolute inset-0 bg-ink-abyss/60" onClick={() => setDrawerOpen(false)} />
-          <div className="absolute bottom-0 right-0 top-0 w-[min(90vw,390px)] overflow-y-auto bg-white p-6 shadow-2xl">
-            <div className="mb-5 flex items-center justify-between">
-              <h2 className="display text-2xl">Filter records</h2>
-              <button onClick={() => setDrawerOpen(false)} aria-label="Close filters" className="p-2"><X /></button>
+          <div className="absolute bottom-0 right-0 top-0 flex w-[min(90vw,390px)] flex-col bg-white shadow-2xl">
+            <div className="flex items-center justify-between border-b border-line px-6 py-4">
+              <h2 className="text-lg font-semibold text-ink">Filter frames</h2>
+              <button type="button" onClick={() => setDrawerOpen(false)} aria-label="Close filters" className="-mr-2 rounded-lg p-2 text-muted hover:bg-paper hover:text-ink"><X size={20} /></button>
             </div>
-            <Panel options={options} value={value} update={update} clear={clear} />
-            <button onClick={() => setDrawerOpen(false)} className="button-primary mt-8 w-full">Show {resultCount.toLocaleString()} results</button>
+            <div className="flex-1 overflow-y-auto px-6 py-5">
+              <Panel options={options} value={value} update={update} clear={clear} activeCount={active.length} />
+            </div>
+            <div className="border-t border-line px-6 py-4">
+              <button type="button" onClick={() => setDrawerOpen(false)} className="button-primary w-full rounded-lg">
+                Show {resultCount.toLocaleString("en-GB")} frame{resultCount === 1 ? "" : "s"}
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -65,6 +65,12 @@
   --font-display: var(--font-source-serif), Georgia, "Times New Roman", serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, "SFMono-Regular", Menlo, monospace;
 
+  /* Body text sizes, a step up from Tailwind's defaults for legibility.
+     Headings use text-lg and above, which keep the default scale. */
+  --text-xs: 0.8125rem;
+  --text-sm: 0.9375rem;
+  --text-base: 1.0625rem;
+
   /* The one layout constant: the measure everything is set to. */
   --spacing-shell: 1220px;
 }
@@ -89,6 +95,7 @@ body {
   background: #fff;
   color: var(--color-ink);
   font-family: var(--font-sans);
+  font-size: 1.0625rem;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
@@ -133,10 +140,13 @@ textarea {
   letter-spacing: -0.035em;
 }
 
+/* Section kickers and metadata labels, set in the mono face like the footer's
+   bottom line and the statistics labels. */
 .eyebrow {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
@@ -229,7 +239,7 @@ textarea {
 
 .field-label {
   display: block;
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.11em;
   margin-bottom: 0.6rem;
@@ -293,6 +303,13 @@ textarea {
     5px 5px,
     5px 5px;
   padding-right: 2rem;
+}
+
+/* The explore sort control is 40px tall, so its chevron sits higher. */
+.field-select.explore-sort {
+  background-position:
+    calc(100% - 16px) 16px,
+    calc(100% - 11px) 16px;
 }
 
 /* ---------------------------------------------------------------------------

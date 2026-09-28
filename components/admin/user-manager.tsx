@@ -363,7 +363,7 @@ function UserRow({
       <Td>
         <span className="block font-medium">{user.fullName ?? user.email}</span>
         {user.fullName ? (
-          <span className="block font-mono text-[.72rem] text-muted">{user.email}</span>
+          <span className="block font-mono text-[.77rem] text-muted">{user.email}</span>
         ) : null}
         <span className="mt-1 flex flex-wrap gap-1">
           {isSelf ? <Badge tone="published">you</Badge> : null}

@@ -55,7 +55,7 @@ export default async function AdminAudit({
               name="entityId"
               defaultValue={entityId ?? ""}
               placeholder="seq-001 or WAS-V01-F5"
-              className="field-input h-10 w-56 font-mono text-[.8rem]"
+              className="field-input h-10 w-56 font-mono text-[.85rem]"
             />
           </label>
           <button type="submit" className="button-primary min-h-10 text-xs">
@@ -90,7 +90,7 @@ export default async function AdminAudit({
                     {formatDate(entry.createdAt, true)}
                   </Td>
                   <Td>{entry.actor.email ?? <span className="text-muted-dim">system</span>}</Td>
-                  <Td className="font-mono text-[.78rem]">{entry.action}</Td>
+                  <Td className="font-mono text-[.83rem]">{entry.action}</Td>
                   <Td>
                     <Link
                       href={
@@ -100,7 +100,7 @@ export default async function AdminAudit({
                             ? `/admin/images/${entry.entityId}`
                             : `/admin/audit?entityId=${encodeURIComponent(entry.entityId)}`
                       }
-                      className="font-mono text-[.78rem] text-sky hover:underline"
+                      className="font-mono text-[.83rem] text-sky hover:underline"
                     >
                       {entry.entityId}
                     </Link>

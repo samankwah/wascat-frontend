@@ -85,7 +85,7 @@ export function Badge({
     <span
       title={title}
       className={cx(
-        "inline-flex items-center gap-1.5 border px-2 py-0.5 text-[.65rem] font-bold uppercase tracking-[.09em]",
+        "inline-flex items-center gap-1.5 border px-2 py-0.5 text-[.7rem] font-bold uppercase tracking-[.09em]",
         BADGE_TONES[tone],
       )}
     >
@@ -184,7 +184,7 @@ export function Fact({
   return (
     <div className="grid gap-1 py-3 sm:grid-cols-[10rem_1fr] sm:gap-4">
       <dt className="text-xs font-bold uppercase tracking-[.09em] text-muted">{label}</dt>
-      <dd className={cx("text-sm", mono && !empty && "font-mono text-[.8rem]")}>
+      <dd className={cx("text-sm", mono && !empty && "font-mono text-[.85rem]")}>
         {empty ? <span className="text-muted-dim">Not recorded</span> : children}
       </dd>
     </div>

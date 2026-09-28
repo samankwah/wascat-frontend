@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import Link from "next/link";
-import { ImageOff } from "lucide-react";
+import type { ReactNode } from "react";
+import { ChevronLeft, ChevronRight, ImageOff } from "lucide-react";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { ExploreShell, type ExploreOptions } from "@/components/explore-filters";
 import { FrameCard } from "@/components/frame-card";
@@ -101,66 +102,108 @@ export default async function ExplorePage({
   const hasNext = nextOffset < matchedTotal;
   const hasPrevious = offset > 0;
   const previousOffset = Math.max(0, offset - query.limit);
+  const currentPage = Math.floor(offset / query.limit) + 1;
+  const pageCount = Math.max(1, Math.ceil(matchedTotal / query.limit));
+  const invertedRange = query.oktasMin != null && query.oktasMax != null && query.oktasMin > query.oktasMax;
+
+  const summary: [string, string][] = [
+    [archiveImageTotal.toLocaleString("en-GB"), "Frames"],
+    [segmentedImageTotal.toLocaleString("en-GB"), "With cloud mask"],
+    [collectionCount.toLocaleString("en-GB"), "Capture sequences"],
+  ];
 
   return (
     <>
       <Breadcrumbs trail={[{ label: "Home", href: "/" }, { label: "Explore" }]} />
-      <section className="border-b border-line bg-paper">
-        <div className="container-shell py-12 md:py-16">
-          <p className="eyebrow text-sky">ALL-SKY CLOUD SEGMENTATION CATALOG</p>
-          <h1 className="display mt-3 text-5xl md:text-6xl">Explore the archive</h1>
-          <p className="mt-4 max-w-2xl leading-7 text-muted">
-            {archiveImageTotal.toLocaleString()} all-sky frames across {collectionCount} capture sequences.{" "}
-            {segmentedImageTotal.toLocaleString()}{" "}
-            carry a binary cloud mask, and their cloud cover is measured from that mask against the camera&apos;s field of
-            view rather than assigned by hand. The remaining{" "}
-            {(archiveImageTotal - segmentedImageTotal).toLocaleString()}{" "}
-            are sampled evenly from the frames nobody has segmented yet, and report no cover at all.
-          </p>
-        </div>
-      </section>
+      <div className="relative bg-paper text-ink">
+        {/* The same sky wash the statistics page opens with. */}
+        <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-[420px] bg-gradient-to-b from-sky-wash to-transparent" />
 
-      <ExploreShell options={options} resultCount={matchedTotal}>
-        {matched.length > 0 ? (
-          <div className="mt-7 grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-5 sm:gap-y-9 xl:grid-cols-3">
-            {matched.map((image, index) => <FrameCard key={image.id} image={image} priority={index < 3} />)}
-          </div>
-        ) : (
-          <div className="flex min-h-[430px] flex-col items-center justify-center text-center">
-            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-sky-pale text-sky"><ImageOff /></span>
-            <h2 className="display mt-5 text-3xl">No sky matches this view.</h2>
-            <p className="mt-3 max-w-sm text-sm leading-6 text-muted">
-              {query.oktasMin != null && query.oktasMax != null && query.oktasMin > query.oktasMax
-                ? // Distinct from an ordinary empty result: this range can never
-                  // match anything, by construction, so say that rather than
-                  // suggesting a widen that would not fix it.
-                  `Minimum cover (${query.oktasMin}/8) is above maximum (${query.oktasMax}/8), so no frame can satisfy both.`
-                : "Try widening the cloud-cover range or clearing a filter."}
-            </p>
-            <Link href="/explore" className="button-primary mt-6">Clear all filters</Link>
-          </div>
-        )}
-
-        {matchedTotal > query.limit && (
-          <nav aria-label="Pagination" className="mt-14 flex flex-col gap-4 border-t border-line pt-5 sm:flex-row sm:items-center sm:justify-between">
-            <span className="text-xs text-muted">
-              Showing {(offset + 1).toLocaleString()}–{Math.min(nextOffset, matchedTotal).toLocaleString()} of {matchedTotal.toLocaleString()}
-            </span>
-            <div className="flex gap-2">
-              {hasPrevious ? (
-                <Link href={pageHref(params, previousOffset > 0 ? encodeOffsetCursor(previousOffset) : undefined)} className="button-secondary min-h-10 flex-1 whitespace-nowrap sm:flex-none">
-                  <span aria-hidden="true">←</span> Previous
-                </Link>
-              ) : null}
-              {hasNext ? (
-                <Link href={pageHref(params, encodeOffsetCursor(nextOffset))} className="button-secondary min-h-10 flex-1 whitespace-nowrap sm:flex-none">
-                  Next page <span aria-hidden="true">→</span>
-                </Link>
-              ) : null}
+        <section className="container-shell relative pb-2 pt-12 md:pt-16">
+          <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-2xl">
+              <p className="inline-flex rounded-full bg-white px-3 py-1 font-mono text-[.71rem] font-semibold uppercase tracking-[.14em] text-sky ring-1 ring-sky/40">
+                Image archive
+              </p>
+              <h1 className="mt-4 text-[clamp(2.4rem,5vw,3.4rem)] font-bold leading-tight tracking-tight text-ink">Explore the Archive</h1>
+              <p className="mt-3 text-[1.05rem] leading-7 text-muted">
+                Search all-sky frames by capture sequence, cloud cover and available artifacts. Cloud cover is measured
+                from each frame&apos;s segmentation mask, so frames not yet segmented report none.
+              </p>
             </div>
-          </nav>
-        )}
-      </ExploreShell>
+
+            <dl className="grid grid-cols-3 divide-x divide-line overflow-hidden rounded-xl border border-line bg-white shadow-[0_2px_8px_rgba(27,73,103,.06)] lg:min-w-[440px]">
+              {summary.map(([value, label]) => (
+                <div key={label} className="px-4 py-4 sm:px-5">
+                  <dt className="font-mono text-[.65rem] uppercase tracking-[.16em] text-muted-dim sm:text-[.69rem]">{label}</dt>
+                  <dd className="tabular mt-1.5 font-mono text-xl font-semibold text-sky sm:text-2xl">{value}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </section>
+
+        <ExploreShell options={options} resultCount={matchedTotal}>
+          {matched.length > 0 ? (
+            <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3">
+              {matched.map((image, index) => <FrameCard key={image.id} image={image} priority={index < 3} />)}
+            </div>
+          ) : (
+            <div className="mt-6 flex min-h-[420px] flex-col items-center justify-center rounded-2xl border border-dashed border-line-strong bg-white px-6 text-center">
+              <span className="flex size-14 items-center justify-center rounded-full bg-sky-pale text-sky"><ImageOff aria-hidden="true" /></span>
+              <h2 className="mt-5 text-xl font-semibold text-ink">No frames match these filters</h2>
+              <p className="mt-2 max-w-sm text-sm leading-6 text-muted">
+                {invertedRange
+                  ? // Distinct from an ordinary empty result: this range can never
+                    // match anything, by construction, so say that rather than
+                    // suggesting a widen that would not fix it.
+                    `Minimum cover (${query.oktasMin}/8) is above maximum (${query.oktasMax}/8), so no frame can satisfy both.`
+                  : "Try widening the cloud-cover range or removing a filter."}
+              </p>
+              <Link href="/explore" className="button-primary mt-6 rounded-lg">Clear all filters</Link>
+            </div>
+          )}
+
+          {matchedTotal > query.limit && (
+            <nav aria-label="Pagination" className="mt-10 flex flex-col gap-4 rounded-xl border border-line bg-white px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+              <p className="text-sm text-muted">
+                Showing{" "}
+                <span className="tabular font-semibold text-ink">
+                  {(offset + 1).toLocaleString("en-GB")}–{Math.min(nextOffset, matchedTotal).toLocaleString("en-GB")}
+                </span>{" "}
+                of <span className="tabular font-semibold text-ink">{matchedTotal.toLocaleString("en-GB")}</span>
+              </p>
+              <div className="flex items-center gap-3">
+                <span className="hidden font-mono text-xs text-muted-dim sm:inline">
+                  Page {currentPage} of {pageCount}
+                </span>
+                <div className="flex flex-1 gap-2 sm:flex-none">
+                  <PageLink href={hasPrevious ? pageHref(params, previousOffset > 0 ? encodeOffsetCursor(previousOffset) : undefined) : undefined} label="Previous page">
+                    <ChevronLeft size={16} aria-hidden="true" /> Previous
+                  </PageLink>
+                  <PageLink href={hasNext ? pageHref(params, encodeOffsetCursor(nextOffset)) : undefined} label="Next page">
+                    Next <ChevronRight size={16} aria-hidden="true" />
+                  </PageLink>
+                </div>
+              </div>
+            </nav>
+          )}
+        </ExploreShell>
+      </div>
     </>
+  );
+}
+
+/** A pagination step; rendered disabled rather than removed, so the pair never shifts. */
+function PageLink({ href, label, children }: { href?: string; label: string; children: ReactNode }) {
+  const className = "inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-lg border px-4 text-sm font-semibold transition-colors sm:flex-none";
+  return href ? (
+    <Link href={href} aria-label={label} className={`${className} border-line-strong bg-white text-ink hover:border-sky hover:text-sky`}>
+      {children}
+    </Link>
+  ) : (
+    <span aria-disabled="true" className={`${className} cursor-not-allowed border-line bg-paper text-muted-dim`}>
+      {children}
+    </span>
   );
 }
