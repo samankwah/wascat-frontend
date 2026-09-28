@@ -1,18 +1,21 @@
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin } from "lucide-react";
+import { Clock, MapPin } from "lucide-react";
 import { frameLabel } from "@/lib/format";
-import type { ImageRecord } from "@/lib/types";
+import type { Coordinates, ImageRecord } from "@/lib/types";
 
 const TIME = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "UTC" });
 const DATE = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
 
+const coordinateLabel = ({ latitude, longitude }: Coordinates) =>
+  `${Math.abs(latitude).toFixed(4)}° ${latitude < 0 ? "S" : "N"}, ${Math.abs(longitude).toFixed(4)}° ${longitude < 0 ? "W" : "E"}`;
+
 /**
  * One recent frame, for the "latest" row on the home page.
  *
- * The layout is fixed - cloud type over the image, then place and time, the
- * station, and the date - so a row of cards lines up whatever each record
- * holds. Place and time are shown only when the archive actually has them;
+ * The layout is fixed - cloud type over the image, then station and time,
+ * place, coordinates, and the date - so a row of cards lines up whatever each
+ * record holds. Place and time are shown only when the archive actually has them;
  * until the capture team supplies them the rows say so, rather than being
  * filled with a plausible-looking station or clock time.
  */
@@ -20,17 +23,22 @@ export function LatestFrameCard({
   image,
   cloudType,
   station,
+  stationCoordinates,
   priority = false,
 }: {
   image: ImageRecord;
   cloudType?: string;
   /** The sequence's station, used when the frame has no place of its own. */
   station?: string;
+  /** The sequence's station position, used when the frame has none of its own. */
+  stationCoordinates?: Coordinates;
   priority?: boolean;
 }) {
   const place = image.location ?? station;
+  const name = station ?? place;
+  const coordinates = image.coordinates ?? stationCoordinates;
   const captured = image.capturedAt ? new Date(image.capturedAt) : undefined;
-  const heading = place && captured ? `${place} — ${TIME.format(captured)} UTC` : place ?? frameLabel(image);
+  const heading = name ? (captured ? `${name} — ${TIME.format(captured)} UTC` : name) : frameLabel(image);
 
   return (
     <article className="group h-full overflow-hidden rounded-xl border border-line bg-white shadow-[0_8px_24px_rgba(16,47,65,.07)] transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-1 hover:border-on-dark hover:shadow-[0_14px_34px_rgba(16,47,65,.13)] focus-within:-translate-y-1 focus-within:shadow-[0_14px_34px_rgba(16,47,65,.13)] motion-reduce:transition-none motion-reduce:hover:translate-y-0">
@@ -49,7 +57,13 @@ export function LatestFrameCard({
             <MapPin size={13} className="shrink-0 text-rose-600" aria-hidden />
             {place ?? "Station not recorded"}
           </p>
-          <p className="font-mono text-[.73rem] text-muted-soft sm:text-xs">{captured ? DATE.format(captured) : "Time not recorded"}</p>
+          <p className={`font-mono text-[.66rem] sm:text-[.7rem] ${coordinates ? "text-muted" : "text-muted-soft"}`}>
+            {coordinates ? coordinateLabel(coordinates) : "Coordinates not recorded"}
+          </p>
+          <p className={`flex items-center gap-1.5 font-mono text-[.73rem] sm:text-xs ${captured ? "text-muted" : "text-muted-soft"}`}>
+            <Clock size={13} className="shrink-0" aria-hidden />
+            {captured ? `${DATE.format(captured)} · ${TIME.format(captured)} UTC` : "Time not recorded"}
+          </p>
         </div>
       </Link>
     </article>
