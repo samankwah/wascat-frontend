@@ -144,7 +144,7 @@ export function AdminNav({ user }: { user: AdminUser }) {
         {groups.map((group) => (
           <div key={group.heading ?? "root"} className="mb-1">
             {group.heading ? (
-              <p className="px-3 pb-1 pt-4 text-[.62rem] font-bold uppercase tracking-[.12em] text-muted-dim">
+              <p className="px-3 pb-1 pt-4 text-[.67rem] font-bold uppercase tracking-[.12em] text-muted-dim">
                 {group.heading}
               </p>
             ) : null}
@@ -197,7 +197,7 @@ export function AdminNav({ user }: { user: AdminUser }) {
           {user.roles.map((role) => (
             <span
               key={role}
-              className="border border-line bg-paper px-1.5 py-0.5 text-[.6rem] font-bold uppercase tracking-[.09em] text-muted"
+              className="border border-line bg-paper px-1.5 py-0.5 text-[.65rem] font-bold uppercase tracking-[.09em] text-muted"
             >
               {role}
             </span>

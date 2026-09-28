@@ -107,7 +107,7 @@ export function RecordsTable({
               <Td>
                 <Link
                   href={`/admin/images/${record.id}`}
-                  className="font-mono text-[.8rem] font-medium text-sky hover:underline"
+                  className="font-mono text-[.85rem] font-medium text-sky hover:underline"
                 >
                   {record.id}
                 </Link>
@@ -127,7 +127,7 @@ export function RecordsTable({
                   <span className="text-muted-dim">None recorded</span>
                 )}
               </Td>
-              <Td align="right" className="font-mono text-[.78rem] text-muted">
+              <Td align="right" className="font-mono text-[.83rem] text-muted">
                 v{record.release}
               </Td>
             </tr>

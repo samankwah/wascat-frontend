@@ -4,9 +4,9 @@ import { Skeleton } from "@/components/skeleton";
  * reflow when the real records arrive. */
 export function FrameCardSkeleton() {
   return (
-    <div>
+    <div className="overflow-hidden rounded-xl border border-line bg-white">
       <Skeleton className="aspect-[16/9] w-full" />
-      <div className="mt-3 flex flex-col items-start gap-2 sm:flex-row sm:justify-between sm:gap-3">
+      <div className="flex flex-col items-start gap-2 p-3 sm:flex-row sm:justify-between sm:gap-3 sm:p-4">
         <div className="min-w-0 flex-1">
           <Skeleton className="h-3 w-32" />
           <Skeleton className="mt-2 h-2.5 w-24" />

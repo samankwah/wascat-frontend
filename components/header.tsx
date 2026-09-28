@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowRight, CircleHelp, Menu, X } from "lucide-react";
+import { ArrowRight, Menu, UserPlus, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Logo } from "./logo";
 
@@ -86,21 +86,27 @@ export function Header() {
         }`}
       >
         <div
-          className={`container-shell flex items-center justify-between transition-[height] duration-300 ease-out motion-reduce:transition-none ${
+          className={`container-shell flex items-center justify-between transition-[height] duration-300 ease-out motion-reduce:transition-none md:grid md:grid-cols-[1fr_auto_1fr] ${
             scrolled ? "h-16" : "h-[76px]"
           }`}
         >
-          <Logo />
-          <nav aria-label="Primary navigation" className="hidden items-center gap-8 md:flex">
+          {/* Three columns from md up: the logo and the account icon take equal
+              outer tracks, so the page links sit at the true centre of the
+              header rather than wherever the logo's width leaves them. */}
+          <div className="md:justify-self-start">
+            <Logo />
+          </div>
+          <nav aria-label="Primary navigation" className="hidden items-center gap-6 md:flex lg:gap-10">
             {links.map(([label, href]) => (
-              <Link key={href} href={href} className="nav-link text-[.92rem] font-bold" data-active={pathname.startsWith(href)}>
+              <Link key={href} href={href} className="nav-link font-mono text-[.81rem] font-semibold uppercase tracking-[.12em]" data-active={pathname.startsWith(href)}>
                 {label}
               </Link>
             ))}
-            <Link href="/about#using-the-data" aria-label="Dataset information" title="Dataset information" className="rounded-full p-1.5 text-muted-dim hover:bg-sky-pale hover:text-sky">
-              <CircleHelp size={20} />
-            </Link>
           </nav>
+          {/* Already signed in? The proxy forwards /admin/login on to /admin. */}
+          <Link href="/admin/login" aria-label="Sign in" title="Sign in" className="hidden size-10 items-center justify-center justify-self-end rounded-full text-ink transition-colors hover:bg-sky-pale hover:text-sky md:inline-flex">
+            <UserPlus size={21} strokeWidth={1.75} />
+          </Link>
           <button ref={triggerRef} className="inline-flex size-11 items-center justify-center rounded-full border border-line text-ink transition-colors hover:border-sky hover:bg-sky-pale hover:text-sky md:hidden" aria-expanded={open} aria-controls="mobile-navigation" aria-label="Open navigation" onClick={() => setOpen(true)}>
             <Menu size={21} />
           </button>
@@ -135,14 +141,11 @@ export function Header() {
           </div>
 
           <nav aria-label="Mobile primary navigation" className="flex-1 overflow-y-auto px-5 py-5">
-            {links.map(([label, href], index) => {
+            {links.map(([label, href]) => {
               const active = pathname.startsWith(href);
               return (
                 <Link key={href} href={href} onClick={closeDrawer} data-active={active} className="group flex items-center justify-between border-b border-line-soft py-5">
-                  <span className="flex items-baseline gap-4">
-                    <span className="font-mono text-[.65rem] text-on-dark-dim">0{index + 1}</span>
-                    <span className={`display text-[1.8rem] leading-none transition-colors ${active ? "text-sky" : "text-ink group-hover:text-sky"}`}>{label}</span>
-                  </span>
+                  <span className={`display text-[1.8rem] leading-none transition-colors ${active ? "text-sky" : "text-ink group-hover:text-sky"}`}>{label}</span>
                   <ArrowRight size={18} className={`transition-transform group-hover:translate-x-1 ${active ? "text-sky" : "text-line-strong"}`} aria-hidden="true" />
                 </Link>
               );
@@ -150,9 +153,9 @@ export function Header() {
           </nav>
 
           <div className="border-t border-line bg-paper p-5">
-            <Link href="/about#using-the-data" onClick={closeDrawer} className="flex items-start gap-3 rounded-lg bg-white p-4 shadow-[0_5px_18px_rgba(16,47,65,.07)]">
-              <CircleHelp size={20} className="mt-0.5 shrink-0 text-sky" aria-hidden="true" />
-              <span><strong className="block text-sm">Dataset information</strong><span className="mt-1 block text-xs leading-5 text-muted">Scope, licensing, citation, and responsible use.</span></span>
+            <Link href="/admin/login" onClick={closeDrawer} className="flex items-start gap-3 rounded-lg bg-white p-4 shadow-[0_5px_18px_rgba(16,47,65,.07)]">
+              <UserPlus size={20} className="mt-0.5 shrink-0 text-sky" aria-hidden="true" />
+              <span><strong className="block text-sm">Sign in</strong><span className="mt-1 block text-xs leading-5 text-muted">Curator access to the archive dashboard.</span></span>
             </Link>
           </div>
         </div>

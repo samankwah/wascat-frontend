@@ -33,6 +33,8 @@ export const imageQuerySchema = z.object({
   location: z.string().trim().max(80).optional(),
   /** A curator's read of the sequence's dominant sky condition, not a closed enum. */
   skyClass: z.string().trim().max(80).optional(),
+  /** A collection's cloud-type name: every sequence named after that type. */
+  cloudType: z.string().trim().max(80).optional(),
   artifact: z.enum(artifactTypes).optional(),
   from: z.string().date().optional(),
   to: z.string().date().optional(),

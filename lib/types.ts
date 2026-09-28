@@ -36,6 +36,9 @@ export type CollectionSummary = Schemas["CollectionSummaryOut"];
 export type Facets = Schemas["FacetsOut"];
 export type FacetValue = Schemas["FacetValue"];
 
+/** Archive-wide totals and breakdowns for the Statistics page. */
+export type Stats = Schemas["StatsOut"];
+
 export type ApiError = Schemas["ErrorDetail"];
 
 /** One page of image records, with the cursor for the next. */

@@ -1,10 +1,10 @@
 import Image from "next/image";
 import { connection } from "next/server";
 import Link from "next/link";
-import { ArrowRight, Check, ChevronDown, Database, Download, Image as ImageIcon, Layers3, MapPin, Search, SlidersHorizontal } from "lucide-react";
-import { CollectionCard } from "@/components/collection-card";
-import { getArchiveStats, getCollections } from "@/lib/api-client";
-import { sequenceLabel } from "@/lib/format";
+import { ArrowRight, BarChart3, Check, ChevronDown, Database, Image as ImageIcon, Layers3, MapPin, Search, SlidersHorizontal } from "lucide-react";
+import { LatestFrameCard } from "@/components/latest-frame-card";
+import { getArchiveStats, getCollectionImages, getCollections } from "@/lib/api-client";
+import { cloudTypeNames } from "@/lib/cloud-types";
 import { oktaLabel, oktaValues } from "@/lib/vocab";
 
 export default async function HomePage() {
@@ -16,6 +16,24 @@ export default async function HomePage() {
 
   const [stats, collections] = await Promise.all([getArchiveStats(), getCollections()]);
   const { total: archiveImageTotal, sequences: sequenceIds } = stats;
+  // Types some sequence is named after; the rest are listed but not selectable.
+  const availableTypes = new Set(collections.map((collection) => collection.title));
+
+  // The newest frame of each of the four most recent sequences. Taking the
+  // four newest frames overall would give four near-identical frames of one
+  // sequence; one per sequence shows four different skies. Sequence ids are
+  // fixed width, so they sort newest-last as strings.
+  const newestSequences = [...collections]
+    .sort((a, b) => (b.sequenceIds.at(-1) ?? "").localeCompare(a.sequenceIds.at(-1) ?? ""))
+    .slice(0, 4);
+  const latest = (
+    await Promise.all(
+      newestSequences.map(async (collection) => {
+        const [image] = await getCollectionImages(collection.slug, { sort: "newest", limit: 1 });
+        return image ? { image, cloudType: collection.title, station: collection.locationName ?? undefined } : null;
+      }),
+    )
+  ).filter((entry) => entry !== null);
 
   return (
     <>
@@ -39,22 +57,22 @@ export default async function HomePage() {
                 <span className="block">West African skies</span>
               </h1>
               <p className="mt-6 max-w-[410px] text-[1.02rem] leading-[1.62] text-ink-panel md:text-[1.08rem]">
-                WASCAT is an expert-labelled demonstration archive spanning Ghana, Nigeria, and Burkina Faso, built for transparent cloud, aerosol, and atmospheric-condition research.
+                WASCAT is an open archive of all-sky cloud images from across Ghana, each paired with AI classification and segmentation for atmospheric research.
               </p>
 
-              {/* Mobile/tablet: one dominant action, the download deliberately
+              {/* Mobile/tablet: one dominant action, the statistics link deliberately
                   lighter-weight so it doesn't compete with it - the desktop
                   pair below (lg+) is untouched. */}
               <div className="mt-5 flex flex-col gap-3 lg:hidden">
                 <Link href="/explore" className="hero-primary-link inline-flex min-h-12 items-center justify-center rounded-[7px] bg-sky-vivid px-9 text-sm font-bold transition-colors hover:bg-sky-bright">Browse images</Link>
-                <a href="/api/v1/images?limit=100" download="wascat-metadata.json" className="inline-flex min-h-11 items-center justify-center gap-1.5 text-[.84rem] font-bold text-sky-bright transition-colors hover:text-sky-dark">
-                  <Download size={15} strokeWidth={2.25} aria-hidden="true" />
-                  Download metadata
-                </a>
+                <Link href="/statistics" className="inline-flex min-h-11 items-center justify-center gap-1.5 text-[.89rem] font-bold text-sky-bright transition-colors hover:text-sky-dark">
+                  <BarChart3 size={15} strokeWidth={2.25} aria-hidden="true" />
+                  Statistics
+                </Link>
               </div>
               <div className="mt-2 hidden gap-4 lg:flex">
                 <Link href="/explore" className="hero-primary-link inline-flex min-h-12 min-w-[178px] items-center justify-center rounded-[7px] bg-sky-vivid px-9 text-sm font-bold transition-colors hover:bg-sky-bright">Browse images</Link>
-                <a href="/api/v1/images?limit=100" download="wascat-metadata.json" className="hero-secondary-link inline-flex min-h-12 min-w-[195px] items-center justify-center rounded-[7px] border-2 border-sky-vivid bg-white/65 px-7 text-sm font-bold transition-colors hover:bg-white">Download metadata</a>
+                <Link href="/statistics" className="hero-secondary-link inline-flex min-h-12 min-w-[195px] items-center justify-center rounded-[7px] border-2 border-sky-vivid bg-white/65 px-7 text-sm font-bold transition-colors hover:bg-white">Statistics</Link>
               </div>
             </div>
 
@@ -89,7 +107,7 @@ export default async function HomePage() {
                     <ChevronDown size={18} className="text-muted-dim transition-transform group-open:rotate-180" aria-hidden="true" />
                   </summary>
                   <div className="grid gap-4 px-4 pb-5 pt-1.5">
-                    <label className="hero-filter-label"><span className="field-label text-muted-dim">Sequence</span><select name="sequence" className="field-select hero-search-control" defaultValue=""><option value="">All sequences</option>{sequenceIds.map((sequenceId) => <option key={sequenceId} value={sequenceId}>Sequence {sequenceLabel(sequenceId)}</option>)}</select></label>
+                    <CloudTypeSelect available={availableTypes} />
                     <label className="hero-filter-label"><span className="field-label text-muted-dim">Cloud cover</span><select name="oktas" className="field-select hero-search-control" defaultValue=""><option value="">Any</option>{oktaValues.map((okta) => <option key={okta} value={okta}>{oktaLabel(okta)}</option>)}</select></label>
                   </div>
                 </details>
@@ -107,7 +125,7 @@ export default async function HomePage() {
               <Search size={24} strokeWidth={1.75} className="pointer-events-none absolute left-4 top-3.5 text-muted-dim" aria-hidden="true" />
               <input name="q" type="search" className="field-input hero-search-control search-field-input" placeholder="Search by date, class or condition" />
             </label>
-            <label className="hero-filter-label"><span className="field-label text-muted-dim">Sequence</span><select name="sequence" className="field-select hero-search-control" defaultValue=""><option value="">All sequences</option>{sequenceIds.map((sequenceId) => <option key={sequenceId} value={sequenceId}>Sequence {sequenceLabel(sequenceId)}</option>)}</select></label>
+            <CloudTypeSelect available={availableTypes} />
             <label className="hero-filter-label"><span className="field-label text-muted-dim">Cloud cover</span><select name="oktas" className="field-select hero-search-control" defaultValue=""><option value="">Any</option>{oktaValues.map((okta) => <option key={okta} value={okta}>{oktaLabel(okta)}</option>)}</select></label>
             <button type="submit" className="inline-flex h-[50px] items-center justify-center self-end whitespace-nowrap rounded-[7px] bg-sky-vivid px-5 text-sm font-bold text-white transition-colors hover:bg-sky-bright sm:col-span-2 lg:col-span-1">Explore archive</button>
           </form>
@@ -117,12 +135,12 @@ export default async function HomePage() {
           <div className="flex flex-col items-center gap-1.5 text-center sm:min-h-[64px] sm:flex-row sm:items-center sm:justify-start sm:gap-5 sm:pr-7 sm:text-left">
             <ImageIcon strokeWidth={1.25} className="size-6 shrink-0 text-sky-vivid sm:size-11" aria-hidden="true" />
             <strong className="display text-xl font-normal text-ink sm:text-[2rem]">{archiveImageTotal.toLocaleString()}</strong>
-            <span className="text-[.6rem] font-bold uppercase tracking-[.1em] text-muted-dim sm:text-[.66rem] sm:tracking-[.14em]">Images</span>
+            <span className="text-[.65rem] font-bold uppercase tracking-[.1em] text-muted-dim sm:text-[.71rem] sm:tracking-[.14em]">Images</span>
           </div>
           <div className="flex flex-col items-center gap-1.5 border-l border-on-dark text-center sm:min-h-[64px] sm:flex-row sm:items-center sm:justify-center sm:gap-5 sm:border-t-0 sm:px-7 sm:text-left">
             <Layers3 strokeWidth={1.25} className="size-6 shrink-0 text-sky-vivid sm:size-11" aria-hidden="true" />
             <strong className="display text-xl font-normal text-ink sm:text-[2rem]">{sequenceIds.length}</strong>
-            <span className="text-[.6rem] font-bold uppercase tracking-[.1em] text-muted-dim sm:text-[.66rem] sm:tracking-[.14em]">Sequences</span>
+            <span className="text-[.65rem] font-bold uppercase tracking-[.1em] text-muted-dim sm:text-[.71rem] sm:tracking-[.14em]">Sequences</span>
           </div>
           <div className="flex flex-col items-center gap-1.5 border-l border-on-dark text-center sm:min-h-[64px] sm:flex-row sm:items-center sm:justify-end sm:gap-5 sm:border-t-0 sm:pl-7 sm:text-left">
             <MapPin strokeWidth={1.25} className="size-6 shrink-0 text-sky-vivid sm:size-11" aria-hidden="true" />
@@ -132,12 +150,22 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="container-shell py-20 md:py-28">
-        <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
-          <div><p className="eyebrow text-sky">CURATED FOR DISCOVERY</p><h2 className="display mt-3 max-w-xl text-4xl leading-tight md:text-5xl">Featured collections from the archive</h2></div>
-          <Link href="/collections" className="flex items-center gap-2 text-sm font-bold text-sky">View all collections <ArrowRight size={16} /></Link>
+      <section className="py-20 md:py-28">
+        <div className="container-shell">
+          <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
+            <div>
+              <p className="inline-flex rounded-full px-3 py-1 text-[.75rem] font-semibold uppercase tracking-wider text-sky ring-1 ring-sky/40">Recent observations</p>
+              <h2 className="display mt-4 max-w-xl text-4xl leading-tight md:text-5xl">Latest from the archive</h2>
+              <p className="mt-3 max-w-xl leading-7 text-muted">The newest frame from each of the most recent capture sequences.</p>
+            </div>
+            <Link href="/explore" className="inline-flex items-center gap-2 self-start rounded-lg px-4 py-2.5 text-sm font-bold text-sky ring-1 ring-line-strong transition-colors hover:bg-sky-pale md:self-auto">Browse all frames <ArrowRight size={16} aria-hidden /></Link>
+          </div>
+          <div className="mt-12 grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-4">
+            {latest.map(({ image, cloudType, station }, index) => (
+              <LatestFrameCard image={image} cloudType={cloudType} station={station} priority={index === 0} key={image.id} />
+            ))}
+          </div>
         </div>
-        <div className="mt-12 grid gap-12 md:grid-cols-3 md:gap-6">{collections.map((collection, index) => <CollectionCard collection={collection} priority={index === 0} key={collection.slug} />)}</div>
       </section>
 
       <section className="bg-ink-panel py-20 text-white md:py-28">
@@ -150,9 +178,9 @@ export default async function HomePage() {
           </div>
           <div className="grid gap-px bg-white/15 sm:grid-cols-3">
             {[
-              [Database, "01", "Source", "Illustrative regional imagery, dimensions, and fixture capture metadata."],
-              [Layers3, "02", "Artifacts", "Pixel masks, diagnostic overlays, labels, and future products."],
-              [Check, "03", "Provenance", "Demonstration status, methods, versions, manifests, citations, and SHA-256 checksums."],
+              [Database, "01", "Source", "All-sky images from observation sites across Ghana, stored with their capture metadata."],
+              [Layers3, "02", "Artifacts", "Cloud segmentation masks, overlays, and model predictions for every image."],
+              [Check, "03", "Provenance", "Methods, versioned releases, citations, and a SHA-256 checksum for every file."],
             ].map(([Icon, number, title, body]) => {
               const Graphic = Icon as typeof Database;
               return <div key={String(title)} className="bg-ink-panel p-7 sm:min-h-[280px]"><div className="flex items-center justify-between"><Graphic size={25} className="text-lime" /><span className="text-xs text-on-dark-dim">{String(number)}</span></div><h3 className="display mt-16 text-2xl">{String(title)}</h3><p className="mt-3 text-sm leading-6 text-field">{String(body)}</p></div>;
@@ -166,5 +194,26 @@ export default async function HomePage() {
         <div className="flex flex-wrap gap-3"><Link href="/explore" className="button-primary">Browse archive <ArrowRight size={16} /></Link><Link href="/api-docs" className="button-secondary">Read API docs</Link></div>
       </section>
     </>
+  );
+}
+
+/**
+ * Each cloud type once, in the Collections page order. A type several
+ * sequences share is one option that finds all of them; a type no sequence
+ * shows yet is listed but cannot be chosen.
+ */
+function CloudTypeSelect({ available }: { available: Set<string> }) {
+  return (
+    <label className="hero-filter-label">
+      <span className="field-label text-muted-dim">Cloud type</span>
+      <select name="cloudType" className="field-select hero-search-control" defaultValue="">
+        <option value="">All cloud types</option>
+        {cloudTypeNames.map((name) => (
+          <option key={name} value={name} disabled={!available.has(name)}>
+            {available.has(name) ? name : `${name} (no frames yet)`}
+          </option>
+        ))}
+      </select>
+    </label>
   );
 }

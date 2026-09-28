@@ -251,7 +251,7 @@ function VocabularyPanel({
                 ) : (
                   <span className="flex flex-wrap items-center gap-2">
                     <span className="font-medium">{term.label}</span>
-                    <code className="font-mono text-[.7rem] text-muted">{term.slug}</code>
+                    <code className="font-mono text-[.75rem] text-muted">{term.slug}</code>
                     {term.system ? (
                       <Badge tone="published" title="The public API validates against this">
                         API value

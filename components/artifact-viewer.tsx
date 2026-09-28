@@ -65,7 +65,7 @@ export function ArtifactViewer({ record }: { record: ImageRecord }) {
           />
         )}
 
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-between bg-gradient-to-t from-black/55 to-transparent px-4 pb-3 pt-10 text-[.6rem] font-bold tracking-wide text-white/80">
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-between bg-gradient-to-t from-black/55 to-transparent px-4 pb-3 pt-10 text-[.65rem] font-bold tracking-wide text-white/80">
           <span>{record.width} × {record.height} PX</span>
           {/* "Unsegmented" everywhere else in the archive; this bar is the one
               place text is uppercased for a caption treatment, not a

@@ -3,11 +3,13 @@ import { connection } from "next/server";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowDownToLine, ArrowRight, Camera, CloudSun, ExternalLink, Film, MapPin, ShieldCheck } from "lucide-react";
+import { ArrowDownToLine, ArrowRight, Camera, Cloud, CloudSun, ExternalLink, Film, MapPin, ShieldCheck } from "lucide-react";
 import { Breadcrumbs } from "@/components/breadcrumbs";
+import { CloudLevelBadge } from "@/components/collection-card";
 import { CopyButton } from "@/components/copy-button";
 import { FrameCard } from "@/components/frame-card";
 import { getCollection, getCollectionImages } from "@/lib/api-client";
+import { cloudTypeInfo } from "@/lib/cloud-types";
 import { formatDate, sequenceLabel } from "@/lib/format";
 import { oktaLabel } from "@/lib/vocab";
 
@@ -53,6 +55,7 @@ export default async function CollectionPage({ params }: { params: Promise<{ slu
   const meanOktas = collection.meanCloudCoverOktas ?? 0;
   const segmentedCount = collection.segmented;
   const registered = collection.maskRegistration.filter((entry) => entry.corrected);
+  const cloud = cloudTypeInfo(collection.title);
 
   // Only render facts we actually hold; a missing value is omitted, never filled in.
   const facts: [typeof MapPin, string, string][] = [
@@ -77,10 +80,22 @@ export default async function CollectionPage({ params }: { params: Promise<{ slu
           <div className="pb-2">
             <p className="eyebrow text-sky">{collection.kicker}</p>
             <h1 className="display mt-4 text-5xl leading-[.98] md:text-7xl">{collection.title}</h1>
+            {cloud ? (
+              <div className="mt-6 max-w-2xl border-l-2 border-sky/40 pl-4">
+                <CloudLevelBadge level={cloud.level} heights={cloud.heights} />
+                <p className="mt-3 text-lg leading-8">{cloud.description}</p>
+                <p className="mt-2 flex items-center gap-2 text-sm text-muted"><Cloud size={15} aria-hidden /> {cloud.weather}</p>
+              </div>
+            ) : null}
             <p className="mt-6 max-w-2xl text-lg leading-8 text-muted">{collection.description}</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <a href={metadataUrl} download className="button-primary"><ArrowDownToLine size={17} /> Download metadata JSON</a>
-              <Link href={`/explore?collection=${collection.slug}`} className="button-secondary">Explore frames <ArrowRight size={16} /></Link>
+              <Link
+                href={`/explore?${new URLSearchParams(
+                  collection.skyClass ? { collection: collection.slug, skyClass: collection.skyClass } : { collection: collection.slug },
+                )}`}
+                className="button-secondary"
+              >Explore frames <ArrowRight size={16} /></Link>
             </div>
           </div>
           <div className="relative aspect-[16/9] overflow-hidden bg-line-soft">
@@ -178,14 +193,14 @@ export default async function CollectionPage({ params }: { params: Promise<{ slu
           <div className="mt-7 overflow-x-auto">
             <table className="w-full min-w-[650px] border-collapse text-left text-sm">
               <thead>
-                <tr className="border-b border-line-strong text-[.65rem] uppercase tracking-[.1em] text-muted">
+                <tr className="border-b border-line-strong text-[.7rem] uppercase tracking-[.1em] text-muted">
                   <th className="py-3">Version</th><th>Published</th><th>Frames</th><th>Size</th><th></th>
                 </tr>
               </thead>
               <tbody>
                 {collection.releases.map((release) => (
                   <tr key={release.version} className="border-b border-line">
-                    <td className="py-4 font-bold">v{release.version} {release.current && <span className="ml-2 rounded-full bg-lime px-2 py-1 text-[.6rem]">CURRENT</span>}</td>
+                    <td className="py-4 font-bold">v{release.version} {release.current && <span className="ml-2 rounded-full bg-lime px-2 py-1 text-[.65rem]">CURRENT</span>}</td>
                     <td>{release.publishedAt ? formatDate(release.publishedAt) : "—"}</td>
                     <td>{release.images.toLocaleString()}</td>
                     <td>{release.size}</td>

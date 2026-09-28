@@ -8,7 +8,7 @@ export function Footer() {
       <div className="container-shell grid grid-cols-2 gap-x-7 gap-y-10 py-12 md:grid-cols-[1.4fr_1fr_1fr] md:py-14">
         <div className="col-span-2 md:col-span-1">
           <Logo inverse />
-          <p className="mt-5 max-w-sm text-sm leading-6 text-field">An archive of all-sky camera frames and their cloud-segmentation masks, with cloud cover measured from the imagery itself.</p>
+          <p className="mt-5 max-w-sm text-sm leading-6 text-field">West African Sky Cloud Atlas &amp; Dataset. An AI-powered atmospheric research platform.</p>
         </div>
         <div>
           <p className="eyebrow text-line-strong">Archive</p>
@@ -24,8 +24,8 @@ export function Footer() {
         </div>
       </div>
       <div className="border-t border-white/15">
-        <div className="container-shell flex flex-col gap-2 py-5 text-xs text-line-strong sm:flex-row sm:justify-between">
-          <p>© 2026 WASCAT</p><p>Measured cloud cover · Versioned releases · Checksummed artifacts</p>
+        <div className="container-shell py-5 text-center font-mono text-[.75rem] tracking-[.06em] text-line-strong">
+          <p>© 2026 WASCAT · West African Sky Cloud Atlas · Built for Atmospheric Research</p>
         </div>
       </div>
     </footer>

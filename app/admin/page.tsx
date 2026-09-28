@@ -91,7 +91,7 @@ export default async function AdminOverview({
                   className="flex items-center justify-between gap-4 px-5 py-3 text-sm hover:bg-paper"
                 >
                   <span>
-                    <span className="font-mono text-[.8rem]">{collection.slug}</span>
+                    <span className="font-mono text-[.85rem]">{collection.slug}</span>
                     <span className="ml-3 text-muted">
                       {collection.images.toLocaleString()} frames
                     </span>
@@ -160,7 +160,7 @@ export default async function AdminOverview({
                 {recent.map((entry) => (
                   <li key={entry.id} className="px-5 py-3 text-sm">
                     <p className="flex flex-wrap items-baseline gap-x-2">
-                      <span className="font-mono text-[.78rem]">{entry.action}</span>
+                      <span className="font-mono text-[.83rem]">{entry.action}</span>
                       <span className="text-muted">{entry.entityId}</span>
                     </p>
                     <p className="mt-1 text-xs text-muted">

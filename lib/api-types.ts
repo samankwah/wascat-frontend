@@ -106,6 +106,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Archive-wide statistics */
+        get: operations["catalog_get_stats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/auth/login": {
         parameters: {
             query?: never;
@@ -723,6 +740,11 @@ export interface components {
              * @default []
              */
             maskRegistration: components["schemas"]["MaskRegistration"][];
+            /**
+             * Skyclass
+             * @description Observed cloud type, when every labelled frame shares one.
+             */
+            skyClass?: string | null;
             /** Locationname */
             locationName?: string | null;
             /** Location */
@@ -786,6 +808,11 @@ export interface components {
              * @default []
              */
             maskRegistration: components["schemas"]["MaskRegistration"][];
+            /**
+             * Skyclass
+             * @description Observed cloud type, when every labelled frame shares one.
+             */
+            skyClass?: string | null;
             /** Locationname */
             locationName?: string | null;
             /** Location */
@@ -911,10 +938,43 @@ export interface components {
             /** Locations */
             locations: components["schemas"]["FacetValue"][];
         };
+        /** GrowthPoint */
+        GrowthPoint: {
+            /** Month */
+            month: string;
+            /** Count */
+            count: number;
+            /** Cumulative */
+            cumulative: number;
+        };
+        /** GrowthSeries */
+        GrowthSeries: {
+            /**
+             * Basis
+             * @enum {string}
+             */
+            basis: "capturedAt" | "capturedOrIngested";
+            /** Items */
+            items: components["schemas"]["GrowthPoint"][];
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
+        };
+        /** HourBreakdown */
+        HourBreakdown: {
+            /** Hastimestamps */
+            hasTimestamps: boolean;
+            /** Items */
+            items: components["schemas"]["HourCount"][];
+        };
+        /** HourCount */
+        HourCount: {
+            /** Hour */
+            hour: number;
+            /** Count */
+            count: number;
         };
         /** ImageEnvelope */
         ImageEnvelope: {
@@ -1197,6 +1257,56 @@ export interface components {
              * @default true
              */
             current: boolean;
+        };
+        /** StatsBreakdown */
+        StatsBreakdown: {
+            /** Basis */
+            basis: string;
+            /** Items */
+            items: components["schemas"]["StatsCount"][];
+        };
+        /** StatsCount */
+        StatsCount: {
+            /** Value */
+            value?: string | null;
+            /** Label */
+            label: string;
+            /** Count */
+            count: number;
+        };
+        /** StatsEnvelope */
+        StatsEnvelope: {
+            data: components["schemas"]["StatsOut"];
+            meta: components["schemas"]["Meta"];
+            links: components["schemas"]["Links"];
+        };
+        /** StatsOut */
+        StatsOut: {
+            totals: components["schemas"]["StatsTotals"];
+            byLocation: components["schemas"]["StatsBreakdown"];
+            cloudTypes: components["schemas"]["StatsBreakdown"];
+            byHourUtc: components["schemas"]["HourBreakdown"];
+            /** Coveragehistogram */
+            coverageHistogram: components["schemas"]["StatsCount"][];
+            growth: components["schemas"]["GrowthSeries"];
+        };
+        /** StatsTotals */
+        StatsTotals: {
+            /** Images */
+            images: number;
+            /** Sites */
+            sites: number;
+            /**
+             * Sitesbasis
+             * @enum {string}
+             */
+            sitesBasis: "locations" | "collections";
+            /** Processedpct */
+            processedPct?: number | null;
+            /** Avgcoveragepct */
+            avgCoveragePct?: number | null;
+            /** Measured */
+            measured: number;
         };
         /**
          * UserCreate
@@ -1494,6 +1604,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["FacetsEnvelope"];
+                };
+            };
+        };
+    };
+    catalog_get_stats: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StatsEnvelope"];
                 };
             };
         };

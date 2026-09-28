@@ -1,4 +1,3 @@
-import { CollectionCardSkeleton } from "@/components/collection-card-skeleton";
 import { Skeleton, SkeletonPage } from "@/components/skeleton";
 
 /**
@@ -55,8 +54,16 @@ export default function HomeLoading() {
           </div>
           <Skeleton className="h-4 w-40" />
         </div>
-        <div className="mt-12 grid gap-12 md:grid-cols-3 md:gap-6">
-          {Array.from({ length: 3 }, (_, index) => <CollectionCardSkeleton key={index} />)}
+        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {Array.from({ length: 4 }, (_, index) => (
+            <div key={index} className="overflow-hidden rounded-xl border border-line bg-white shadow-[0_8px_24px_rgba(16,47,65,.07)]">
+              <Skeleton className="aspect-square w-full" />
+              <div className="p-4">
+                <Skeleton className="h-4 w-4/5" />
+                <Skeleton className="mt-4 h-3 w-24" />
+              </div>
+            </div>
+          ))}
         </div>
       </section>
     </SkeletonPage>

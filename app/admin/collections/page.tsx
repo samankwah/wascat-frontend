@@ -68,7 +68,7 @@ export default async function AdminCollections() {
                   <Td>
                     <Link
                       href={`/admin/collections/${collection.slug}`}
-                      className="font-mono text-[.8rem] font-medium text-sky hover:underline"
+                      className="font-mono text-[.85rem] font-medium text-sky hover:underline"
                     >
                       {collection.slug}
                     </Link>

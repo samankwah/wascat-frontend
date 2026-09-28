@@ -25,7 +25,7 @@ export default function CollectionsLoading() {
       </section>
 
       <section className="container-shell py-16 md:py-24">
-        <div className="grid gap-14 md:grid-cols-3 md:gap-7">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-7">
           {Array.from({ length: 6 }, (_, index) => <CollectionCardSkeleton key={index} />)}
         </div>
       </section>

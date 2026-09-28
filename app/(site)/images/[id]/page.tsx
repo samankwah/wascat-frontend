@@ -106,10 +106,10 @@ export default async function ImageDetailPage({ params }: { params: Promise<{ id
                 <div className="min-w-0">
                   <p className="text-sm font-bold">{artifact.type === "source" ? "Source frame" : "Segmentation mask"}</p>
                   {/* The real stored path, not a synthesised filename. */}
-                  <p className="mt-1 break-all font-mono text-[.64rem] text-muted">{artifact.objectKey}</p>
+                  <p className="mt-1 break-all font-mono text-[.69rem] text-muted">{artifact.objectKey}</p>
                 </div>
                 <span className="hidden text-xs text-muted sm:block">{(artifact.bytes / 1024).toFixed(0)} KB</span>
-                <span className="hidden font-mono text-[.62rem] text-muted sm:block">SHA-256 {artifact.checksum.slice(0, 10)}…</span>
+                <span className="hidden font-mono text-[.67rem] text-muted sm:block">SHA-256 {artifact.checksum.slice(0, 10)}…</span>
                 <a href={artifact.url} download className="flex h-9 w-9 items-center justify-center rounded-full border border-line-strong hover:border-sky hover:text-sky" aria-label={`Download ${artifact.type}`}>
                   <ArrowDownToLine size={16} />
                 </a>
@@ -147,12 +147,12 @@ export default async function ImageDetailPage({ params }: { params: Promise<{ id
         <aside className="min-w-0 space-y-5">
           <div className="border border-line bg-paper p-5">
             <div className="flex items-center gap-2"><FileJson2 size={18} className="text-sky" /><h2 className="font-bold">Use this record in code</h2></div>
-            <div className="mt-4 overflow-x-auto bg-ink p-4 font-mono text-[.68rem] leading-5 text-sky-mist"><code className="whitespace-nowrap">curl {apiUrl}</code></div>
+            <div className="mt-4 overflow-x-auto bg-ink p-4 font-mono text-[.73rem] leading-5 text-sky-mist"><code className="whitespace-nowrap">curl {apiUrl}</code></div>
             <div className="mt-4"><CopyButton value={apiUrl} label="Copy API URL" /></div>
           </div>
           <div className="border border-line p-5">
             <p className="eyebrow text-muted">STABLE REFERENCE</p>
-            <p className="mt-3 break-all font-mono text-[.68rem] leading-5">wascat:{record.collection}:{record.release}:{record.id}</p>
+            <p className="mt-3 break-all font-mono text-[.73rem] leading-5">wascat:{record.collection}:{record.release}:{record.id}</p>
             <p className="mt-3 text-xs leading-5 text-muted">Use the stable identifier and release when testing integrations so this exact record can be recovered.</p>
           </div>
         </aside>

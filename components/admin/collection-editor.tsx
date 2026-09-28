@@ -180,7 +180,7 @@ export function CollectionEditor({
                 value={values.doi}
                 onChange={(event) => set("doi", event.target.value)}
                 placeholder="10.5281/zenodo.0000000"
-                className="field-input font-mono text-[.8rem]"
+                className="field-input font-mono text-[.85rem]"
               />
             </Field>
 
