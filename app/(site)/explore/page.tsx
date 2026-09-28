@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { connection } from "next/server";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { ChevronLeft, ChevronRight, ImageOff } from "lucide-react";
+import { ArrowLeft, ArrowRight, ImageOff } from "lucide-react";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { ExploreShell, type ExploreOptions } from "@/components/explore-filters";
 import { FrameCard } from "@/components/frame-card";
@@ -52,7 +52,7 @@ export default async function ExplorePage({
   const query = parsed.success ? parsed.data : imageQuerySchema.parse({});
 
   const offset = decodeOffsetCursor(query.cursor);
-  const [facets, collections, page, timestamped] = await Promise.all([
+  const [facets, collections, page] = await Promise.all([
     getFacets(),
     getCollections(),
     getImages({
@@ -63,10 +63,6 @@ export default async function ExplorePage({
       ) as Record<string, string | number>),
       cursor: encodeOffsetCursor(offset),
     }),
-    // A date filter excludes frames with no capture time, so the total it
-    // reports is the number of frames that have one. Zero until the capture
-    // team supplies provenance, at which point the date filters appear.
-    getImages({ from: "1970-01-01", limit: 1 }),
   ]);
 
   const options: ExploreOptions = {
@@ -85,9 +81,7 @@ export default async function ExplorePage({
     locations: values(facets.locations),
     seasons: populated(facets.seasons),
     timesOfDay: populated(facets.timesOfDay),
-    skyClasses: values(facets.skyClasses),
     artifactTypes: values(facets.artifacts),
-    hasTimestamps: timestamped.total > 0,
     hasUnsegmented: countOf(facets.segmentation, "unsegmented") > 0,
     oktaCounts: Array.from({ length: 9 }, (_, okta) => countOf(facets.cloudCoverOktas, String(okta))),
   };
@@ -101,10 +95,14 @@ export default async function ExplorePage({
   const nextOffset = offset + query.limit;
   const hasNext = nextOffset < matchedTotal;
   const hasPrevious = offset > 0;
-  const previousOffset = Math.max(0, offset - query.limit);
   const currentPage = Math.floor(offset / query.limit) + 1;
   const pageCount = Math.max(1, Math.ceil(matchedTotal / query.limit));
   const invertedRange = query.oktasMin != null && query.oktasMax != null && query.oktasMin > query.oktasMax;
+
+  const sites = new Map(collections.map((collection) => [collection.slug, collection]));
+  const pageNumbers = pageWindow(currentPage, pageCount);
+  const offsetOf = (pageNumber: number) => (pageNumber - 1) * query.limit;
+  const hrefOf = (pageNumber: number) => pageHref(params, pageNumber > 1 ? encodeOffsetCursor(offsetOf(pageNumber)) : undefined);
 
   const summary: [string, string][] = [
     [archiveImageTotal.toLocaleString("en-GB"), "Frames"],
@@ -146,7 +144,9 @@ export default async function ExplorePage({
         <ExploreShell options={options} resultCount={matchedTotal}>
           {matched.length > 0 ? (
             <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3">
-              {matched.map((image, index) => <FrameCard key={image.id} image={image} priority={index < 3} />)}
+              {matched.map((image, index) => (
+                <FrameCard key={image.id} image={image} site={sites.get(image.collection)} priority={index < 3} />
+              ))}
             </div>
           ) : (
             <div className="mt-6 flex min-h-[420px] flex-col items-center justify-center rounded-2xl border border-dashed border-line-strong bg-white px-6 text-center">
@@ -165,26 +165,27 @@ export default async function ExplorePage({
           )}
 
           {matchedTotal > query.limit && (
-            <nav aria-label="Pagination" className="mt-10 flex flex-col gap-4 rounded-xl border border-line bg-white px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
-              <p className="text-sm text-muted">
-                Showing{" "}
-                <span className="tabular font-semibold text-ink">
-                  {(offset + 1).toLocaleString("en-GB")}–{Math.min(nextOffset, matchedTotal).toLocaleString("en-GB")}
-                </span>{" "}
-                of <span className="tabular font-semibold text-ink">{matchedTotal.toLocaleString("en-GB")}</span>
-              </p>
-              <div className="flex items-center gap-3">
-                <span className="hidden font-mono text-xs text-muted-dim sm:inline">
-                  Page {currentPage} of {pageCount}
-                </span>
-                <div className="flex flex-1 gap-2 sm:flex-none">
-                  <PageLink href={hasPrevious ? pageHref(params, previousOffset > 0 ? encodeOffsetCursor(previousOffset) : undefined) : undefined} label="Previous page">
-                    <ChevronLeft size={16} aria-hidden="true" /> Previous
-                  </PageLink>
-                  <PageLink href={hasNext ? pageHref(params, encodeOffsetCursor(nextOffset)) : undefined} label="Next page">
-                    Next <ChevronRight size={16} aria-hidden="true" />
-                  </PageLink>
-                </div>
+            <nav aria-label="Pagination" className="mt-10 flex justify-center">
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                <PageLink href={hasPrevious ? hrefOf(currentPage - 1) : undefined} label="Previous page">
+                  <ArrowLeft size={15} aria-hidden="true" />
+                </PageLink>
+                {pageNumbers.map((pageNumber, index) =>
+                  pageNumber == null ? (
+                    <span key={`gap-${index}`} aria-hidden="true" className="px-0.5 font-mono text-sm text-muted-dim">…</span>
+                  ) : pageNumber === currentPage ? (
+                    <span key={pageNumber} aria-current="page" className="tabular inline-flex h-9 min-w-9 items-center justify-center rounded-md bg-gradient-to-br from-sky-light to-sky px-2.5 font-mono text-sm font-semibold text-white shadow-[0_4px_12px_rgba(27,73,103,.25)]">
+                      {pageNumber}
+                    </span>
+                  ) : (
+                    <PageLink key={pageNumber} href={hrefOf(pageNumber)} label={`Page ${pageNumber}`}>
+                      <span className="tabular font-mono">{pageNumber}</span>
+                    </PageLink>
+                  ),
+                )}
+                <PageLink href={hasNext ? hrefOf(currentPage + 1) : undefined} label="Next page">
+                  <ArrowRight size={15} aria-hidden="true" />
+                </PageLink>
               </div>
             </nav>
           )}
@@ -194,15 +195,26 @@ export default async function ExplorePage({
   );
 }
 
-/** A pagination step; rendered disabled rather than removed, so the pair never shifts. */
+/**
+ * The page numbers to offer: always the first and last, the current page and
+ * its neighbours, with `null` marking an elided run.
+ */
+function pageWindow(current: number, count: number): (number | null)[] {
+  const shown = [...new Set([1, current - 1, current, current + 1, count])]
+    .filter((page) => page >= 1 && page <= count)
+    .sort((a, b) => a - b);
+  return shown.flatMap((page, index) => (index > 0 && page - shown[index - 1] > 1 ? [null, page] : [page]));
+}
+
+/** A pagination step; rendered disabled rather than removed, so the row never shifts. */
 function PageLink({ href, label, children }: { href?: string; label: string; children: ReactNode }) {
-  const className = "inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-lg border px-4 text-sm font-semibold transition-colors sm:flex-none";
+  const className = "inline-flex h-9 min-w-9 items-center justify-center rounded-md border px-2.5 text-sm font-semibold transition-colors";
   return href ? (
-    <Link href={href} aria-label={label} className={`${className} border-line-strong bg-white text-ink hover:border-sky hover:text-sky`}>
+    <Link href={href} aria-label={label} className={`${className} border-line bg-white text-ink hover:border-sky hover:text-sky`}>
       {children}
     </Link>
   ) : (
-    <span aria-disabled="true" className={`${className} cursor-not-allowed border-line bg-paper text-muted-dim`}>
+    <span aria-disabled="true" className={`${className} cursor-not-allowed border-line bg-paper text-muted-dim opacity-60`}>
       {children}
     </span>
   );

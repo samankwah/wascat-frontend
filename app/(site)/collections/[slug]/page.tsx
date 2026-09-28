@@ -124,7 +124,7 @@ export default async function CollectionPage({ params }: { params: Promise<{ slu
           <p className="eyebrow text-sky">SAMPLE FRAMES</p>
           <h2 className="display mt-3 text-4xl">Inside this sequence</h2>
           <div className="mt-8 grid grid-cols-2 gap-x-3 gap-y-7 sm:gap-5">
-            {samples.map((sample) => <FrameCard key={sample.id} image={sample} />)}
+            {samples.map((sample) => <FrameCard key={sample.id} image={sample} site={collection} />)}
           </div>
         </div>
         <aside>
