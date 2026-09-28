@@ -5,13 +5,15 @@ import { Skeleton } from "@/components/skeleton";
 export function FrameCardSkeleton() {
   return (
     <div className="overflow-hidden rounded-xl border border-line bg-white">
-      <Skeleton className="aspect-[16/9] w-full" />
-      <div className="flex flex-col items-start gap-2 p-3 sm:flex-row sm:justify-between sm:gap-3 sm:p-4">
-        <div className="min-w-0 flex-1">
-          <Skeleton className="h-3 w-32" />
-          <Skeleton className="mt-2 h-2.5 w-24" />
-        </div>
-        <Skeleton className="h-5 w-20 shrink-0 rounded-full" />
+      <Skeleton className="aspect-square w-full" />
+      <div className="flex flex-col gap-2 p-3 sm:p-4">
+        <Skeleton className="h-3.5 w-3/4" />
+        <Skeleton className="h-2.5 w-24" />
+        <Skeleton className="h-2.5 w-32" />
+        <Skeleton className="h-2.5 w-28" />
+      </div>
+      <div className="mx-3 border-t border-line py-3 sm:mx-4">
+        <Skeleton className="h-2.5 w-36" />
       </div>
     </div>
   );

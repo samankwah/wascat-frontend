@@ -20,9 +20,7 @@ export type ExploreOptions = {
   locations: string[];
   seasons: string[];
   timesOfDay: string[];
-  skyClasses: string[];
   artifactTypes: string[];
-  hasTimestamps: boolean;
   /** True when the catalogue holds frames that have not been segmented. */
   hasUnsegmented: boolean;
   /**
@@ -162,16 +160,6 @@ function Panel({
         </label>
       )}
 
-      {options.skyClasses.length > 0 && (
-        <label>
-          <span className="field-label">Sky class</span>
-          <select className="field-select rounded-lg" value={value("skyClass")} onChange={(event) => update("skyClass", event.target.value)}>
-            <option value="">Any</option>
-            {options.skyClasses.map((skyClass) => <option key={skyClass}>{skyClass}</option>)}
-          </select>
-        </label>
-      )}
-
       {(options.seasons.length > 0 || options.timesOfDay.length > 0) && (
         <div className="grid grid-cols-2 gap-3">
           {options.seasons.length > 0 && (
@@ -195,15 +183,6 @@ function Panel({
         </div>
       )}
 
-      {options.hasTimestamps && (
-        <fieldset>
-          <legend className="field-label">Capture date</legend>
-          <div className="grid grid-cols-2 gap-3">
-            <label><span className="sr-only">From date</span><input type="date" className="field-input rounded-lg text-xs" defaultValue={value("from")} onBlur={(event) => update("from", event.target.value)} /></label>
-            <label><span className="sr-only">To date</span><input type="date" className="field-input rounded-lg text-xs" defaultValue={value("to")} onBlur={(event) => update("to", event.target.value)} /></label>
-          </div>
-        </fieldset>
-      )}
     </div>
   );
 }
