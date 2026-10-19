@@ -5,7 +5,7 @@ import { ArrowRight, BarChart3, Check, ChevronDown, Database, Image as ImageIcon
 import { SkyConditionsCard } from "@/components/sky-conditions-card";
 import { LatestFrameCard } from "@/components/latest-frame-card";
 import { getArchiveStats, getCollectionImages, getCollections } from "@/lib/api-client";
-import { getStationConditions } from "@/lib/conditions";
+import { orderedGroundViews } from "@/lib/ground-views";
 import { cloudTypeNames } from "@/lib/cloud-types";
 import { oktaLabel, oktaValues } from "@/lib/vocab";
 
@@ -16,7 +16,7 @@ export default async function HomePage() {
   // costs a render and not a round trip.
   await connection();
 
-  const [stats, collections, conditions] = await Promise.all([getArchiveStats(), getCollections(), getStationConditions()]);
+  const [stats, collections] = await Promise.all([getArchiveStats(), getCollections()]);
   const { total: archiveImageTotal, sequences: sequenceIds } = stats;
   // Types some sequence is named after; the rest are listed but not selectable.
   const availableTypes = new Set(collections.map((collection) => collection.title));
@@ -161,7 +161,7 @@ export default async function HomePage() {
 
       <section className="border-b border-line py-16 md:py-24" aria-labelledby="current-conditions-title">
         <div className="container-shell">
-          <SkyConditionsCard conditions={conditions} />
+          <SkyConditionsCard views={orderedGroundViews()} />
         </div>
       </section>
 

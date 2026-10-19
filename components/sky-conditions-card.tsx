@@ -1,20 +1,18 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { GroundViewCarousel } from "@/components/ground-view-carousel";
-import { stationReadings, type StationConditions } from "@/lib/conditions";
-import { groundStation } from "@/lib/ground-views";
+import { cloudTypeCounts, groundStation, type GroundView } from "@/lib/ground-views";
 
 /**
- * The home page's way in to /conditions: what the sky over the station looks
- * like, what it has reported, and one link to the rest.
+ * The home page's way in to the station's ground photographs: what the sky
+ * over it has looked like, which clouds it showed, and where to see more.
  *
  * Not a whole-card link, unlike the archive's cards: the photographs swipe,
- * and a link under them would turn every drag into a page change. The title
- * and the button go to /conditions; each photograph goes there opened on
- * itself.
+ * and a link under them would turn every drag into a page change. Each
+ * photograph opens its own page; the title and the button open the newest.
  */
-export function SkyConditionsCard({ conditions }: { conditions: StationConditions }) {
-  const { readings } = stationReadings(conditions);
+export function SkyConditionsCard({ views }: { views: readonly GroundView[] }) {
+  const types = cloudTypeCounts(views).map(([name]) => name);
 
   return (
     <article className="grid grid-cols-[minmax(0,1fr)] gap-8 overflow-hidden rounded-xl border border-line bg-white p-5 sm:p-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-center lg:gap-14 lg:p-10">
@@ -29,14 +27,12 @@ export function SkyConditionsCard({ conditions }: { conditions: StationCondition
           {groundStation.place}. Photographed from the ground at the synoptic station.
         </p>
 
-        {readings.length > 0 ? (
+        {types.length > 0 ? (
           <dl className="mt-8 border-t border-line">
-            {readings.map(({ label, value }) => (
-              <div key={label} className="flex items-baseline justify-between gap-6 border-b border-line py-3">
-                <dt className="shrink-0 text-sm text-muted">{label}</dt>
-                <dd className="text-right text-sm font-bold text-ink">{value}</dd>
-              </div>
-            ))}
+            <div className="flex items-baseline justify-between gap-6 border-b border-line py-3">
+              <dt className="shrink-0 text-sm text-muted">{types.length === 1 ? "Cloud type" : "Cloud types"}</dt>
+              <dd className="text-right text-sm font-bold text-ink">{types.join(", ")}</dd>
+            </div>
           </dl>
         ) : null}
 
@@ -49,7 +45,7 @@ export function SkyConditionsCard({ conditions }: { conditions: StationCondition
         </Link>
       </div>
 
-      <GroundViewCarousel views={conditions.views} place={groundStation.name} variant="card" linkTo="/conditions" />
+      <GroundViewCarousel views={views} place={groundStation.name} linkTo="/conditions" />
     </article>
   );
 }

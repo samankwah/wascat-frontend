@@ -49,3 +49,34 @@ describe("ordering", () => {
     expect(orderedGroundViews(views).map((view) => view.src)).toEqual(["d", "b", "a", "c"]);
   });
 });
+
+describe("addressing", () => {
+  it("gives every photograph a distinct id that finds it again", async () => {
+    const { findGroundView, groundViewId } = await import("@/lib/ground-views");
+    const ids = groundViews.map(groundViewId);
+    expect(new Set(ids).size).toBe(ids.length);
+    for (const view of groundViews) expect(findGroundView(groundViewId(view))).toBe(view);
+    expect(findGroundView("no-such-photo")).toBeUndefined();
+  });
+
+  it("relates photographs by their main cloud only, never to themselves", async () => {
+    const { relatedGroundViews } = await import("@/lib/ground-views");
+    for (const view of groundViews) {
+      const related = relatedGroundViews(view, groundViews);
+      expect(related).not.toContain(view);
+      for (const other of related) expect(other.clouds[0]).toBe(view.clouds[0]);
+    }
+  });
+});
+
+describe("cloud type groups", () => {
+  it("groups by main cloud in the archive's order, each opening on its first photograph", async () => {
+    const { cloudTypeGroups, orderedGroundViews } = await import("@/lib/ground-views");
+    const views = orderedGroundViews();
+    const groups = cloudTypeGroups(views);
+    const order = groups.map((group) => cloudTypeNames.indexOf(group.name));
+    expect(order).toEqual([...order].sort((a, b) => a - b));
+    expect(groups.reduce((sum, group) => sum + group.count, 0)).toBe(views.length);
+    for (const group of groups) expect(group.first).toBe(views.find((view) => view.clouds[0] === group.name));
+  });
+});

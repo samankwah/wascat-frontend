@@ -24,6 +24,7 @@
  * delivered, 18 repeated a neighbour (three byte for byte, the rest within a
  * few seconds, by perceptual hash), so each sky appears once.
  */
+import { cloudTypeNames } from "./cloud-types";
 import type { Coordinates } from "./types";
 
 export type GroundView = {
@@ -105,4 +106,42 @@ export function orderedGroundViews(views: readonly GroundView[] = groundViews): 
       return a.index - b.index;
     })
     .map(({ view }) => view);
+}
+
+/** A photograph's address: its file name, which never changes, e.g. "ground-09". */
+export function groundViewId(view: GroundView): string {
+  return view.src.slice(view.src.lastIndexOf("/") + 1).replace(/\.[a-z]+$/i, "");
+}
+
+export function findGroundView(id: string, views: readonly GroundView[] = groundViews): GroundView | undefined {
+  return views.find((view) => groundViewId(view) === id);
+}
+
+/** Other photographs whose main cloud is the same genus, in the same order as the carousel. */
+export function relatedGroundViews(view: GroundView, views: readonly GroundView[] = orderedGroundViews()): GroundView[] {
+  return views.filter((other) => other.src !== view.src && other.clouds[0] === view.clouds[0]);
+}
+
+/** Each genus in the photographs and how many show it, most often seen first. */
+export function cloudTypeCounts(views: readonly GroundView[] = groundViews): [string, number][] {
+  const seen = new Map<string, number>();
+  for (const { clouds } of views) for (const cloud of clouds) seen.set(cloud, (seen.get(cloud) ?? 0) + 1);
+  return [...seen].sort((a, b) => b[1] - a[1]);
+}
+
+/**
+ * The photographs grouped by their main cloud, in the archive's cloud-type
+ * order: each group's name, how many it holds and the photograph that opens
+ * it, the first of them in carousel order.
+ */
+export function cloudTypeGroups(views: readonly GroundView[] = orderedGroundViews()): { name: string; first: GroundView; count: number }[] {
+  const groups = new Map<string, { name: string; first: GroundView; count: number }>();
+  for (const view of views) {
+    const name = view.clouds[0];
+    const group = groups.get(name);
+    if (group) group.count += 1;
+    else groups.set(name, { name, first: view, count: 1 });
+  }
+  const rank = (name: string) => (cloudTypeNames.includes(name) ? cloudTypeNames.indexOf(name) : cloudTypeNames.length);
+  return [...groups.values()].sort((a, b) => rank(a.name) - rank(b.name));
 }
