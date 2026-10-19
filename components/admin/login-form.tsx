@@ -5,6 +5,9 @@ import { useState, type FormEvent } from "react";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { AdminApiError, adminApi } from "@/lib/admin/api";
 
+const EMAIL_FORMAT_MESSAGE =
+  "Enter the full email address your account was created with, such as you@example.org.";
+
 /**
  * The sign-in form.
  *
@@ -23,6 +26,15 @@ export function LoginForm({ next }: { next?: string }) {
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
+
+    // The form is noValidate so errors render in one place; a username such
+    // as "admin" would otherwise reach the API and come back as its generic
+    // "query parameters are invalid", which means nothing on this form.
+    if (!email.trim().includes("@")) {
+      setError(EMAIL_FORMAT_MESSAGE);
+      return;
+    }
+
     setPending(true);
 
     try {
@@ -34,7 +46,9 @@ export function LoginForm({ next }: { next?: string }) {
       // neither does this.
       setError(
         caught instanceof AdminApiError
-          ? caught.message
+          ? caught.fieldError("email")
+            ? EMAIL_FORMAT_MESSAGE
+            : caught.message
           : "Could not reach the archive. Check that the API is running.",
       );
       setPending(false);
