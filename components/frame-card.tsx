@@ -12,13 +12,15 @@ const coordinateLabel = ({ latitude, longitude }: Coordinates) =>
 
 /**
  * One catalogue record in a grid: status and measured cover over the image,
- * then station and time, place, coordinates, capture date, and the model's
- * cloud-type reading.
+ * then the sequence's cloud type, which frame this is, the station,
+ * coordinates, capture date, and the model's cloud-type reading.
  *
- * The sequence's station stands in for place and coordinates the frame does not
- * carry itself. Anything neither has is said to be missing rather than filled
- * in. "Processed" means a mask exists; cover is measured from it, so a frame
- * without one shows no cover chip.
+ * The heading names the cloud and the pin line names the station - never the
+ * other way round, and never one of them twice. Coordinates have a line of
+ * their own, so the pin line uses the bare station name rather than the
+ * collection's "station · lat, lon" label. Anything missing is said to be
+ * missing rather than filled in. "Processed" means a mask exists; cover is
+ * measured from it, so a frame without one shows no cover chip.
  */
 export function FrameCard({
   image,
@@ -26,16 +28,17 @@ export function FrameCard({
   priority = false,
 }: {
   image: ImageRecord;
-  /** The frame's capture sequence, for station, place and coordinates. */
-  site?: Pick<CollectionSummary, "locationName" | "location" | "coordinates">;
+  /** The frame's capture sequence, for its cloud type, station and coordinates. */
+  site?: Pick<CollectionSummary, "title" | "locationName" | "coordinates">;
   priority?: boolean;
 }) {
   const station = site?.locationName ?? undefined;
-  const place = image.location ?? site?.location ?? undefined;
   const coordinates = image.coordinates ?? site?.coordinates ?? undefined;
   const captured = image.capturedAt ? new Date(image.capturedAt) : undefined;
-  const name = station ?? place;
-  const heading = name ? (captured ? `${name} — ${TIME.format(captured)} UTC` : name) : frameLabel(image);
+  // An unnamed sequence's public title falls back to its station; repeating
+  // that as the heading would print the station twice.
+  const cloud = site?.title && site.title !== station ? site.title : undefined;
+  const heading = cloud ?? frameLabel(image);
   const cover = image.cloudFraction != null ? Math.round(image.cloudFraction * 100) : undefined;
   const prediction = image.predictions?.[0];
   const top = prediction?.classes[0];
@@ -67,9 +70,14 @@ export function FrameCard({
         </div>
         <div className="flex flex-1 flex-col gap-1.5 p-3 sm:p-4">
           <h2 className="text-sm font-bold leading-snug text-ink sm:text-[.95rem]">{heading}</h2>
-          <p className={`flex items-center gap-1.5 font-mono text-[.7rem] sm:text-xs ${place ? "text-muted" : "text-muted-soft"}`}>
+          {cloud ? (
+            <p className="-mt-1 font-mono text-[.62rem] uppercase tracking-wider text-muted-dim sm:text-[.66rem]">
+              {frameLabel(image)}
+            </p>
+          ) : null}
+          <p className={`flex items-center gap-1.5 font-mono text-[.7rem] sm:text-xs ${station ? "text-muted" : "text-muted-soft"}`}>
             <MapPin size={13} className="shrink-0 text-rose-600" aria-hidden />
-            {place ?? "Place not recorded"}
+            {station ?? "Station not recorded"}
           </p>
           <p className={`font-mono text-[.66rem] sm:text-[.7rem] ${coordinates ? "text-muted" : "text-muted-soft"}`}>
             {coordinates ? coordinateLabel(coordinates) : "Coordinates not recorded"}

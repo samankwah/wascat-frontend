@@ -36,9 +36,8 @@ export default async function AdminCollections() {
 
       {missing > 0 ? (
         <p className="border border-line bg-sky-pale px-4 py-3 text-sm leading-6 text-sky-dark">
-          {missing} of {collections.length} sequences are missing a site or a licence. Until
-          they have one, the archive shows them as capture sequences rather than places, and
-          offers no citation.
+          {missing} of {collections.length} sequences are missing a station or a licence. Until
+          they have one, their cards show no station, and the archive offers no citation.
         </p>
       ) : null}
 
@@ -54,7 +53,8 @@ export default async function AdminCollections() {
             <thead>
               <tr>
                 <Th>Sequence</Th>
-                <Th>Site</Th>
+                <Th>Name</Th>
+                <Th>Station</Th>
                 <Th align="right">Frames</Th>
                 <Th align="right">Segmented</Th>
                 <Th>Licence</Th>
@@ -72,6 +72,9 @@ export default async function AdminCollections() {
                     >
                       {collection.slug}
                     </Link>
+                  </Td>
+                  <Td>
+                    {collection.title || <span className="text-muted-dim">Not named</span>}
                   </Td>
                   <Td>
                     {collection.locationName ?? (
