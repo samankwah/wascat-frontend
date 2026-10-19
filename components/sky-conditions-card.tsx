@@ -10,7 +10,8 @@ import { groundStation } from "@/lib/ground-views";
  *
  * Not a whole-card link, unlike the archive's cards: the photographs swipe,
  * and a link under them would turn every drag into a page change. The title
- * and the button are the two ways through, and they go to the same place.
+ * and the button go to /conditions; each photograph goes there opened on
+ * itself.
  */
 export function SkyConditionsCard({ conditions }: { conditions: StationConditions }) {
   const { readings } = stationReadings(conditions);
@@ -32,7 +33,7 @@ export function SkyConditionsCard({ conditions }: { conditions: StationCondition
           <dl className="mt-8 border-t border-line">
             {readings.map(({ label, value }) => (
               <div key={label} className="flex items-baseline justify-between gap-6 border-b border-line py-3">
-                <dt className="text-sm text-muted">{label}</dt>
+                <dt className="shrink-0 text-sm text-muted">{label}</dt>
                 <dd className="text-right text-sm font-bold text-ink">{value}</dd>
               </div>
             ))}
@@ -48,7 +49,7 @@ export function SkyConditionsCard({ conditions }: { conditions: StationCondition
         </Link>
       </div>
 
-      <GroundViewCarousel views={conditions.views} place={groundStation.name} variant="card" />
+      <GroundViewCarousel views={conditions.views} place={groundStation.name} variant="card" linkTo="/conditions" />
     </article>
   );
 }

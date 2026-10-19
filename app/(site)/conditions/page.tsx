@@ -28,11 +28,11 @@ const coordinateLabel = ({ latitude, longitude }: { latitude: number; longitude:
  * without a column of "Not recorded" rows, and a missing report never reads
  * as a clear day.
  */
-export default async function ConditionsPage() {
+export default async function ConditionsPage({ searchParams }: { searchParams: Promise<{ photo?: string }> }) {
   // Request time, like every catalogue page, so the build needs no database.
   await connection();
 
-  const conditions = await getStationConditions();
+  const [conditions, { photo }] = await Promise.all([getStationConditions(), searchParams]);
   const { views, frame } = conditions;
   const { readings, missing } = stationReadings(conditions);
 
@@ -52,7 +52,7 @@ export default async function ConditionsPage() {
       </header>
 
       <div className="container-shell mt-10">
-        <GroundViewCarousel views={views} place={groundStation.name} variant="page" eager />
+        <GroundViewCarousel views={views} place={groundStation.name} variant="page" eager initialPhoto={photo ? Number(photo) : undefined} />
       </div>
 
       <section
@@ -65,7 +65,7 @@ export default async function ConditionsPage() {
             <dl className="mt-5 border-t border-line">
               {readings.map(({ label, detail }) => (
                 <div key={label} className="flex items-baseline justify-between gap-6 border-b border-line py-3.5">
-                  <dt className="text-sm text-muted">{label}</dt>
+                  <dt className="shrink-0 text-sm text-muted">{label}</dt>
                   <dd className="text-right text-sm font-bold text-ink">{detail}</dd>
                 </div>
               ))}
@@ -87,8 +87,13 @@ export default async function ConditionsPage() {
               </Link>
               <div>
                 <p className="leading-7 text-muted">
-                  The fisheye camera looks straight up, so it measures cloud rather than visibility. Its newest frame from this station supplies the cloud readings.
+                  The fisheye camera looks straight up, so it measures cloud rather than visibility. Its newest frame from this station supplies the cloud cover readings.
                 </p>
+                {frame.skyClass ? (
+                  <p className="mt-3 text-sm text-muted">
+                    Classified as <span className="font-bold text-ink">{frame.skyClass}</span>
+                  </p>
+                ) : null}
                 <p className="mt-3 font-mono text-xs text-muted">
                   Sequence {sequenceLabel(frame.sequenceId)} · frame {frame.frameIndex.toLocaleString()}
                   {frame.capturedAt ? ` · ${formatDate(frame.capturedAt, true)}` : ""}

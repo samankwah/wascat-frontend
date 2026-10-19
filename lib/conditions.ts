@@ -43,18 +43,32 @@ export type Reading = {
  * report never reads as a clear day; `missing` names them for a page that
  * wants to say so once.
  */
-export function stationReadings({ view, frame, collection }: StationConditions): {
+export function stationReadings({ views, view, frame }: StationConditions): {
   readings: Reading[];
   missing: string[];
 } {
   // The photograph's own report first, then the frame's: both are the station's.
   const visibility = view?.visibilityM ?? frame?.visibilityM ?? undefined;
-  const cloudType = frame?.skyClass ?? collection?.title;
+  // The genera the photographs show, most often seen first. The all-sky
+  // frame's own classification is a different instrument's reading, so the
+  // page shows it beside that frame rather than here.
+  const seen = new Map<string, number>();
+  for (const { clouds } of views) for (const cloud of clouds) seen.set(cloud, (seen.get(cloud) ?? 0) + 1);
+  const genera = [...seen].sort((a, b) => b[1] - a[1]);
   const measured = frame?.cloudCoverOktas ?? undefined;
   const observed = frame?.observedCloudCoverOktas ?? undefined;
 
   const all: [string, Reading | undefined][] = [
-    ["cloud type", cloudType ? { label: "Cloud type", value: cloudType, detail: cloudType } : undefined],
+    [
+      "cloud types",
+      genera.length > 0
+        ? {
+            label: genera.length === 1 ? "Cloud type" : "Cloud types",
+            value: genera.map(([name]) => name).join(", "),
+            detail: genera.map(([name, count]) => `${name} (${count})`).join(", "),
+          }
+        : undefined,
+    ],
     [
       "visibility",
       visibility != null
