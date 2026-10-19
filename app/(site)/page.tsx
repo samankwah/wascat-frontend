@@ -30,7 +30,14 @@ export default async function HomePage() {
     await Promise.all(
       newestSequences.map(async (collection) => {
         const [image] = await getCollectionImages(collection.slug, { sort: "newest", limit: 1 });
-        return image ? { image, cloudType: collection.title, station: collection.locationName ?? undefined } : null;
+        return image
+          ? {
+              image,
+              cloudType: collection.title,
+              station: collection.locationName ?? undefined,
+              stationCoordinates: collection.coordinates ?? undefined,
+            }
+          : null;
       }),
     )
   ).filter((entry) => entry !== null);
@@ -161,8 +168,8 @@ export default async function HomePage() {
             <Link href="/explore" className="inline-flex items-center gap-2 self-start rounded-lg px-4 py-2.5 text-sm font-bold text-sky ring-1 ring-line-strong transition-colors hover:bg-sky-pale md:self-auto">Browse all frames <ArrowRight size={16} aria-hidden /></Link>
           </div>
           <div className="mt-12 grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-4">
-            {latest.map(({ image, cloudType, station }, index) => (
-              <LatestFrameCard image={image} cloudType={cloudType} station={station} priority={index === 0} key={image.id} />
+            {latest.map(({ image, cloudType, station, stationCoordinates }, index) => (
+              <LatestFrameCard image={image} cloudType={cloudType} station={station} stationCoordinates={stationCoordinates} priority={index === 0} key={image.id} />
             ))}
           </div>
         </div>
