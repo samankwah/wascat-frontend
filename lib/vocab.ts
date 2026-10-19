@@ -51,3 +51,29 @@ export const oktaTerm = (okta: number) => oktaTerms[okta] ?? "";
 
 export const oktasFromFraction = (fraction: number) =>
   Math.min(8, Math.max(0, Math.round(fraction * 8)));
+
+/**
+ * Horizontal visibility, as a station reports it: metres in, a reading out.
+ *
+ * 9999 is METAR's own code for "10 km or more", not a distance of 9.999 km,
+ * so it is read as that. Below a kilometre a report is in metres and is shown
+ * in metres; above, in kilometres.
+ */
+export const visibilityLabel = (metres: number) => {
+  if (metres === 9999) return "10 km or more";
+  if (metres < 1000) return `${metres.toLocaleString("en-GB")} m`;
+  const km = metres / 1000;
+  return `${Number.isInteger(km) ? km : km.toFixed(1)} km`;
+};
+
+/**
+ * The Met Office's visibility terms. Like the okta bands, the boundaries are
+ * what the words mean rather than a presentation choice.
+ */
+export const visibilityTerm = (metres: number) => {
+  if (metres < 1000) return "Very poor";
+  if (metres < 4000) return "Poor";
+  if (metres < 9999) return "Moderate";
+  if (metres < 40000) return "Good";
+  return "Very good";
+};

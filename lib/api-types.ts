@@ -1025,6 +1025,11 @@ export interface components {
             /** Observedcloudcoveroktas */
             observedCloudCoverOktas?: number | null;
             /**
+             * Visibilitym
+             * @description Horizontal visibility the station reported at capture time, in metres. Absent until a report is attached; never estimated.
+             */
+            visibilityM?: number | null;
+            /**
              * Maskscale
              * @description Scale at which the mask was delivered relative to its frame. 1 for a correctly registered sequence; greater where the mask was rendered larger and the viewer must scale it back.
              */
@@ -1086,7 +1091,8 @@ export interface components {
          *     ``observedCloudCoverOktas`` is the one number here, and it is an
          *     observation rather than a measurement: a count a person read off the sky,
          *     correcting or supplying what the label table loaded. It writes to its own
-         *     column and leaves ``cloudCoverOktas`` alone.
+         *     column and leaves ``cloudCoverOktas`` alone. ``visibilityM`` is the same
+         *     kind of value: the station's reported visibility, in metres.
          */
         ImageRecordWrite: {
             /** Capturedat */
@@ -1107,6 +1113,8 @@ export interface components {
             skyClass?: string | null;
             /** Observedcloudcoveroktas */
             observedCloudCoverOktas?: number | null;
+            /** Visibilitym */
+            visibilityM?: number | null;
             /** Conditiontags */
             conditionTags?: string[] | null;
             /** Custom */

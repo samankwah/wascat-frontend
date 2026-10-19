@@ -15,6 +15,17 @@ export const formatDate = (value: string, withTime = false) =>
     ...(withTime ? { hour: "2-digit", minute: "2-digit", timeZone: "UTC", timeZoneName: "short" } : {}),
   }).format(new Date(value));
 
+/** "1 Oct 2026, 08:56" in UTC, for photograph capture times. */
+export const MOMENT = new Intl.DateTimeFormat("en-GB", {
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: false,
+  timeZone: "UTC",
+});
+
 /**
  * The reader-facing name of a capture sequence: "seq-007" -> "07".
  *

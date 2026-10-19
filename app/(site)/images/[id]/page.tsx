@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { connection } from "next/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowDownToLine, Box, Camera, Cloud, Clock3, CloudOff, CloudSun, Eye, ExternalLink, FileJson2, Film, MapPin } from "lucide-react";
+import { ArrowDownToLine, Binoculars, Box, Camera, Cloud, Clock3, CloudOff, CloudSun, Eye, ExternalLink, FileJson2, Film, MapPin } from "lucide-react";
 import { ArtifactViewer } from "@/components/artifact-viewer";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { CopyButton } from "@/components/copy-button";
@@ -10,7 +10,7 @@ import { FrameCard } from "@/components/frame-card";
 import { PredictionPanel } from "@/components/prediction-panel";
 import { getCollection, getCollectionImages, getImage } from "@/lib/api-client";
 import { formatDate, sequenceLabel } from "@/lib/format";
-import { oktaLabel } from "@/lib/vocab";
+import { oktaLabel, visibilityLabel, visibilityTerm } from "@/lib/vocab";
 
 // Detail pages render on demand: there are too many records to pre-render, and
 // `dynamicParams` defaults to true so any valid id is served.
@@ -46,6 +46,7 @@ export default async function ImageDetailPage({ params }: { params: Promise<{ id
       ? [CloudOff, "Cloud cover", "Not measured — this frame has no segmentation mask"]
       : [CloudSun, "Measured cloud cover", `${oktaLabel(record.cloudCoverOktas ?? 0)} · ${(record.cloudFraction * 100).toFixed(1)}% of the field of view`],
     ...(record.observedCloudCoverOktas != null ? [[Eye, "Observed cloud cover", `${oktaLabel(record.observedCloudCoverOktas)} · recorded by an observer`] as [typeof Clock3, string, string]] : []),
+    ...(record.visibilityM != null ? [[Binoculars, "Visibility", `${visibilityLabel(record.visibilityM)} · ${visibilityTerm(record.visibilityM)} · reported by the station`] as [typeof Clock3, string, string]] : []),
     [Box, "Dimensions", `${record.width} × ${record.height} pixels`],
     ...(record.capturedAt ? [[Clock3, "Captured", formatDate(record.capturedAt, true)] as [typeof Clock3, string, string]] : []),
     ...(record.location ? [[MapPin, "Location", record.location] as [typeof Clock3, string, string]] : []),
