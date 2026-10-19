@@ -166,7 +166,7 @@ export default async function ImageDetailPage({ params }: { params: Promise<{ id
               <Link href={`/explore?collection=${record.collection}`} className="shrink-0 text-xs font-bold text-sky">View all →</Link>
             </div>
             <div className="mt-8 grid grid-cols-2 gap-x-3 gap-y-7 sm:grid-cols-3 sm:gap-5">
-              {related.map((item) => <FrameCard key={item.id} image={item} />)}
+              {related.map((item) => <FrameCard key={item.id} image={item} site={collection ?? undefined} />)}
             </div>
           </div>
         </section>

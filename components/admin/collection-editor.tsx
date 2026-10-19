@@ -5,8 +5,10 @@ import { useState, type FormEvent } from "react";
 import { AlertCircle, Check, Loader2 } from "lucide-react";
 import { AdminApiError, adminApi } from "@/lib/admin/api";
 import { Panel, PanelHeader, cx } from "@/components/admin/ui";
+import { cloudTypeNames } from "@/lib/cloud-types";
 
 type Editorial = {
+  title: string;
   locationName: string;
   latitude: number | null;
   longitude: number | null;
@@ -87,32 +89,48 @@ export function CollectionEditor({
     <Panel>
       <PanelHeader
         title="Editorial metadata"
-        description="Where this sequence was captured, and how it should be credited. Not part of a release, so it can be corrected at any time."
+        description="What this sequence is called, where it was captured, and how it should be credited. Not part of a release, so it can be corrected at any time."
       />
 
       <form onSubmit={onSubmit} className="grid gap-5 p-5">
         <fieldset disabled={!editable || pending} className="grid gap-5 border-0 p-0">
           <div className="grid gap-5 sm:grid-cols-2">
+            {/* A list rather than free text: the name is also the collection's
+                cloud type, which keys its badge, its description and the
+                cloud-type filters. A name outside the list would quietly lose
+                all three. */}
             <Field
-              label="Site"
-              hint="Shown as the collection's title once set"
+              label="Name"
+              hint="The cloud type, shown as the heading of every card"
+              error={fieldError("title")}
+            >
+              <select
+                value={values.title}
+                onChange={(event) => set("title", event.target.value)}
+                className="field-input"
+              >
+                {values.title === "" ? <option value="">Not named yet</option> : null}
+                {values.title !== "" && !cloudTypeNames.includes(values.title) ? (
+                  <option value={values.title}>{values.title}</option>
+                ) : null}
+                {cloudTypeNames.map((name) => (
+                  <option key={name} value={name}>
+                    {name}
+                  </option>
+                ))}
+              </select>
+            </Field>
+
+            <Field
+              label="Station"
+              hint="Where the sequence was captured, shown under every card's heading"
               error={fieldError("locationName")}
             >
               <input
                 type="text"
                 value={values.locationName}
                 onChange={(event) => set("locationName", event.target.value)}
-                placeholder="Kumasi"
-                className="field-input"
-              />
-            </Field>
-
-            <Field label="Instrument" error={fieldError("instrument")}>
-              <input
-                type="text"
-                value={values.instrument}
-                onChange={(event) => set("instrument", event.target.value)}
-                placeholder="All-sky camera"
+                placeholder="Kumasi Synoptic Station"
                 className="field-input"
               />
             </Field>
@@ -145,6 +163,16 @@ export function CollectionEditor({
               />
             </Field>
           </div>
+
+          <Field label="Instrument" error={fieldError("instrument")}>
+            <input
+              type="text"
+              value={values.instrument}
+              onChange={(event) => set("instrument", event.target.value)}
+              placeholder="All-sky camera"
+              className="field-input"
+            />
+          </Field>
 
           <Field
             label="Licence"

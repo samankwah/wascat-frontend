@@ -44,10 +44,13 @@ export default async function AdminCollectionDetail({
         <div className="mt-3 flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="display text-3xl leading-tight">
-              {collection.locationName ??
+              {collection.title ||
                 `Capture sequence ${collection.sequenceIds.map(sequenceLabel).join(", ")}`}
             </h1>
-            <p className="mt-1 font-mono text-sm text-muted">{collection.slug}</p>
+            <p className="mt-1 font-mono text-sm text-muted">
+              {collection.locationName ? `${collection.locationName} · ` : ""}
+              {collection.slug}
+            </p>
           </div>
           <Link
             href={`/collections/${collection.slug}`}
@@ -65,6 +68,7 @@ export default async function AdminCollectionDetail({
             slug={collection.slug}
             editable={can(user, PERMISSIONS.catalogWrite)}
             initial={{
+              title: collection.title ?? "",
               locationName: collection.locationName ?? "",
               latitude: collection.coordinates?.latitude ?? null,
               longitude: collection.coordinates?.longitude ?? null,
