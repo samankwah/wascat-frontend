@@ -148,6 +148,7 @@ export default async function AdminImageDetail({
               timeOfDay: record.timeOfDay ?? "",
               skyClass: record.skyClass ?? "",
               observedCloudCoverOktas: record.observedCloudCoverOktas ?? null,
+              visibilityM: record.visibilityM ?? null,
               conditionTags: record.conditionTags ?? [],
             }}
             seasons={facets.seasons.map((entry) => String(entry.value))}
