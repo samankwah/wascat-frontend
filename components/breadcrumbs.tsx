@@ -17,12 +17,13 @@ export type Crumb = { label: string; href?: string; mono?: boolean };
  * The row scrolls horizontally rather than wrapping, so a long trail (or a
  * long mono record id as the last crumb) never breaks onto a second line.
  *
- * Mobile/tablet only: desktop already has the full header nav for
- * wayfinding, so this is hidden at `lg` and up.
+ * Mobile/tablet only by default: desktop already has the full header nav
+ * for wayfinding, so this is hidden at `lg` and up. `everywhere` keeps it on
+ * desktop too, for pages the header nav has no entry for.
  */
-export function Breadcrumbs({ trail }: { trail: Crumb[] }) {
+export function Breadcrumbs({ trail, everywhere = false }: { trail: Crumb[]; everywhere?: boolean }) {
   return (
-    <nav aria-label="Breadcrumb" className="border-b border-line bg-paper lg:hidden">
+    <nav aria-label="Breadcrumb" className={`border-b border-line bg-paper ${everywhere ? "" : "lg:hidden"}`}>
       <div className="container-shell overflow-x-auto whitespace-nowrap py-3">
         <ol className="inline-flex items-center gap-1.5 text-xs font-bold">
           {trail.map((crumb, index) => {
