@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { AdminNav } from "@/components/admin/nav";
 import { ScrollToTop } from "@/components/scroll-to-top";
-import { getSession } from "@/lib/admin/session";
+import { listDataRequests } from "@/lib/admin/data";
+import { PERMISSIONS, can, getSession } from "@/lib/admin/session";
 
 export const metadata: Metadata = {
   title: { default: "Dashboard", template: "%s · WASCAT dashboard" },
@@ -21,13 +22,18 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   // whose only job is to not show navigation.
   if (!user) return <>{children}</>;
 
+  // A failed count must not take the dashboard down with it.
+  const pending = can(user, PERMISSIONS.requestReview)
+    ? await listDataRequests("PENDING").then((result) => result.pending).catch(() => 0)
+    : 0;
+
   return (
     <div className="min-h-screen bg-paper">
       {/* `items-start` keeps the sidebar from being stretched to the height of
           the content: a stretched flex child has no room to move, which is
           what stops `position: sticky` from doing anything. */}
       <div className="mx-auto flex w-full max-w-[110rem] flex-col items-start lg:flex-row">
-        <AdminNav user={user} />
+        <AdminNav user={user} counts={{ "/admin/requests": pending }} />
         <div className="w-full min-w-0 flex-1 px-5 py-7 sm:px-7 lg:px-9 lg:py-9">{children}</div>
       </div>
       <ScrollToTop />

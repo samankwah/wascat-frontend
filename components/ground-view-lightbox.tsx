@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useRef, type KeyboardEvent, type PointerEvent } from "react";
-import { ChevronLeft, ChevronRight, ExternalLink, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { cloudTypeInfo } from "@/lib/cloud-types";
 import { MOMENT } from "@/lib/format";
 import type { GroundView } from "@/lib/ground-views";
@@ -189,18 +189,7 @@ export function GroundViewLightbox({
             ))}
           </dl>
 
-          <div className="mt-6 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 md:mt-auto md:pt-6">
-            <p className="text-xs text-muted">Cloud types identified from the photograph.</p>
-            <a
-              href={view.src}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-sm font-bold text-sky hover:underline"
-            >
-              Open original
-              <ExternalLink size={14} aria-hidden="true" />
-            </a>
-          </div>
+          <p className="mt-6 text-xs text-muted md:mt-auto md:pt-6">Cloud types identified from the photograph.</p>
         </aside>
       </div>
     </dialog>

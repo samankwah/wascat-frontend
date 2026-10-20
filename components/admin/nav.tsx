@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   ClipboardList,
   Images,
+  Inbox,
   Layers3,
   LayoutDashboard,
   LogOut,
@@ -52,6 +53,12 @@ const GROUPS: { heading: string | null; items: Item[] }[] = [
     ],
   },
   {
+    heading: "Requests",
+    items: [
+      { href: "/admin/requests", label: "Data requests", icon: Inbox, permission: "request:review" },
+    ],
+  },
+  {
     heading: "Governance",
     items: [
       { href: "/admin/audit", label: "Audit log", icon: ClipboardList, permission: "audit:read" },
@@ -60,7 +67,11 @@ const GROUPS: { heading: string | null; items: Item[] }[] = [
   },
 ];
 
-export function AdminNav({ user }: { user: AdminUser }) {
+/**
+ * `counts` puts a number beside an entry - waiting data requests - so work
+ * that needs someone is visible from anywhere in the dashboard.
+ */
+export function AdminNav({ user, counts = {} }: { user: AdminUser; counts?: Record<string, number> }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -181,6 +192,12 @@ export function AdminNav({ user }: { user: AdminUser }) {
                         className={active ? "text-sky" : "text-muted-dim"}
                       />
                       {item.label}
+                      {counts[item.href] ? (
+                        <span className="tabular ml-auto rounded-full bg-sky px-2 py-0.5 text-[.68rem] font-bold text-white">
+                          {counts[item.href]}
+                          <span className="sr-only"> waiting</span>
+                        </span>
+                      ) : null}
                     </Link>
                   </li>
                 );

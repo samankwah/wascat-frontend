@@ -193,3 +193,38 @@ export async function listUsers(): Promise<{ users: ManagedUser[]; roles: Manage
     roles: (body.meta.roles as ManagedRole[] | undefined) ?? [],
   };
 }
+
+export type DataRequestStatus = "PENDING" | "APPROVED" | "DECLINED";
+
+/** A data request as the dashboard sees it. The access token is never sent. */
+export type DataRequest = {
+  id: string;
+  reference: string;
+  status: DataRequestStatus;
+  name: string;
+  email: string;
+  organisation: string;
+  purpose: string;
+  collections: string[];
+  createdAt: string;
+  reviewedAt: string | null;
+  reviewedBy: string | null;
+  decisionNote: string | null;
+  accessExpiresAt: string | null;
+  adminsNotifiedAt: string | null;
+  requesterNotifiedAt: string | null;
+  lastMailError: string | null;
+};
+
+export async function listDataRequests(
+  status?: DataRequestStatus,
+): Promise<{ requests: DataRequest[]; pending: number }> {
+  const body = await adminFetch<DataRequest[]>(`/admin/data-requests${status ? `?status=${status}` : ""}`);
+  if (!body) return { requests: [], pending: 0 };
+  return { requests: body.data, pending: Number(body.meta.pending ?? 0) };
+}
+
+export async function getDataRequest(id: string): Promise<DataRequest | null> {
+  const body = await adminFetch<DataRequest>(`/admin/data-requests/${encodeURIComponent(id)}`);
+  return body?.data ?? null;
+}

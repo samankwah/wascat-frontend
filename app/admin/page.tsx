@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { ArrowRight, ClipboardList, CloudOff, Images, Layers3, MapPinOff } from "lucide-react";
+import { ArrowRight, ClipboardList, CloudOff, Images, Inbox, Layers3, MapPinOff } from "lucide-react";
 import { Badge, EmptyState, Fact, Facts, Panel, PanelHeader } from "@/components/admin/ui";
-import { listAudit, listCollections } from "@/lib/admin/data";
+import { listAudit, listCollections, listDataRequests } from "@/lib/admin/data";
 import { PERMISSIONS, can, requireSession } from "@/lib/admin/session";
 import { getArchiveStats } from "@/lib/api-client";
 
@@ -14,10 +14,13 @@ export default async function AdminOverview({
 }) {
   const [user, { denied }] = await Promise.all([requireSession("/admin"), searchParams]);
 
-  const [stats, collections, recent] = await Promise.all([
+  const [stats, collections, recent, waiting] = await Promise.all([
     getArchiveStats(),
     can(user, PERMISSIONS.catalogRead) ? listCollections() : Promise.resolve([]),
     can(user, PERMISSIONS.auditRead) ? listAudit({ limit: 6 }) : Promise.resolve([]),
+    can(user, PERMISSIONS.requestReview)
+      ? listDataRequests("PENDING").then((result) => result.pending).catch(() => 0)
+      : Promise.resolve(0),
   ]);
 
   // The point of the dashboard, stated as a number: how much of the archive
@@ -47,6 +50,25 @@ export default async function AdminOverview({
           That page needs the <code className="font-mono">{denied}</code> permission, which
           your account does not have.
         </p>
+      ) : null}
+
+      {/* Work that waits on a person comes before the archive's numbers. */}
+      {waiting > 0 ? (
+        <Link
+          href="/admin/requests"
+          className="group flex flex-wrap items-center justify-between gap-3 border border-sky/30 bg-sky-pale px-5 py-4 transition-colors hover:border-sky"
+        >
+          <span className="flex items-center gap-3">
+            <Inbox size={18} className="text-sky" aria-hidden="true" />
+            <span className="text-sm font-bold text-sky-dark">
+              {waiting === 1 ? "1 data request is" : `${waiting} data requests are`} waiting for review
+            </span>
+          </span>
+          <span className="inline-flex items-center gap-1.5 text-sm font-bold text-sky">
+            Review
+            <ArrowRight size={15} aria-hidden="true" className="transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none" />
+          </span>
+        </Link>
       ) : null}
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

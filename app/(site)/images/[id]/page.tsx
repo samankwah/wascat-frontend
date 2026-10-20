@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { connection } from "next/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowDownToLine, Binoculars, Box, Camera, Cloud, Clock3, CloudOff, CloudSun, Eye, ExternalLink, FileJson2, Film, MapPin } from "lucide-react";
+import { ArrowRight, Binoculars, Box, Camera, Cloud, Clock3, CloudOff, CloudSun, Eye, ExternalLink, FileJson2, Film, MapPin } from "lucide-react";
 import { ArtifactViewer } from "@/components/artifact-viewer";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { CopyButton } from "@/components/copy-button";
@@ -99,11 +99,11 @@ export default async function ImageDetailPage({ params }: { params: Promise<{ id
 
       <section className="container-shell grid gap-12 py-14 md:grid-cols-[1.25fr_.75fr] md:py-20">
         <div className="min-w-0">
-          <p className="eyebrow text-sky">AVAILABLE FILES</p>
-          <h2 className="display mt-3 text-4xl">Download artifacts</h2>
+          <p className="eyebrow text-sky">FILES IN THIS RECORD</p>
+          <h2 className="display mt-3 text-4xl">Artifacts</h2>
           <div className="mt-7 border-t border-line-strong">
             {record.artifacts.map((artifact) => (
-              <div key={artifact.type} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-line py-4 sm:grid-cols-[minmax(0,1fr)_110px_160px_auto] sm:gap-5">
+              <div key={artifact.type} className="grid items-center gap-3 border-b border-line py-4 sm:grid-cols-[minmax(0,1fr)_110px_160px] sm:gap-5">
                 <div className="min-w-0">
                   <p className="text-sm font-bold">{artifact.type === "source" ? "Source frame" : "Segmentation mask"}</p>
                   {/* The real stored path, not a synthesised filename. */}
@@ -111,11 +111,18 @@ export default async function ImageDetailPage({ params }: { params: Promise<{ id
                 </div>
                 <span className="hidden text-xs text-muted sm:block">{(artifact.bytes / 1024).toFixed(0)} KB</span>
                 <span className="hidden font-mono text-[.67rem] text-muted sm:block">SHA-256 {artifact.checksum.slice(0, 10)}…</span>
-                <a href={artifact.url} download className="flex h-9 w-9 items-center justify-center rounded-full border border-line-strong hover:border-sky hover:text-sky" aria-label={`Download ${artifact.type}`}>
-                  <ArrowDownToLine size={16} />
-                </a>
               </div>
             ))}
+          </div>
+          {/* Downloads are by request for now: the files go out after a reviewer approves it. */}
+          <div className="mt-6 flex flex-col gap-4 rounded-xl border border-line bg-paper p-5 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-bold">Need these files?</p>
+              <p className="mt-1 text-sm leading-6 text-muted">Data is shared on request. Tell us what it is for and we will send a download link once it is approved.</p>
+            </div>
+            <Link href={`/request-data?collection=${record.collection}`} className="button-primary shrink-0">
+              Request this data <ArrowRight size={16} aria-hidden />
+            </Link>
           </div>
           <div className="mt-8">
             <p className="eyebrow text-muted">

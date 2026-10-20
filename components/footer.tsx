@@ -13,7 +13,7 @@ export function Footer() {
         <div>
           <p className="eyebrow text-line-strong">Archive</p>
           <div className="mt-4 grid gap-2 text-sm">
-            <Link href="/explore">Explore images</Link><Link href="/collections">Collections</Link><Link href="/methods">Methods</Link><Link href="/api-docs">API documentation</Link>
+            <Link href="/explore">Explore images</Link><Link href="/collections">Collections</Link><Link href="/methods">Methods</Link><Link href="/api-docs">API documentation</Link><Link href="/request-data">Request data</Link>
           </div>
         </div>
         <div>

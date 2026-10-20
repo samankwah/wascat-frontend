@@ -3,7 +3,7 @@ import { connection } from "next/server";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowDownToLine, ArrowRight, Camera, Cloud, CloudSun, ExternalLink, Film, MapPin, ShieldCheck } from "lucide-react";
+import { ArrowRight, Camera, Cloud, CloudSun, ExternalLink, Film, MapPin, Send, ShieldCheck } from "lucide-react";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { CloudLevelBadge } from "@/components/collection-card";
 import { CopyButton } from "@/components/copy-button";
@@ -45,7 +45,6 @@ export default async function CollectionPage({ params }: { params: Promise<{ slu
   // Show what the sequence actually holds: mostly segmented frames, plus one
   // of the sampled unsegmented ones where there are any.
   const samples = [...segmentedSample, ...unsegmentedSample].slice(0, 4);
-  const metadataUrl = `/api/v1/images?collection=${collection.slug}&release=${current?.version ?? ""}&limit=100`;
   const citationValue = collection.citation
     ? collection.doi ? `${collection.citation} https://doi.org/${collection.doi}` : collection.citation
     : undefined;
@@ -89,7 +88,8 @@ export default async function CollectionPage({ params }: { params: Promise<{ slu
             ) : null}
             <p className="mt-6 max-w-2xl text-lg leading-8 text-muted">{collection.description}</p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <a href={metadataUrl} download className="button-primary"><ArrowDownToLine size={17} /> Download metadata JSON</a>
+              {/* Downloads are by request for now: the data goes out after a reviewer approves it. */}
+              <Link href={`/request-data?collection=${collection.slug}`} className="button-primary"><Send size={16} aria-hidden /> Request this collection</Link>
               <Link
                 href={`/explore?${new URLSearchParams(
                   collection.skyClass ? { collection: collection.slug, skyClass: collection.skyClass } : { collection: collection.slug },
@@ -194,7 +194,7 @@ export default async function CollectionPage({ params }: { params: Promise<{ slu
             <table className="w-full min-w-[650px] border-collapse text-left text-sm">
               <thead>
                 <tr className="border-b border-line-strong text-[.7rem] uppercase tracking-[.1em] text-muted">
-                  <th className="py-3">Version</th><th>Published</th><th>Frames</th><th>Size</th><th></th>
+                  <th className="py-3">Version</th><th>Published</th><th>Frames</th><th>Size</th>
                 </tr>
               </thead>
               <tbody>
@@ -204,7 +204,6 @@ export default async function CollectionPage({ params }: { params: Promise<{ slu
                     <td>{release.publishedAt ? formatDate(release.publishedAt) : "—"}</td>
                     <td>{release.images.toLocaleString()}</td>
                     <td>{release.size}</td>
-                    <td className="text-right"><a href={metadataUrl} download className="text-xs font-bold text-sky">Metadata</a></td>
                   </tr>
                 ))}
               </tbody>
