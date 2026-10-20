@@ -11,6 +11,7 @@ const links = [
   ["Collections", "/collections"],
   ["Methods", "/methods"],
   ["API", "/api-docs"],
+  ["Request data", "/request-data"],
   ["About", "/about"],
 ] as const;
 
@@ -131,7 +132,7 @@ export function Header() {
           role="dialog"
           aria-modal="true"
           aria-label="Mobile navigation"
-          className={`absolute inset-y-0 right-0 flex w-[min(88vw,370px)] flex-col bg-white shadow-[-18px_0_50px_rgba(7,27,39,.24)] transition-transform duration-300 ease-out ${open ? "translate-x-0" : "translate-x-full"}`}
+          className={`absolute inset-y-0 right-0 flex w-[min(88vw,370px)] flex-col bg-white transition-[transform,box-shadow] duration-300 ease-out ${open ? "translate-x-0 shadow-[-18px_0_50px_rgba(7,27,39,.24)]" : "translate-x-full shadow-none"}`}
         >
           <div className="flex h-[76px] items-center justify-between border-b border-line px-5">
             <span className="eyebrow text-sky">NAVIGATION</span>

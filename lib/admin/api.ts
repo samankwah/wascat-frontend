@@ -192,7 +192,24 @@ export const adminApi = {
     request<ManagedUserWithSecret>(`/admin/users/${encodeURIComponent(id)}/password`, {
       method: "POST",
     }),
+
+  // -- Data requests ---------------------------------------------------------
+  approveDataRequest: (id: string, note?: string, accessDays?: number) =>
+    request<DecidedRequest>(`/admin/data-requests/${encodeURIComponent(id)}/approve`, {
+      method: "POST",
+      body: { ...(note ? { note } : {}), ...(accessDays ? { accessDays } : {}) },
+    }),
+  declineDataRequest: (id: string, note: string) =>
+    request<DecidedRequest>(`/admin/data-requests/${encodeURIComponent(id)}/decline`, {
+      method: "POST",
+      body: { note },
+    }),
+  resendDataRequest: (id: string) =>
+    request<DecidedRequest>(`/admin/data-requests/${encodeURIComponent(id)}/resend`, { method: "POST" }),
 };
+
+/** What a decision returns: enough to say truthfully whether the email went. */
+export type DecidedRequest = { status: string; email: string; lastMailError: string | null };
 
 /** An account, plus the one-time password that will never be readable again. */
 export type ManagedUserWithSecret = {

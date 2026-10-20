@@ -7,6 +7,7 @@ const sections = [
   ["endpoints", "Endpoints"],
   ["filters", "Filters"],
   ["envelope", "Response envelope"],
+  ["bulk-data", "Files & bulk data"],
   ["limits", "Limits & caching"],
 ] as const;
 

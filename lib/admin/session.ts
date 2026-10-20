@@ -91,4 +91,5 @@ export const PERMISSIONS = {
   ingestRun: "ingest:run",
   userManage: "user:manage",
   auditRead: "audit:read",
+  requestReview: "request:review",
 } as const;

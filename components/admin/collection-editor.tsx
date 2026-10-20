@@ -176,7 +176,7 @@ export function CollectionEditor({
 
           <Field
             label="Licence"
-            hint="Shown on the public page and in the download panel"
+            hint="Shown on the public page and with the data sent to approved requesters"
             error={fieldError("license")}
           >
             <input
@@ -197,7 +197,7 @@ export function CollectionEditor({
               value={values.citation}
               onChange={(event) => set("citation", event.target.value)}
               rows={3}
-              className="field-input h-auto py-2.5"
+              className="field-input"
             />
           </Field>
 

@@ -259,6 +259,17 @@ textarea {
     box-shadow 0.15s ease;
 }
 
+/* A text area grows with what is written in it. This sits outside Tailwind's
+   layers, like .field-input itself, so utility classes such as h-auto cannot
+   override the fixed input height - which is why it is set here. */
+textarea.field-input {
+  height: auto;
+  min-height: 7rem;
+  padding: 0.65rem 0.85rem;
+  line-height: 1.55;
+  resize: vertical;
+}
+
 .field-input:hover,
 .field-select:hover {
   border-color: var(--color-line-strong);
